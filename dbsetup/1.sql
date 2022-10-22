@@ -10,9 +10,9 @@ use letswatch;
 DROP TABLE IF EXISTS Friendships;
 DROP TABLE IF EXISTS User_Group_Memberships;
 DROP TABLE IF EXISTS User_List_Memberships;
-DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS User_Groups;
 DROP TABLE IF EXISTS Watch_Lists;
+DROP TABLE IF EXISTS User_Groups;
+DROP TABLE IF EXISTS Users;
 
 
 
@@ -20,10 +20,11 @@ DROP TABLE IF EXISTS Watch_Lists;
 CREATE TABLE Users(
     id BIGINT NOT NULL AUTO_INCREMENT,
     Username varchar(255),
-    Password varchar(255),
+    User_Password varchar(255),
     ProfileImageID int,
     Bio varchar(100),
     Access_Token varchar(255),
+    Date_joined DATE,
     PRIMARY KEY (id)
 );
 

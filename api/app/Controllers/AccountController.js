@@ -14,7 +14,6 @@ Accessible through route at /account/signup
 Parameters (passed through ctx)
     username: str
     password: str
-
 */
 async function signup(ctx)
 {
@@ -22,6 +21,7 @@ async function signup(ctx)
     const defaultProfileBio = '';
     const username = ctx.headers.username;
     const password = ctx.headers.password;
+    const joinDate = new Date();
     const accessTokenLen = 32;
 
     const query = `INSERT INTO Users 
