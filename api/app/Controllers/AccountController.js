@@ -27,11 +27,13 @@ async function signup(ctx)
     const query = `INSERT INTO Users 
                     (
                         Username, 
-                        Password, 
+                        User_Password, 
                         ProfileImageID, 
                         BIO,
-                        ACCESS_TOKEN
+                        ACCESS_TOKEN,
+                        Date_joined
                     ) VALUES(
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -50,7 +52,8 @@ async function signup(ctx)
                 password,
                 defaultProfileImage,
                 defaultProfileBio,
-                randomStr(accessTokenLen)
+                randomStr(accessTokenLen),
+                joinDate
             ]
         }, async (err, tuples) => {
             if(err)
@@ -95,7 +98,7 @@ async function getAccessToken(username, password)
 {
     const query = `SELECT * FROM Users 
                         WHERE Username=?
-                        AND Password=?;`
+                        AND User_Password=?;`
     
     return new Promise((res, rej) => {
         const execution = conn.query({
