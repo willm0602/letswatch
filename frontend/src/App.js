@@ -2,19 +2,13 @@ import logo from './logo.svg';
 import './App.css';
 import {get, post} from './APIInterface/Utils';
 import React from "react";
+import { signup } from './APIInterface/AccountManagement';
 
 function App() {
 
   const [test, setTest] = React.useState(undefined);
   React.useEffect(() => {
-    get('/test').then(
-      (res) => {
-        setTest(res);
-      },
-      (rej) => {
-        setTest(rej);
-      }
-    )
+    signup('testuser6211', 'password');
   });
 
   return (

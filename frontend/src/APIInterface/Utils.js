@@ -22,7 +22,9 @@ const axios = AxiosSetup();
 
 export async function get(route, extraData={}, callback=undefined, error=undefined)
 {
-    return axios.get(route, extraData).then(
+    return axios.get(route, undefined, {
+        params: extraData
+    }).then(
         (res) => {
             callback && callback(res.data);
             return res.data;
@@ -53,7 +55,9 @@ export async function get(route, extraData={}, callback=undefined, error=undefin
 */
 export async function post(route, extraData={}, callback=undefined, error=undefined)
 {
-    return axios.post(route, extraData).then(
+    return axios.post(route, undefined, {
+        params: extraData
+    }).then(
         (res) => {
             callback && callback(res.data);
             return res.data;

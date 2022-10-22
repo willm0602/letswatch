@@ -13,7 +13,6 @@ module.exports.randomStr = (strLen) => {
         validChars.charAt(
             Math.floor(Math.random() * validChars.length)    
         );
-        console.log(Math.floor(Math.random() * validChars.length));
     }
     return result;
 }

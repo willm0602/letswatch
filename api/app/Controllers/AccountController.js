@@ -15,12 +15,14 @@ Parameters (passed through ctx)
     username: str
     password: str
 */
-async function signup(ctx)
+async function signup(ctx, next)
 {
+    const params = ctx.request.query;
+    console.log('making new user for', params);
     const defaultProfileImage = 0;
     const defaultProfileBio = '';
-    const username = ctx.headers.username;
-    const password = ctx.headers.password;
+    const username = params.username;
+    const password = params.password;
     const joinDate = new Date();
     const accessTokenLen = 32;
 
@@ -108,7 +110,7 @@ async function getAccessToken(username, password)
                 password,
             ]
         }, (err, tuples) => {
-            if(err)
+            if(err || tuples.length == 0)
                 return undefined;
             return res(tuples[0].Access_Token);
         })
