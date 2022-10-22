@@ -4,12 +4,6 @@
     CREATE DATABASE letswatch;
 */ 
 
-/* Assumes you have created a database called letswatch.
-    Otherwise, go into mysql shell or sql workbench and run the following:
-
-    CREATE DATABASE letswatch;
-*/ 
-
 use letswatch;
 
 -- Drops all tables

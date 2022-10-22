@@ -1,28 +1,28 @@
 
-
+const AllRouters = require('../app/Routers/AllRouters');
 const Authorize = require('../app/Middleware/Authorize.js');
 const VerifyJWT = require('../app/Middleware/VerifyJWT.js');
 
-/*
-|--------------------------------------------------------------------------
-| Default router
-|--------------------------------------------------------------------------
-|
-| Default router is used to define any routes that don't belong to a
-| controller. Also used as a parent container for the other routers.
-|
-*/
-const router = require('koa-router')({
+const KoaRouter = require('koa-router');
+
+
+const testRouter = require('koa-router')({
     prefix: '/api'
 });
 
-router.get('/', function (ctx) {
+testRouter.get('/', function (ctx) {
     console.log('router.get(/)');
     return ctx.body = 'test';
 });
 
 
 module.exports = function (app) {
-    app.use(router.routes());
-    app.use(router.allowedMethods());
+    app.use(testRouter.routes());
+    app.use(testRouter.allowedMethods());
+
+    for(const router of AllRouters)
+    {
+        app.use(router.routes());
+        app.use(router.allowedMethods());
+    }
 };
