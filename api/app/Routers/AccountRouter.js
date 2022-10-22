@@ -17,5 +17,6 @@ const AccountRouter = KoaRouter({
 
 AccountRouter.get('/test', AccountController.test);
 AccountRouter.post('/signup', AccountController.signup)
+AccountRouter.get('/login', AccountController.login)
 
 module.exports = AccountRouter;

@@ -75,6 +75,35 @@ async function signup(ctx, next)
     })
 }
 
+
+/**
+ * DB call to let users sign in 
+ * 
+ * Accessible through route at /account/login
+ * 
+ * Parameters (passed through ctx)
+    username: str
+    password: str
+
+    Returns an access token
+*/
+async function login(ctx)
+{
+    const {username, password} = ctx.request.query;
+    const accessToken = await getAccessToken(username, password);
+    return new Promise((res, rej) => {
+        if(accessToken !== undefined)
+        {
+            ctx.body = apiResponse(true, accessToken);
+            return res('Succesfully logged in');
+        }
+        ctx.body = apiResponse(false, {});
+        return rej('Failed to sign in');
+    })
+
+}
+
+
 async function usernameTaken(username)
 {
     console.log('checking if username has been taken')
@@ -121,5 +150,6 @@ async function getAccessToken(username, password)
 module.exports = {
     test,
     getAccessToken,
-    signup
+    signup,
+    login
 }
