@@ -1,5 +1,5 @@
 import { setAccessToken } from "../LocalStorageInterface";
-import { post } from "./Utils";
+import { get, post } from "./Utils";
 
 export function signup(username, password)
 {
@@ -13,7 +13,23 @@ export function signup(username, password)
         }  
     },
         (rej) => {
-            window.alert(rej.msg);
+            console.error(rej);
         }
     )
+}
+
+export function login(username, password)
+{
+    get('/account/login', {
+        username,
+        password
+    }, (res) => {
+        if(res.status === 'PASS')
+        {
+            setAccessToken(res.data);
+        }
+    }, (rej) => {
+        //window.alert(rej);
+        console.error(rej);
+    })
 }

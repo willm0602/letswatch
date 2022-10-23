@@ -2,13 +2,13 @@ import logo from './logo.svg';
 import './App.css';
 import {get, post} from './APIInterface/Utils';
 import React from "react";
-import { signup } from './APIInterface/AccountManagement';
+import { login, signup } from './APIInterface/AccountManagement';
 
 function App() {
 
   const [test, setTest] = React.useState(undefined);
   React.useEffect(() => {
-    signup('testuser6211', 'password');
+    login('testuser62', 'password');
   });
 
   return (

@@ -22,7 +22,8 @@ const axios = AxiosSetup();
 
 export async function get(route, extraData={}, callback=undefined, error=undefined)
 {
-    return axios.get(route, undefined, {
+    console.log(route, extraData);  
+    return axios.get(route, {
         params: extraData
     }).then(
         (res) => {

@@ -18,7 +18,6 @@ Parameters (passed through ctx)
 async function signup(ctx, next)
 {
     const params = ctx.request.query;
-    console.log('making new user for', params);
     const defaultProfileImage = 0;
     const defaultProfileBio = '';
     const username = params.username;
@@ -87,10 +86,15 @@ async function signup(ctx, next)
 
     Returns an access token
 */
-async function login(ctx)
+async function login(ctx, next)
 {
-    const {username, password} = ctx.request.query;
+    const queryParams = ctx.request.query;
+    const username = queryParams.username;
+    const password = queryParams.password;
+    console.log(username, password, '\n\n');
+
     const accessToken = await getAccessToken(username, password);
+    console.log(`accessToken is`, accessToken);
     return new Promise((res, rej) => {
         if(accessToken !== undefined)
         {
@@ -132,6 +136,7 @@ async function getAccessToken(username, password)
                         AND User_Password=?;`
     
     return new Promise((res, rej) => {
+        console.log('getting access token from database');
         const execution = conn.query({
             sql: query,
             values: [
@@ -139,8 +144,11 @@ async function getAccessToken(username, password)
                 password,
             ]
         }, (err, tuples) => {
-            if(err || tuples.length == 0)
-                return undefined;
+            console.log('got access tokens from database', tuples, err);
+            if(err)
+                return rej(undefined);
+            if(tuples.length === 0)
+                return res(undefined);
             return res(tuples[0].Access_Token);
         })
     })
