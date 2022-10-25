@@ -10,6 +10,7 @@ use letswatch;
 DROP TABLE IF EXISTS Friendships;
 DROP TABLE IF EXISTS User_Group_Memberships;
 DROP TABLE IF EXISTS User_List_Memberships;
+DROP TABLE IF EXISTS Watch_List_Items;
 DROP TABLE IF EXISTS Watch_Lists;
 DROP TABLE IF EXISTS User_Groups;
 DROP TABLE IF EXISTS Users;
@@ -49,6 +50,14 @@ CREATE TABLE Watch_Lists(
     PRIMARY KEY (id),
     group_id BIGINT NOT NULL,
     FOREIGN KEY (group_id) references User_Groups(id)
+);
+
+CREATE TABLE Watch_List_Items(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    watchlist_id BIGINT NOT NULL,
+    media_id BIGINT NOT NULL,
+    FOREIGN KEY (watchlist_id) references Watch_Lists(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE User_List_Memberships(
