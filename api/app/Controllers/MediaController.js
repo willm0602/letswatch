@@ -42,7 +42,12 @@ async function mediaSearch(ctx)
 
 async function saveMediaToDB(media)
 {
-
+    const query = `INSERT INTO media(
+                        title,
+                        image_url,
+                        rating,
+                        
+                    )`
 }
 
 function getPosterPath(path)

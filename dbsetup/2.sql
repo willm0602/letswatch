@@ -5,11 +5,11 @@
     ! you should back it up before running this file
 */
 
-DROP TABLE IF EXISTS Media;
 DROP TABLE IF EXISTS Watch_List_Items;
+DROP TABLE IF EXISTS Media;
 
 CREATE TABLE Media(
-    id BIGINT NOT NULL AUTO_INCREMENT,
+    id BIGINT,
     title VARCHAR(512),
     image_url VARCHAR(2048),
     rating FLOAT(4),
