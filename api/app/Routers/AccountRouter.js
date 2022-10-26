@@ -2,7 +2,12 @@
  * =========================
  * Router @ /account  
  * Routes
- *      /account/test
+ *      Get
+ *          /account/test
+ *          /login
+ * 
+ *      Post
+ *          /signup
  * ==========================
  */
 

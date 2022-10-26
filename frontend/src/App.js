@@ -2,13 +2,15 @@ import logo from './logo.svg';
 import './App.css';
 import {get, post} from './APIInterface/Utils';
 import React from "react";
-import { login, signup } from './APIInterface/AccountManagement';
+import { searchForMedia } from './APIInterface/MediaManagement';
 
 function App() {
 
   const [test, setTest] = React.useState(undefined);
   React.useEffect(() => {
-    login('testuser62', 'password');
+    searchForMedia('Avengers').then((res) => {
+      console.log(res);
+    })
   });
 
   return (
