@@ -1,5 +1,6 @@
 const axios = require('axios');
 const conn = require("../../database/mySQLconnect");
+const moment = require('moment');
 const {apiResponse} = require('../../MiscUtils');
 
 async function mediaSearch(ctx)
@@ -19,12 +20,16 @@ async function mediaSearch(ctx)
                         title: media.title,
                         id: media.id,
                         synopsis: media.overview,
-                        image: getPosterPath(media.poster_path)
+                        image: getPosterPath(media.poster_path),
+                        rating: media.vote_average * 10,
+                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD'))
                     } : media.name ? {
                         title: media.name,
                         id: media.id,
                         synopsis: media.overview,
-                        image: getPosterPath(media.poster_path)
+                        image: getPosterPath(media.poster_path),
+                        rating: media.vote_average * 10,
+                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD'))
                     } : undefined
                 });
                 res(ctx.body);
@@ -33,6 +38,11 @@ async function mediaSearch(ctx)
             rej(err);
         })
     });
+}
+
+async function saveMediaToDB(media)
+{
+
 }
 
 function getPosterPath(path)
