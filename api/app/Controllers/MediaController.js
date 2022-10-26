@@ -32,6 +32,9 @@ async function mediaSearch(ctx)
                         releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD'))
                     } : undefined
                 });
+                ctx.body.map((media) => {
+                    saveMediaToDB(media);
+                })
                 res(ctx.body);
             }
         ).catch((err) => {
@@ -43,11 +46,37 @@ async function mediaSearch(ctx)
 async function saveMediaToDB(media)
 {
     const query = `INSERT INTO media(
+                        id,
                         title,
                         image_url,
                         rating,
-                        
-                    )`
+                        release_data,
+                        synopsis
+                    ) VALUES(
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?
+                    )`;
+    return new Promise((res, rej) => {
+        conn.query({
+            sql: query,
+            values: [
+                media.id,
+                media.title,
+                media.image,
+                media.rating,
+                media.release_date,
+                media.synopsis
+            ]
+        }, (err, tuples) => {
+            if(err)
+                return false;
+            return true;
+        })
+    });
 }
 
 function getPosterPath(path)

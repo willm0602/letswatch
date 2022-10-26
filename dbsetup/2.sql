@@ -13,7 +13,7 @@ CREATE TABLE Media(
     title VARCHAR(512),
     image_url VARCHAR(2048),
     rating FLOAT(4),
-    release_data DATE,
+    release_date DATE,
     synopsis TEXT(1048576),
     PRIMARY KEY (id)
 );
