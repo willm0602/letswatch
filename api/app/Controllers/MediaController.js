@@ -15,11 +15,17 @@ async function mediaSearch(ctx)
         axios.get(url).then(
             (resp) => {
                 ctx.body = resp.data.results.map((media) => {
-                    return {
+                    return media.title ? {
                         title: media.title,
                         id: media.id,
-                        synopsis: media.overview
-                    };
+                        synopsis: media.overview,
+                        image: getPosterPath(media.poster_path)
+                    } : media.name ? {
+                        title: media.name,
+                        id: media.id,
+                        synopsis: media.overview,
+                        image: getPosterPath(media.poster_path)
+                    } : undefined
                 });
                 res(ctx.body);
             }
@@ -29,9 +35,10 @@ async function mediaSearch(ctx)
     });
 }
 
-async function getPosterPath(path)
+function getPosterPath(path)
 {
-    return `https://image.tmdb.org/t/p/original${path}`;
+    return path ? `https://image.tmdb.org/t/p/original${path}` 
+                : undefined;
 }
 
 module.exports = {
