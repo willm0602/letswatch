@@ -43,6 +43,26 @@ async function mediaSearch(ctx)
     });
 }
 
+async function getMediaByID(id)
+{
+    const query = `SELECT * FROM media WHERE id=?;`;
+
+    return new Promise((res, rej) => {
+        conn.query({
+            sql: query,
+            values: [id]
+        }, (err, tuples) => {
+            if(err)
+                rej('unable to query our database to get movies');
+            if(tuples.length > 0)
+            {
+
+            }
+        })
+    })
+}
+
+
 async function saveMediaToDB(media)
 {
     const query = `INSERT INTO media(
