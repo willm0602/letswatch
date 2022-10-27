@@ -9,15 +9,21 @@ Start by [forking](https://docs.github.com/en/get-started/quickstart/fork-a-repo
 in the root folder, run npm install. This should install any dependencies. If you are missing any ping Will (note: most of the time, if it says you're missing a dependency, it can be resolved by doing `npm install package`). Following this, you will need to make a .env file in the root directory. It should have a template as follows:
 
 APP_ENV=local
+
 APP_PORT=6262
+
 APP_DOMAIN=localhost
 
 JWT_KEY=GqqRpRmu9_yxo_sEIxVNYLedFXLw3zf_G_zbMIl9VMc1234
 
 DB_HOST=localhost
+
 DB_PORT=PORT
+
 DB_USER=DBUSERNAME
+
 DB_PASS=DBPASSWORD
+
 DB_DATABASE=letswatch
 
 TMDB=TMDBAPIKEY
