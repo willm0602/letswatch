@@ -1,7 +1,10 @@
 const axios = require('axios');
-const conn = require("../../database/mySQLconnect");
 const moment = require('moment');
+
+const conn = require("../../database/mySQLconnect");
 const {apiResponse} = require('../../MiscUtils');
+const C = require('../../config/Constants');
+
 const tmdbAPIToken = process.env.TMDB;
 
 async function mediaSearch(ctx)
@@ -14,12 +17,16 @@ async function mediaSearch(ctx)
 
     return new Promise((res, rej) => {
         axios.get(url).then(
-            (resp) => {
-                console.log(resp.data);
+            async (resp) => {
                 ctx.body = resp.data.results.map((media) => {
+                    console.log(media);
+                    if(!Object.values(C.MEDIA_TYPES).includes(media.media_type))
+                    {
+                        return undefined;
+                    }
                     return media.title ? {
                         title: media.title,
-                        id: media.id,
+                        tmdbID: media.id,
                         synopsis: media.overview,
                         image: getPosterPath(media.poster_path),
                         rating: media.vote_average * 10,
@@ -27,18 +34,32 @@ async function mediaSearch(ctx)
                         type: media.media_type
                     } : media.name ? {
                         title: media.name,
-                        id: media.id,
+                        tmdbID: media.id,
                         synopsis: media.overview,
                         image: getPosterPath(media.poster_path),
                         rating: media.vote_average * 10,
-                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD')),
+                        releaseDate: new Date(moment(media.first_air_date, 'YYYY-MM-DD')),
                         type: media.media_type
                     } : undefined
                 });
-                ctx.body.map((media) => {
-                    saveMediaToDB(media);
+
+                ctx.body = ctx.body.filter( val => val!==undefined);
+
+                await ctx.body.map(async (media) => {
+                    await saveMediaToDB(media);
                 })
-                res(ctx.body);
+
+                ctx.body = ctx.body.map(async (media) => {
+                    const lw = await existsInDatabase(media.tmdbID, media.type);
+                    const id = lw.id;
+                    if(id)
+                        return {
+                            ...media,
+                            id
+                        }
+                }).then(() => {
+                    res(ctx.body);
+                })
             }
         ).catch((err) => {
             rej(err);
@@ -59,27 +80,47 @@ async function getMediaByID(id)
                 rej('unable to query our database to get movies');
             if(tuples.length > 0)
                 return res(tuples[0]);
-
-            // if we don't have the media in the database, we need to try to 
-            // get the media from TMDB, first checking for a matching movie,
-            // then for a matching tv show
-            const tmdbMovieURL = `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbAPIToken}`;
-            const movieReq = await axios.get(tmdbMovieURL);
-            const movie = movieReq.data;
-            console.log(movie);
         })
     })
 }
 
+async function existsInDatabase(mediaID, mediaType)
+{
+    const query = `SELECT * 
+                    FROM media 
+                        WHERE type=?
+                        AND tmdb_id=?`;
+    return new Promise((res, rej) => {
+        conn.query({
+            sql: query,
+            values: [
+                mediaType,
+                mediaID
+            ]
+        }, (err, tuples) => {
+            if(err)
+                return rej('unable to access database');
+            if(tuples.length)
+                return res(tuples[0]);
+            return res(false);
+        })
+    })
+}
 
 async function saveMediaToDB(media)
 {
+    const alreadyExists = await existsInDatabase(media.tmdbID, media.type);
+    if(alreadyExists)
+    {
+        return;
+    }
+
     const query = `INSERT INTO media(
-                        id,
+                        tmdb_id,
                         title,
                         image_url,
                         rating,
-                        release_data,
+                        release_date,
                         synopsis,
                         type
                     ) VALUES(
@@ -95,7 +136,7 @@ async function saveMediaToDB(media)
         conn.query({
             sql: query,
             values: [
-                media.id,
+                media.tmdbID,
                 media.title,
                 media.image,
                 media.rating,
@@ -105,7 +146,10 @@ async function saveMediaToDB(media)
             ]
         }, (err, tuples) => {
             if(err)
+            {
+                console.error('Error saving media:', err);
                 return false;
+            }
             return true;
         })
     });

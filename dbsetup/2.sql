@@ -16,7 +16,7 @@ CREATE TABLE Media(
     release_date DATE,
     synopsis TEXT(1048576),
     type VARCHAR(32) NOT NULL,
-    lets_watch_id BIGINT NOT NULL,
+    tmdb_id BIGINT NOT NULL,
     PRIMARY KEY (id)
 );
 
