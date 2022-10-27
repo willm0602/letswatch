@@ -9,12 +9,14 @@ DROP TABLE IF EXISTS Watch_List_Items;
 DROP TABLE IF EXISTS Media;
 
 CREATE TABLE Media(
-    id BIGINT,
+    id BIGINT NOT NULL AUTO_INCREMENT,
     title VARCHAR(512),
     image_url VARCHAR(2048),
     rating FLOAT(4),
     release_date DATE,
     synopsis TEXT(1048576),
+    type VARCHAR(32) NOT NULL,
+    lets_watch_id BIGINT NOT NULL,
     PRIMARY KEY (id)
 );
 

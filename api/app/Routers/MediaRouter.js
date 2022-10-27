@@ -18,5 +18,10 @@ const MediaRouter = KoaRouter({
 });
 
 MediaRouter.get('/search', MediaController.mediaSearch);
+MediaRouter.get('/:id', async (ctx) => {
+    const id = ctx.params.id;
+    const media = await MediaController.getMediaByID(id);
+    ctx.body = media;
+})
 
 module.exports = MediaRouter;

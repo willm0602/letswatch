@@ -2,12 +2,12 @@ const axios = require('axios');
 const conn = require("../../database/mySQLconnect");
 const moment = require('moment');
 const {apiResponse} = require('../../MiscUtils');
+const tmdbAPIToken = process.env.TMDB;
 
 async function mediaSearch(ctx)
 {
     const queryParams = ctx.request.query;
     const query = queryParams.query;
-    const tmdbAPIToken = process.env.TMDB;
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbAPIToken}&language=en-US&page=1&include_adult=false&query=${
         query.split(' ').join('+')
     }`;
@@ -15,6 +15,7 @@ async function mediaSearch(ctx)
     return new Promise((res, rej) => {
         axios.get(url).then(
             (resp) => {
+                console.log(resp.data);
                 ctx.body = resp.data.results.map((media) => {
                     return media.title ? {
                         title: media.title,
@@ -22,14 +23,16 @@ async function mediaSearch(ctx)
                         synopsis: media.overview,
                         image: getPosterPath(media.poster_path),
                         rating: media.vote_average * 10,
-                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD'))
+                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD')),
+                        type: media.media_type
                     } : media.name ? {
                         title: media.name,
                         id: media.id,
                         synopsis: media.overview,
                         image: getPosterPath(media.poster_path),
                         rating: media.vote_average * 10,
-                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD'))
+                        releaseDate: new Date(moment(media.release_date, 'YYYY-MM-DD')),
+                        type: media.media_type
                     } : undefined
                 });
                 ctx.body.map((media) => {
@@ -51,13 +54,19 @@ async function getMediaByID(id)
         conn.query({
             sql: query,
             values: [id]
-        }, (err, tuples) => {
+        }, async (err, tuples) => {
             if(err)
                 rej('unable to query our database to get movies');
             if(tuples.length > 0)
-            {
+                return res(tuples[0]);
 
-            }
+            // if we don't have the media in the database, we need to try to 
+            // get the media from TMDB, first checking for a matching movie,
+            // then for a matching tv show
+            const tmdbMovieURL = `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbAPIToken}`;
+            const movieReq = await axios.get(tmdbMovieURL);
+            const movie = movieReq.data;
+            console.log(movie);
         })
     })
 }
@@ -71,8 +80,10 @@ async function saveMediaToDB(media)
                         image_url,
                         rating,
                         release_data,
-                        synopsis
+                        synopsis,
+                        type
                     ) VALUES(
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -89,7 +100,8 @@ async function saveMediaToDB(media)
                 media.image,
                 media.rating,
                 media.release_date,
-                media.synopsis
+                media.synopsis,
+                media.type
             ]
         }, (err, tuples) => {
             if(err)
@@ -106,5 +118,6 @@ function getPosterPath(path)
 }
 
 module.exports = {
-    mediaSearch
+    mediaSearch,
+    getMediaByID
 }
