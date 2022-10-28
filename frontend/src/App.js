@@ -1,38 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
-import {get, post} from './APIInterface/Utils';
-import React from "react";
-import { searchForMedia } from './APIInterface/MediaManagement';
+import React, { useContext } from "react";
+
+import {UserContext} from './contextSetup';
+import {Routes, Route} from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Group from './pages/Group';
+import List from './pages/List';
 
 function App() {
 
-  const [test, setTest] = React.useState(undefined);
-  React.useEffect(() => {
-    searchForMedia('Avengers').then((res) => {
-      console.log(res);
-    })
-  });
+  const ctx = useContext(UserContext); //context works
+  const fakeData = ctx.fakeDBInfo;
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          {test ? test : ''}
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      {fakeData.accessToken ? 
+        <Route path='/' element={<Home/>}/>
+        :       
+        <Route path='/' element={<Login/>}/>
+      }
+      <Route path='/group/*' element={<Group/>}/>
+      <Route path='/list/*' element={<List/>}/>
+    </Routes>
   );
 }
 
