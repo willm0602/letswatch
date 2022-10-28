@@ -154,10 +154,33 @@ async function getAccessToken(username, password)
     })
 }
 
+async function getIDFromAccessToken(accessToken)
+{
+    const query = `SELECT * FROM Users 
+                        WHERE Access_Token=?;`
+    
+    return new Promise((res, rej) => {
+        console.log('checking access token from database');
+        const execution = conn.query({
+            sql: query,
+            values: [
+                accessToken
+            ]
+        }, (err, tuples) => {
+            if(err)
+                return rej(undefined);
+            if(tuples.length === 0)
+                return res(undefined);
+            return res(tuples[0].id);
+        })
+    })
+}
+
 
 module.exports = {
     test,
     getAccessToken,
     signup,
-    login
+    login,
+    getIDFromAccessToken
 }
