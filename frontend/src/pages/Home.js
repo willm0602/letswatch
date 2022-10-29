@@ -4,14 +4,16 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { Link } from 'react-router-dom';
+import Footer from './components/footer';
+import NMHeader from './components/nonMediaHeader';
 
 const Home = () => {
     const ctx = useContext(UserContext);
     const fakeData = ctx.fakeDBInfo;
 
     return(
-        <>
-            <h1>Let's Watch</h1>
+        <div style={{display:'flex', flexDirection:'column', textAlign:'center'}}>
+            <NMHeader />
             <h2>Groups</h2>
             <Box>
                 <List>
@@ -24,7 +26,8 @@ const Home = () => {
                     )}
                 </List>
             </Box>
-        </>
+            <Footer />
+        </div>
     )
 }
 
