@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import Footer from "./components/footer";
+import NMHeader from "./components/nonMediaHeader";
 
 const Group = () => {
     const location = useLocation();
@@ -11,8 +13,9 @@ const Group = () => {
 
     return(
         <>
+            <NMHeader />
             <h1>{groupInfo.groupName}</h1>
-            <p>Members are: {groupInfo.members.map(member => <p> {member} </p>)}</p>
+            <p>Members are: {groupInfo.members.map(member => <p> {member.username} </p>)}</p>
             <Box>
                 <List>
                     {groupInfo.lists.map( (list, listIdx) =>
@@ -24,6 +27,7 @@ const Group = () => {
                     )}
                 </List>
             </Box>
+        <Footer />
         </>
     )
 
