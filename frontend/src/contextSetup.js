@@ -1,8 +1,25 @@
-import { createContext, Fragment } from "react";
+import { createContext, Fragment, useState } from "react";
 
 const UserContext = createContext(undefined);
 
 const UserContextProvider = ({children}) => {
+
+    const chainsawMan = {
+        "backdrop_path":"/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg",
+        "first_air_date":"2022-10-12",
+        "genre_ids":[16,10759,10765,35],
+        "id":114410,
+        "media_type":"tv",
+        "name":"Chainsaw Man",
+        "origin_country":["JP"],
+        "original_language":"ja",
+        "original_name":"チェンソーマン",
+        "overview":"Denji has a simple dream—to live a happy and peaceful life, spending time with a girl he likes. This is a far cry from reality, however, as Denji is forced by the yakuza into killing devils in order to pay off his crushing debts. Using his pet devil Pochita as a weapon, he is ready to do anything for a bit of cash.",
+        "popularity":1361.153,
+        "poster_path":"/npdB6eFzizki0WaZ1OvKcJrWe97.jpg",
+        "vote_average":8.7,
+        "vote_count":161
+    }
 
     const fakeMediaSearch = [
             {
@@ -47,16 +64,57 @@ const UserContextProvider = ({children}) => {
                 synopsis:`Trapped on her family’s isolated farm, Pearl must tend to her ailing father under the bitter and overbearing watch of her devout mother. Lusting for a glamorous life like she’s seen in the movies, Pearl’s ambitions, temptations and repressions collide.`,
                 score:70,
             },
+            {
+                title:"The Deep House",
+                poster:'https://www.themoviedb.org/t/p/original/5xhAPxRr64oQPEFnUOrttuI4ZEU.jpg',
+                synopsis:`While diving in a remote French lake, a couple of YouTubers who specialize in underwater exploration videos discover a house submerged in the deep waters. What was initially a unique finding soon turns into a nightmare when they discover that the house was the scene of atrocious crimes. Trapped, with their oxygen reserves falling dangerously, they realize the worst is yet to come: they are not alone in the house.`,
+                score:62,
+            },
     ];
 
-    const fakeDBInfo = {
+    const [fakeDBInfo, setFakeDBInfo] = useState({
         id:101,
-        username:'tree',
-        profileID:5,
-        bio:'Very cool',
+        username:'Tree',
+        profileID:0,
+        bio:'Very cool guy, please be nice or I WILL cry',
         accessToken:'This is an access token',
         dateJoined:'2022-10-27 17:54:04',
         groups:[
+            {
+                groupName:'My Lists',
+                groupID:0,
+                members:[{username:'tree',profileID:0}],
+                lists:[
+                    {
+                        listName:'Just Adam Sandler >:)',
+                        listID:123,
+                        listMembers:[{username:'tree', profileID:0}],
+                        media:[
+                            {
+                                title:'50 First Dates',
+                                poster:'https://www.themoviedb.org/t/p/original/5NxTW4SS6aUKZYnbQzh7UYNivd.jpg',
+                                synopsis:"Henry is a player skilled at seducing women. But when this veterinarian meets Lucy, a girl with a quirky problem when it comes to total recall, he realizes it's possible to fall in love all over again…and again, and again. That's because the delightful Lucy has no short-term memory, so Henry must woo her day after day until he finally sweeps her off her feet.",
+                                score:68,
+                                addedBy:'tree'
+                            },
+                            {
+                                title:'Click',
+                                poster:'https://www.themoviedb.org/t/p/original/oL0k5JA53PyoHSZqKb3cNkhwBCE.jpg',
+                                synopsis:"A married workaholic, Michael Newman doesn't have time for his wife and children, not if he's to impress his ungrateful boss and earn a well-deserved promotion. So when he meets Morty, a loopy sales clerk, he gets the answer to his prayers: a magical remote that allows him to bypass life's little distractions with increasingly hysterical results.",
+                                score:62,
+                                addedBy:'tree'
+                            },
+                            {
+                                title:'Hotel Transylvania',
+                                poster:'https://www.themoviedb.org/t/p/original/eJGvzGrsfe2sqTUPv5IwLWXjVuR.jpg',
+                                synopsis:"Welcome to Hotel Transylvania, Dracula's lavish five-stake resort, where monsters and their families can live it up and no humans are allowed. One special weekend, Dracula has invited all his best friends to celebrate his beloved daughter Mavis's 118th birthday. For Dracula catering to all of these legendary monsters is no problem but the party really starts when one ordinary guy stumbles into the hotel and changes everything!",
+                                score:70,
+                                addedBy:'tree'
+                            },
+                        ]
+                    }
+                ]
+            },
             {
                 groupName:'Bad Movie Club',
                 groupID:101,
@@ -89,15 +147,57 @@ const UserContextProvider = ({children}) => {
                                 addedBy:'tree'
                             }
                         ]
+                    },
+                    {
+                        listName:'Bad Anime',
+                        listID:299,
+                        listMembers:[{username:'tree', profileID:0}, {username:'definetlyDaniel', profileID:1}],
+                        media:[
+                            {
+                                title:'Sword Art Online',
+                                poster:'https://www.themoviedb.org/t/p/original/mK9zGGk90VmHLOnK79sqlGFjZjW.jpg',
+                                synopsis:"In the near future, a Virtual Reality Massive Multiplayer Online Role-Playing Game (VRMMORPG) called Sword Art Online has been released where players control their avatars with their bodies using a piece of technology called Nerve Gear. One day, players discover they cannot log out, as the game creator is holding them captive unless they reach the 100th floor of the game's tower and defeat the final boss. However, if they die in the game, they die in real life. Their struggle for survival starts now...",
+                                score:83,
+                                addedBy:'definetlyDaniel'
+                            },
+                            {
+                                title:'Berserk (2016)',
+                                poster:'https://www.themoviedb.org/t/p/original/xAdubqXNpbmVJyZQNaQ1E4dIfe9.jpg',
+                                synopsis:"Spurred by the flame raging in his heart, the Black Swordsman Guts continues his seemingly endless quest for revenge. Standing in his path are heinous outlaws, delusional evil spirits, and a devout child of god. Even as it chips away at his life, Guts continues to fight his enemies, who wield repulsive and inhumane power, with nary but his body and sword—his strength as a human.",
+                                score:76,
+                                addedBy:'tree'
+                            },
+                        ]
+                    }
+                ]
+            },
+            {
+                groupName:'Bees!?!?!?!',
+                groupID:111,
+                members:[{username:'tree', profileID:0}, {username:'definetlyDaniel', profileID:1}],
+                lists:[
+                    {
+                        listName:'Just the Bee Movie',
+                        listID:110,
+                        listMembers:[{username:'definetlyDaniel', profileID:1}],
+                        media:[
+                            {
+                                title:'Bee Movie',
+                                poster:'https://www.themoviedb.org/t/p/original/aWe27GmvfVYAd7p0KEtJZWwLWk5.jpg',
+                                synopsis:"Barry B. Benson, a bee who has just graduated from college, is disillusioned at his lone career choice: making honey. On a special trip outside the hive, Barry's life is saved by Vanessa, a florist in New York City. As their relationship blossoms, he discovers humans actually eat honey, and subsequently decides to sue us.",
+                                score:60,
+                                addedBy:'definetlyDaniel'
+                            },
+                        ]
                     }
                 ]
             }
         ]
-    };
+    });
 
     return(
         <Fragment>
-            <UserContext.Provider value={{fakeDBInfo, fakeMediaSearch}}>
+            <UserContext.Provider value={{fakeDBInfo, setFakeDBInfo, fakeMediaSearch, chainsawMan}}>
                 {children}
             </UserContext.Provider>
         </Fragment>
