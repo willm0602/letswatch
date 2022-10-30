@@ -16,32 +16,49 @@ import Footer from "./components/footer";
 import NMHeader from "./components/nonMediaHeader";
 
 const ListOfMedia = () => {
-    const [listContent, setListContent] = useState([]);
-
-    const location = useLocation();
-    const listInfo = location.state.list;
-
+    //used for displaying the content as updating content doesn't update the DOM.
+    const [listContent, setListContent] = useState([]); 
     const ctx = useContext(UserContext);
-    const fakeMedia = ctx.fakeMediaSearch.map( media => ({...media, 'label':media.title}));
+    const {fakeDBInfo, setFakeDBInfo} = ctx;
+    const location = useLocation();    
+    const groupIdx = location.state.groupIdx;
+    const listIdx = location.state.listIdx;
+    const listInfo = location.state.list;
+    const fakeMedia = ctx.fakeMediaSearch;
 
 
     const handleClick = (mediaTitle) => {
-        console.log(mediaTitle);
-        if(listContent.filter(item => item.title === mediaTitle).length > 0)
-            return;
+        if(listContent.filter(item => item.title === mediaTitle).length > 0 
+            || ctx.fakeDBInfo.groups[groupIdx].lists[listIdx].media.filter(item => item.title === mediaTitle).length > 0)
+                return;
+        addToCTXList(mediaTitle);
+    }
 
-        const chosenMedia = fakeMedia.filter(media => media.title === mediaTitle);
-        console.log(chosenMedia);
-        setListContent([...listContent, ...chosenMedia]);
+    const addToCTXList = (mediaTitle) => {
+        let chosenMedia = fakeMedia.filter(media => media.title === mediaTitle);
+        chosenMedia = {...chosenMedia[0], addedBy:ctx.fakeDBInfo.username};
+
+        let newDBInfo = ctx.fakeDBInfo;
+        let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice();
+        newMedia = [...newMedia, chosenMedia];
+        newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia;
+        setFakeDBInfo(newDBInfo);
+        setListContent([...listContent, chosenMedia])
     }
 
     const handleRemove = (itemToRemove) => {
+        let newDBInfo = fakeDBInfo;
+        let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice();
+        newMedia = newMedia.filter(item => item.title !== itemToRemove);
+        newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia;
+        setFakeDBInfo(newDBInfo);
+        
         const newList = listContent.filter(item => item.title !== itemToRemove);
         setListContent(newList);
     }
 
     useEffect(()=>{
-        setListContent([...listInfo.media])
+        setListContent([...listInfo.media]);
     },[]);
 
     return(
@@ -58,9 +75,9 @@ const ListOfMedia = () => {
             </Stack>
             <Autocomplete
                 id='add-media'
-                sx={{ width: '90%' }}
+                sx={{ width: '90%', border:'1px solid lightgrey'}}
                 options={fakeMedia}
-                getOptionLabel={(option)=> option.label}
+                getOptionLabel={(option)=> option.title}
                 renderOption={(props,options)=>(
                     <Button style={{
                         display:'flex',
@@ -69,14 +86,14 @@ const ListOfMedia = () => {
                         width:'100%',
                         textTransform: 'none'
                     }}>                        <img style={{maxWidth:'50px'}} src={options.poster}/>
-                        <p style={{marginLeft:'15px'}}>{options.label}</p>
-                        <AddCircleIcon onClick={()=>{handleClick(options.label)}}/>
+                        <p style={{marginLeft:'15px'}}>{options.title}</p>
+                        <AddCircleIcon onClick={()=>{handleClick(options.title)}}/>
                     </Button>
                 )}
                 renderInput={(params)=>(
                     <TextField
                         {...params}
-                        label='Choose Media'
+                        label='Add Media'
                         inputProps={{
                             ...params.inputProps,
                             autocomplete:'new-password',
@@ -88,7 +105,7 @@ const ListOfMedia = () => {
 
             <Box>
                 <List>
-                    {listContent.map( (mediaItem, mediaIndex) =>
+                    {listContent.map( (mediaItem, mediaIndex) => //was listContent
                         <ListItem>
                             <div style={{display:'flex', justifyContent:'space-around'}}>
                                 <div style={{display:'flex', flexDirection:'column'}}>

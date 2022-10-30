@@ -1,3 +1,40 @@
+
+
+.MuiOutlinedInput-notchedOutline{
+  border:none !important; 
+  /* Removes borders from autocomplete fields */
+}
+
+.MuiFormLabel-root{
+  z-index: 99;
+  color:black !important;
+  /* background-color: white; */
+  padding:'5px';
+  text-shadow: white;
+}
+
+.MuiInputLabel-shrink{
+  animation: labelFade 0.3s;
+  opacity: 0;
+}
+
+@keyframes labelFade {
+  from{
+    opacity: 1;
+  }
+
+  to{
+    opacity: 0;
+  }
+}
+
+
+.css-1sumxir-MuiForm-Label-root-MuiInputLabel-root.Mui-focused{
+  color:red !important;
+}
+
+
+
 .App {
   text-align: center;
 }
