@@ -1,27 +1,27 @@
 /**
  * =========================
- * Router @ /media  
+ * Router @ /media
  * Routes
  *      Get
  *          /search
- *  
+ *
  *      Post
  * ==========================
  */
 
-const MediaController = require('../Controllers/MediaController');
+const MediaController = require('../Controllers/MediaController')
 
-const KoaRouter = require('koa-router');
- 
+const KoaRouter = require('koa-router')
+
 const MediaRouter = KoaRouter({
-    prefix: '/media'
-});
+    prefix: '/media',
+})
 
-MediaRouter.get('/search', MediaController.mediaSearch);
+MediaRouter.get('/search', MediaController.mediaSearch)
 MediaRouter.get('/:id', async (ctx) => {
-    const id = ctx.params.id;
-    const media = await MediaController.getMediaByID(id);
-    ctx.body = media;
-});
+    const id = ctx.params.id
+    const media = await MediaController.getMediaByID(id)
+    ctx.body = media
+})
 
-module.exports = MediaRouter;
+module.exports = MediaRouter

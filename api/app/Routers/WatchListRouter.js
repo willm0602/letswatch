@@ -1,11 +1,12 @@
-const WatchListController = require('../Controllers/WatchListController');
+const WatchListController = require('../Controllers/WatchListController')
 
-const KoaRouter = require('koa-router');
- 
+const KoaRouter = require('koa-router')
+
 const WatchListRouter = KoaRouter({
-    prefix: '/watchlist'
-});
+    prefix: '/watchlist',
+})
 
-WatchListRouter.post('/create', WatchListController.createList);
+WatchListRouter.post('/create', WatchListController.createList)
+WatchListRouter.post('/add_media', WatchListController.addMediaToWatchlist)
 
-module.exports = WatchListRouter;
+module.exports = WatchListRouter

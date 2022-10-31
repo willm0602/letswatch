@@ -1,44 +1,63 @@
 /**
- * Misc. utility functions 
+ * Misc. utility functions
  */
 
-const crypto = require('crypto');
+const conn = require('./database/mySQLconnect');
+const crypto = require('crypto')
 
 module.exports.randomStr = (strLen) => {
-    const validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-    let result = '';
-    for(let _ = 0; _ < strLen; _++)
-    {
-        result = result + 
-        validChars.charAt(
-            Math.floor(Math.random() * validChars.length)    
-        );
+    const validChars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
+    let result = ''
+    for (let _ = 0; _ < strLen; _++) {
+        result =
+            result +
+            validChars.charAt(Math.floor(Math.random() * validChars.length))
     }
-    return result;
+    return result
 }
 
 module.exports.apiResponse = (statusPassed, data) => {
     return {
         status: statusPassed ? 'PASS' : 'FAIL',
-        data
+        data,
     }
 }
-
 
 /*
     Putting on hold for now, trying to get encrypting and decrypting strings setup
     For storing passwords in the db
 */
 module.exports.encrypt = (phrase) => {
-    const cipher = crypto.createCipher('aes-192-gcm', process.env.JWT_KEY);
-    let encrypted = cipher.update(phrase, 'utf8', 'hex');
-    encrypted+=cipher.final('hex');
-    return encrypted;
+    const cipher = crypto.createCipher('aes-192-gcm', process.env.JWT_KEY)
+    let encrypted = cipher.update(phrase, 'utf8', 'hex')
+    encrypted += cipher.final('hex')
+    return encrypted
 }
 
 module.exports.decrypt = (phrase) => {
-    const cipher = crypto.createDecipher('aes-192-gcm', process.env.JWT_KEY);
-    let decrypted = cipher.update(phrase, 'utf8', 'hex');
-    decrypted+=cipher.final('hex');
-    return decrypted;
+    const cipher = crypto.createDecipher('aes-192-gcm', process.env.JWT_KEY)
+    let decrypted = cipher.update(phrase, 'utf8', 'hex')
+    decrypted += cipher.final('hex')
+    return decrypted
+}
+
+module.exports.getIDFromAccessToken = async (accessToken) => {
+    const query = `SELECT * FROM Users 
+                        WHERE Access_Token=?;`
+
+    return new Promise((res, rej) => {
+        console.log('checking access token from database')
+        const execution = conn.query(
+            {
+                sql: query,
+                values: [accessToken],
+            },
+            (err, tuples) => {
+                if (err) return rej(undefined)
+                if (tuples.length === 0) return res(undefined)
+                return res(tuples[0].id)
+            }
+        )
+    })
 }
