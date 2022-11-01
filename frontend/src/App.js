@@ -13,7 +13,7 @@ import ManyMedia from './pages/ManyMedia'
 function App() {
     const ctx = useContext(UserContext) //context works
     const fakeData = ctx.fakeDBInfo
-
+    
     return (
         <Routes>
             {fakeData.accessToken ? (

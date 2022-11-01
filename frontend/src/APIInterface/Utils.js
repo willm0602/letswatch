@@ -26,7 +26,6 @@ export async function get(
     callback = undefined,
     error = undefined
 ) {
-    console.log(route, extraData)
     return axios
         .get(route, {
             params: extraData,

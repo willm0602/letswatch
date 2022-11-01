@@ -73,3 +73,24 @@
     transform: rotate(360deg);
   }
 }
+
+.LoginPage{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: aqua;
+  height:100vh;
+}
+
+.LoginPage > h1 {
+  margin-bottom: 0%;
+}
+
+.LoginPage > h2 {
+  margin-top: 10px;
+}
+
+.LoginPage > h4 {
+  margin-bottom: 0px;
+  align-content: center;
+}

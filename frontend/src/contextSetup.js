@@ -1,4 +1,4 @@
-import { createContext, Fragment, useState } from 'react'
+import { createContext, Fragment, useState, useEffect } from 'react'
 
 const UserContext = createContext(undefined)
 
@@ -222,6 +222,8 @@ const UserContextProvider = ({ children }) => {
             },
         ],
     })
+
+    const [userInfo, setUserInfo] = useState({});
 
     return (
         <Fragment>

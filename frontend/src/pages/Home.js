@@ -12,10 +12,19 @@ import Paper from '@mui/material/Paper'
 import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
+import { userMetadata } from '../APIInterface/GetUserData'
+import { setAccessToken } from '../LocalStorageInterface'
 
 const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
+
+    setAccessToken('jh7tj*7YE1GTn&9%V2x7mtp#D6Pm!QvK');
+    userMetadata().then(
+        (res) => {
+            console.log(res);
+        }
+    )
 
     const myLists = fakeData.groups.filter(
         (group) => group.groupName === 'My Lists'
