@@ -53,7 +53,7 @@ async function createList(userID, listName) {
                         ?,
                         ?
                     )`,
-                        values: [userID, userList[0].id],
+                        values: [userID, userList[0].listID],
                     },
                     (err, tuples) => {
                         if (err) return rej(err)

@@ -22,9 +22,11 @@ const Login = () => {
         let newErrorMessage = "";
 
         if(action === 'Login'){
+            login(username, password)
+            /*
             if(username === '') { setUsernameError(true); }
             if(password === '') { setPasswordError(true); }
-
+            */
         } else if( action === 'Register') {
             if(username === '') { 
                 setUsernameError(true);
@@ -43,9 +45,12 @@ const Login = () => {
                 setPasswordError(true);
                 newErrorMessage += "Passwords don't match" + "\n";
             }
+            signup(username, password)
+            /*
             console.log(newErrorMessage)
             console.log(`Username is: ${username}\nPassword is: ${password}\nConfirm Password is: ${cPassword}`)
             setErrorMessage(newErrorMessage);
+            */
         }
     }
 
@@ -76,7 +81,7 @@ const Login = () => {
         </ToggleButtonGroup>
         {(cPasswordError || passwordError || usernameError) && (
         <h3> 
-            {errorMessage.replace(/\n/g, <br />)}
+            {errorMessage}
         </h3>
         )}
         <form
