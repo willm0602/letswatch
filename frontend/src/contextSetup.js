@@ -81,7 +81,7 @@ const UserContextProvider = ({ children }) => {
         username: 'Tree',
         profileID: 0,
         bio: 'Very cool guy, please be nice or I WILL cry',
-        accessToken: 'This is an access token',
+        accessToken: false,
         dateJoined: '2022-10-27 17:54:04',
         groups: [
             {

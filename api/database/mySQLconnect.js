@@ -8,4 +8,13 @@ var connection = mysql.createConnection({
     database: process.env.DB_DATABASE,
 })
 
+connection.query({
+    sql: `SELECT * FROM Users;`
+}, (err, rows) => {
+    console.error(err)
+})
+console.log(`\n\n\nCONNECTION IS ${connection.state}\n\n\n`);
 module.exports = connection
+
+//ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Doctor_Wh0';
+//flush privileges;

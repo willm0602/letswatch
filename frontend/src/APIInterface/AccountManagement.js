@@ -10,6 +10,7 @@ export function signup(username, password) {
         },
         (res) => {
             if (res.status === 'PASS') {
+                console.log(`access token is `, res.data);
                 setAccessToken(res.data)
             }
         },
