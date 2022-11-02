@@ -14,70 +14,58 @@ async function mediaSearch(ctx) {
         .split(' ')
         .join('+')}`
 
-    return new Promise((res, rej) => {
-        axios
-            .get(url)
-            .then(async (resp) => {
-                ctx.body = resp.data.results.map((media) => {
-                    console.log(media)
-                    if (
-                        !Object.values(C.MEDIA_TYPES).includes(media.media_type)
-                    ) {
-                        return undefined
-                    }
-                    return media.title
-                        ? {
-                              title: media.title,
-                              tmdbID: media.id,
-                              synopsis: media.overview,
-                              image: getPosterPath(media.poster_path),
-                              rating: media.vote_average * 10,
-                              releaseDate: new Date(
-                                  moment(media.release_date, 'YYYY-MM-DD')
-                              ),
-                              type: media.media_type,
-                          }
-                        : media.name
-                        ? {
-                              title: media.name,
-                              tmdbID: media.id,
-                              synopsis: media.overview,
-                              image: getPosterPath(media.poster_path),
-                              rating: media.vote_average * 10,
-                              releaseDate: new Date(
-                                  moment(media.first_air_date, 'YYYY-MM-DD')
-                              ),
-                              type: media.media_type,
-                          }
-                        : undefined
-                })
-
-                ctx.body = ctx.body.filter((val) => val !== undefined)
-
-                await ctx.body.map(async (media) => {
-                    await saveMediaToDB(media)
-                })
-
-                ctx.body = ctx.body
-                    .map(async (media) => {
-                        const lw = await existsInDatabase(
-                            media.tmdbID,
-                            media.type
-                        )
-                        const id = lw.id
-                        if (id)
-                            return {
-                                ...media,
-                                id,
+    return new Promise(async (res, rej) => {
+        const resp = await axios.get(url);
+        console.log(`resp is`, resp.data.results);
+        const tmdbData = resp.data.results.map((media) => {
+                            if (
+                                !Object.values(C.MEDIA_TYPES).includes(media.media_type)
+                            ) {
+                                return undefined
                             }
-                    })
-                    .then(() => {
-                        res(ctx.body)
-                    })
-            })
-            .catch((err) => {
-                rej(err)
-            })
+                            return media.title
+                                ? {
+                                        title: media.title,
+                                        tmdbID: media.id,
+                                        synopsis: media.overview,
+                                        image: getPosterPath(media.poster_path),
+                                        rating: media.vote_average * 10,
+                                        releaseDate: new Date(
+                                            moment(media.release_date, 'YYYY-MM-DD')
+                                        ),
+                                        type: media.media_type,
+                                    }
+                                : media.name
+                                ? {
+                                        title: media.name,
+                                        tmdbID: media.id,
+                                        synopsis: media.overview,
+                                        image: getPosterPath(media.poster_path),
+                                        rating: media.vote_average * 10,
+                                        releaseDate: new Date(
+                                            moment(media.first_air_date, 'YYYY-MM-DD')
+                                        ),
+                                        type: media.media_type,
+                                    }
+                                : undefined
+                        });
+
+        const validTMDBData = tmdbData.filter((val) => val !== undefined)
+        
+        let letsWatchSearchResults = [];
+        for(let media of validTMDBData)
+        {
+            const id = await saveMediaToDB(media);
+            letsWatchSearchResults.push({
+                ...media,
+                id
+            });
+        }
+
+        ctx.body = letsWatchSearchResults;
+        console.log(`ctxBody is ${ctx.body}`);
+        
+        return res(letsWatchSearchResults);
     })
 }
 
@@ -111,7 +99,8 @@ async function existsInDatabase(mediaID, mediaType) {
             },
             (err, tuples) => {
                 if (err) return rej('unable to access database')
-                if (tuples.length) return res(tuples[0])
+                console.log(`got packet for exists`, tuples[0]);
+                if (tuples.length) return res(tuples[0].id)
                 return res(false)
             }
         )
@@ -120,9 +109,6 @@ async function existsInDatabase(mediaID, mediaType) {
 
 async function saveMediaToDB(media) {
     const alreadyExists = await existsInDatabase(media.tmdbID, media.type)
-    if (alreadyExists) {
-        return
-    }
 
     const query = `INSERT INTO media(
                         tmdb_id,
@@ -141,7 +127,10 @@ async function saveMediaToDB(media) {
                         ?,
                         ?
                     )`
-    return new Promise((res, rej) => {
+    return new Promise(async (res, rej) => {
+        if (alreadyExists) {
+            return res(alreadyExists );
+        }
         conn.query(
             {
                 sql: query,
@@ -155,12 +144,12 @@ async function saveMediaToDB(media) {
                     media.type,
                 ],
             },
-            (err, tuples) => {
+            async (err, tuples) => {
                 if (err) {
                     console.error('Error saving media:', err)
                     return false
                 }
-                return true
+                return res(await existsInDatabase(media.tmdbID, media.type));
             }
         )
     })
