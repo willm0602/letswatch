@@ -8,4 +8,8 @@ var connection = mysql.createConnection({
     database: process.env.DB_DATABASE,
 })
 
+const status = connection.state;
+
+console.log(`\n\n\n${status}\n\n\n`);
+
 module.exports = connection
