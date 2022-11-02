@@ -44,7 +44,6 @@ async function createList(userID, listName) {
             async (err, tuples) => {
                 if (err) return rej('unable to make watch list')
                 const userList = await getListsForGroup(groupID)
-                console.log(userList);
                 conn.query(
                     {
                         sql: `INSERT INTO user_list_memberships(
