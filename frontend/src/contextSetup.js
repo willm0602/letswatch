@@ -223,7 +223,7 @@ const UserContextProvider = ({ children }) => {
         ],
     })
 
-    const [userInfo, setUserInfo] = useState({});
+    const [userInfo, setUserInfo] = useState(false);
 
     return (
         <Fragment>
@@ -233,6 +233,8 @@ const UserContextProvider = ({ children }) => {
                     setFakeDBInfo,
                     fakeMediaSearch,
                     chainsawMan,
+                    userInfo,
+                    setUserInfo
                 }}
             >
                 {children}

@@ -1,10 +1,15 @@
 import { useLocation } from 'react-router-dom'
+import { useContext } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
+import { UserContext } from '../contextSetup'
 
 const User = () => {
     const location = useLocation()
-    const userInfo = location.state.userInfo
+    const ctx = useContext(UserContext)
+    
+    
+    const userInfo = ctx.userInfo
 
     return (
         <>
@@ -17,7 +22,7 @@ const User = () => {
                         style={{ maxWidth: '100px', borderRadius: '50%' }}
                         src={`/profileImages/${userInfo.profileID}.jpg`}
                     />
-                    <p>{userInfo.dateJoined.split(' ')[0]}</p>
+                    <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
                 </div>
 
                 <div style={{ width: '100%', margin: '0 5%' }}>

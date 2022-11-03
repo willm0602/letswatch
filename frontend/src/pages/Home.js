@@ -12,26 +12,18 @@ import Paper from '@mui/material/Paper'
 import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
-import { userMetadata } from '../APIInterface/GetUserData'
-import { setAccessToken } from '../LocalStorageInterface'
 
 const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
 
-    setAccessToken('jh7tj*7YE1GTn&9%V2x7mtp#D6Pm!QvK');
-    userMetadata().then(
-        (res) => {
-            console.log(res);
-        }
-    )
-
-    const myLists = fakeData.groups.filter(
-        (group) => group.groupName === 'My Lists'
-    )[0].lists
-    const otherLists = fakeData.groups.filter(
-        (group) => group.groupName !== 'My Lists'
-    )
+    let personalGroup=[];
+    let personalLists=[];
+    if(ctx.userInfo){
+        personalGroup = ctx.userInfo.groups.filter( group => group.members.length === 1 && group.members[0].username === ctx.userInfo.username);
+        if(personalGroup)
+            personalLists = personalGroup[0].lists;
+    }
 
     const autoCompletePlaceholderData = [
         {
@@ -46,6 +38,9 @@ const Home = () => {
     ]
 
     return (
+
+        ctx.userInfo ?
+
         <div
             style={{
                 display: 'flex',
@@ -78,7 +73,8 @@ const Home = () => {
             <h2>My Lists</h2>
             <Box style={{ margin: 'auto' }}>
                 <List>
-                    {myLists.map((list, listIdx) => (
+                    {!personalLists? <p>No Lists yet, ya goober :)</p> :
+                        personalLists.map((list, listIdx) => (
                         <ListItem>
                             <Paper
                                 style={{
@@ -135,9 +131,8 @@ const Home = () => {
             <h2>Groups</h2>
             <Box style={{ margin: 'auto' }}>
                 <List>
-                    {otherLists.map((group, index) => (
-                        // index + 1, because we took my list out of the entire list
-                        <ListItem key={index + 1}>
+                    {ctx.userInfo.groups.map((group, index) => (
+                        <ListItem key={index}>
                             <Paper
                                 style={{
                                     display: 'flex',
@@ -153,7 +148,7 @@ const Home = () => {
                                     to={`/group/${group.groupID}`}
                                     state={{
                                         group: group,
-                                        groupIdx: index + 1,
+                                        groupIdx: index,
                                     }}
                                     style={{
                                         margin: 'auto',
@@ -189,6 +184,8 @@ const Home = () => {
             </Button>
             <Footer />
         </div>
+        :
+        null
     )
 }
 

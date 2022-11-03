@@ -9,22 +9,30 @@ import Group from './pages/Group'
 import List from './pages/List'
 import User from './pages/User'
 import ManyMedia from './pages/ManyMedia'
+import {userIsSignedIn} from './LocalStorageInterface'
+import { userMetadata } from './APIInterface/GetUserData'
 
 function App() {
     const ctx = useContext(UserContext) //context works
-    const fakeData = ctx.fakeDBInfo
-    
+
+    //set user information from the db into context
+    if(!ctx.userInfo)
+      userMetadata().then((res) => ctx.setUserInfo(res))
+
     return (
         <Routes>
-            {fakeData.accessToken ? (
-                <Route path="/" element={<Home />} />
+            {userIsSignedIn() ? (
+                <>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/group/*" element={<Group />} />
+                  <Route path="/list/*" element={<List />} />
+                  <Route path="/user/*" element={<User />} />
+                  <Route path="/media" element={<ManyMedia />} />
+                </>
             ) : (
                 <Route path="/" element={<Login />} />
             )}
-            <Route path="/group/*" element={<Group />} />
-            <Route path="/list/*" element={<List />} />
-            <Route path="/user/*" element={<User />} />
-            <Route path="/media" element={<ManyMedia />} />
+            
         </Routes>
     )
 }
