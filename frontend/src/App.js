@@ -11,6 +11,7 @@ import User from './pages/User'
 import ManyMedia from './pages/ManyMedia'
 import {userIsSignedIn} from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
+import Groups from './pages/Groups'
 
 function App() {
     const ctx = useContext(UserContext) //context works
@@ -28,6 +29,8 @@ function App() {
                   <Route path="/list/*" element={<List />} />
                   <Route path="/user/*" element={<User />} />
                   <Route path="/media" element={<ManyMedia />} />
+                  <Route path="/groups" element={<Groups />} />
+
                 </>
             ) : (
                 <Route path="/" element={<Login />} />
