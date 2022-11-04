@@ -13,7 +13,6 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
 
 import * as React from 'react';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 import { useContext } from 'react'
@@ -22,11 +21,7 @@ import { TextField } from '@mui/material'
 const Group = () => {
     const location = useLocation()
     const groupInfo = location.state.group
-    console.log(location.state.groupIdx);
     const ctx = useContext(UserContext)
-    console.log(ctx.userInfo.groups[location.state.groupIdx]);
-
-
 
     const [open, setOpen] = React.useState(false);
     const [newListName, setNewListName] = React.useState('');

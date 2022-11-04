@@ -62,9 +62,12 @@ const Footer = () => {
                     />
                 </Link>
 
-                <BottomNavigationAction
-                    icon={<GroupsIcon style={{ color: 'white' }} />}
-                />
+                <Link to="/groups" style={{ display: 'flex' }}>
+                    <BottomNavigationAction
+                        icon={<GroupsIcon style={{ color: 'white' }} />}
+                    />
+                </Link>
+
                 <BottomNavigationAction
                     icon={<ListIcon style={{ color: 'white' }} />}
                 />
