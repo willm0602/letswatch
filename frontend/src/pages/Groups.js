@@ -14,6 +14,9 @@ import { TextField } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button'
 
+//API stuff
+import { makeNewGroup } from '../APIInterface/CreateGroup'
+import { userMetadata } from '../APIInterface/GetUserData'
 const Groups = () => {
     const ctx = useContext(UserContext)
     const userGroups = ctx.userInfo.groups
@@ -39,20 +42,18 @@ const Groups = () => {
              {
                 groupID:9999,
                 groupName:newGroupName,
-                lists:[ //Do we want to start new groups off with a starter list?
-                    {
-                        listID:89,
-                        listMembers:[{username:ctx.userInfo.username, profileID:ctx.userInfo.profileID}],
-                        listName:'Starter List',
-                        media:[]
-                    }
-                ],
+                lists:[],
                 members:[{username:ctx.userInfo.username, profileID:ctx.userInfo.profileID}],
              }
         ]
-
         userInfo.groups = newGroups;
         ctx.setUserInfo(userInfo);
+        
+        //This function doesn't have the backend setup as of right now
+        makeNewGroup(newGroupName, ctx.userInfo.userID)
+            .then(userMetadata()
+                    .then((res) => ctx.setUserInfo(res)))
+        
         handleClose();
     }
 
@@ -127,7 +128,7 @@ const Groups = () => {
                 <Box sx={{ display: 'flex' }}><CircularProgress /></Box>
             }
 
-            <Fab onClick={()=>handleOpen()} color="primary" aria-label="add" style={{position:'absolute', top:'80%', left:'80%', backgroundColor:'#6C63FF'}}>
+            <Fab onClick={()=>handleOpen()} color="primary" aria-label="add" style={{position:'fixed', top:'80%', left:'80%', backgroundColor:'#6C63FF'}}>
                 <AddIcon />
             </Fab>
 

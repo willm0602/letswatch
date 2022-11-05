@@ -30,7 +30,6 @@ function App() {
                   <Route path="/user/*" element={<User />} />
                   <Route path="/media" element={<ManyMedia />} />
                   <Route path="/groups" element={<Groups />} />
-
                 </>
             ) : (
                 <Route path="/" element={<Login />} />
