@@ -17,6 +17,7 @@ const MediaRouter = KoaRouter({
     prefix: '/media',
 })
 
+MediaRouter.get('/all', MediaController.allMedia)
 MediaRouter.get('/search', MediaController.mediaSearch)
 MediaRouter.get('/:id', async (ctx) => {
     const id = ctx.params.id

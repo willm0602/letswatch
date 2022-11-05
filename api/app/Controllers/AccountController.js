@@ -228,124 +228,31 @@ async function allGroupsForUser(id) {
             "groupName": "23-sologroup",
             "members": [
                 {
-                    "username": "willmigdol11112",
-                    "profileID": 0,
-                    "id": 23
+                    "username",
+                    "profileID",
+                    "id"
                 }...
             ],
             "lists": [
                 {
-                    "listName": "Watch List for 23",
-                    "listID": 11,
+                    "listName",
+                    "listID",
                     "listMembers": [
                         {
-                            "username": "willmigdol11112",
-                            "profileID": 0
-                        },
-                        {
-                            "username": "willmigdol11112",
-                            "profileID": 0
-                        }
+                            "username",
+                            "profileID"
+                        }...
                     ],
                     "media": [
                         {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
+                            "title",
+                            "poster",
+                            "synopsis",
+                            "score",
+                            "addedBy",
                         }
                     ]
-                },
-                {
-                    "listName": "willmigdol11112's Watch List",
-                    "listID": 12,
-                    "listMembers": [],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                },
-                {
-                    "listName": "A List",
-                    "listID": 15,
-                    "listMembers": [],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                },
-                {
-                    "listName": "A List",
-                    "listID": 16,
-                    "listMembers": [],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                },
-                {
-                    "listName": "A List",
-                    "listID": 17,
-                    "listMembers": [],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                },
-                {
-                    "listName": "A List",
-                    "listID": 18,
-                    "listMembers": [],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                },
-                {
-                    "listName": "A List",
-                    "listID": 19,
-                    "listMembers": [
-                        {
-                            "username": "willmigdol11112",
-                            "profileID": 0
-                        }
-                    ],
-                    "media": [
-                        {
-                            "title": "The Avengers",
-                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
-                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
-                            "score": 79,
-                            "addedBy": "willmigdol1111244"
-                        }
-                    ]
-                }
+                }...     
             ]
         }
     ]

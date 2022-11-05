@@ -156,7 +156,28 @@ function getPosterPath(path) {
     return path ? `https://image.tmdb.org/t/p/original${path}` : undefined
 }
 
+async function allMedia(ctx){
+    console.log(`allMedia called`);
+    const sql = `SELECT * FROM Media;`;
+    return new Promise((res, rej) => {
+        conn.query({
+            sql,
+            values: []
+        }, (err, rows) => {
+            if(err)
+            {
+                console.error(err);
+                ctx.body = apiResponse(false, err);
+                return rej('unable to query database for media');
+            }
+            ctx.body = rows;
+            return res(rows);
+        }
+    )})
+}
+
 module.exports = {
     mediaSearch,
     getMediaByID,
+    allMedia
 }
