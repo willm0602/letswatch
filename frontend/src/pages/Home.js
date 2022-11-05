@@ -12,8 +12,8 @@ import Paper from '@mui/material/Paper'
 import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
-
-
+import { userMetadata } from '../APIInterface/GetUserData'
+import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 /*
 
@@ -28,21 +28,22 @@ Hey you goddamn goon, There's some stuff you gotta fix
 -[fixed]make sure the lists on the front page only display like 5 things
 */
 
-
-
-
 const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
+
+    userMetadata().then(
+        (res) => {
+            console.log(res);
+        }
+    )
 
     let personalGroup=[];
     let personalLists=[];
     if(ctx.userInfo){
         personalGroup = ctx.userInfo.groups.filter( group => group.members.length === 1 && group.members[0].username === ctx.userInfo.username);
         if(personalGroup)
-            personalLists = personalGroup[0].lists.slice(0,3);
-
-        
+            personalLists = personalGroup[0].lists.slice(0,3);        
     }
 
     const autoCompletePlaceholderData = [
