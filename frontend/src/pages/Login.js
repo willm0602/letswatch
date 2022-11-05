@@ -1,6 +1,7 @@
 import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
-import { useState } from "react";
-import { login, signup } from "../APIInterface/AccountManagement";
+import { Fragment, useState } from "react";
+import { login, signup} from "../APIInterface/AccountManagement";
+import LoginFooter from "./components/LoginFooter";
 
 const Login = () => {
     const [action, setAction] = useState('Login');
@@ -10,7 +11,6 @@ const Login = () => {
     const [usernameError, setUsernameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [cPasswordError, setCPasswordError] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -18,39 +18,22 @@ const Login = () => {
         setUsernameError(false);
         setPasswordError(false);
         setCPasswordError(false);
-        setErrorMessage("");
-        let newErrorMessage = "";
 
         if(action === 'Login'){
-            login(username, password)
-            /*
-            if(username === '') { setUsernameError(true); }
-            if(password === '') { setPasswordError(true); }
-            */
+            login(username, password);
         } else if( action === 'Register') {
-            if(username === '') { 
-                setUsernameError(true);
-                newErrorMessage += "Username Field can't be empty" + "\n";
-            }
             if(password === '') { 
                 setPasswordError(true);
-                newErrorMessage += "Password field can't be empty" + "\n";
             }
-            if(cPassword === '') { 
+            if(cPassword !== password) { 
                 setCPasswordError(true);
-                newErrorMessage += "Confirm Password can't be empty" + "\n";
             }
-            if(password !== cPassword) {
-                setCPasswordError(true);
-                setPasswordError(true);
-                newErrorMessage += "Passwords don't match" + "\n";
+            if(username === '') { 
+                setUsernameError(true);
+            } else if(!cPasswordError && !passwordError) {
+                signup(username, password)
             }
-            signup(username, password)
-            /*
-            console.log(newErrorMessage)
-            console.log(`Username is: ${username}\nPassword is: ${password}\nConfirm Password is: ${cPassword}`)
-            setErrorMessage(newErrorMessage);
-            */
+
         }
     }
 
@@ -79,11 +62,6 @@ const Login = () => {
                 Register
             </ToggleButton>
         </ToggleButtonGroup>
-        {(cPasswordError || passwordError || usernameError) && (
-        <h3> 
-            {errorMessage}
-        </h3>
-        )}
         <form
             noValidate
             autoComplete="off"
@@ -121,6 +99,7 @@ const Login = () => {
                         required
                         error = {usernameError}
                     />
+                    {usernameError && (<Fragment>Username can't be empty</Fragment>)}
                     <FilledInput 
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
@@ -128,6 +107,7 @@ const Login = () => {
                         required
                         error = {passwordError}
                     />
+                    {passwordError && (<Fragment>Password can't be empty</Fragment>)}
                     <FilledInput
                         onChange={(e) => setCPassword(e.target.value)}
                         placeholder="Confirm password"
@@ -135,6 +115,7 @@ const Login = () => {
                         required
                         error = {cPasswordError}
                     />
+                    {cPasswordError && (<Fragment>Passwords don't match</Fragment>)}
             </Stack>
             )}
             <Box textAlign='center'>
@@ -142,10 +123,12 @@ const Login = () => {
                     type = "submit"
                     variant = "contained"
                     size = "medium"
+                    sx = {{backgroundColor:'#6C63FF'}}
                 >
                     {action}
                 </Button>
             </Box>
+            <LoginFooter/>
         </form>
     </div>
     )

@@ -7,7 +7,6 @@ import HomeIcon from '@mui/icons-material/Home'
 import GroupsIcon from '@mui/icons-material/Groups'
 import LocalMoviesIcon from '@mui/icons-material/LocalMovies'
 import ListIcon from '@mui/icons-material/List'
-import Face4Icon from '@mui/icons-material/Face4'
 import Paper from '@mui/material/Paper'
 
 import BottomNavigation from '@mui/material/BottomNavigation'

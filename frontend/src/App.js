@@ -9,14 +9,15 @@ import Group from './pages/Group'
 import List from './pages/List'
 import User from './pages/User'
 import ManyMedia from './pages/ManyMedia'
+import { userIsSignedIn } from './LocalStorageInterface'
 
 function App() {
     const ctx = useContext(UserContext) //context works
     const fakeData = ctx.fakeDBInfo
-    
+
     return (
         <Routes>
-            {fakeData.accessToken ? (
+            {userIsSignedIn() ? (
                 <Route path="/" element={<Home />} />
             ) : (
                 <Route path="/" element={<Login />} />
