@@ -24,15 +24,14 @@ import { makeWatchList } from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
 
 const Group = () => {
-    const location = useLocation()
-    const groupInfo = location.state.group
-    console.log(location.state.groupIdx)
-    const ctx = useContext(UserContext)
-    console.log(ctx.userInfo.groups[location.state.groupIdx])
+    const location = useLocation();
+    const [groupInfo, setGroupInfo] = React.useState(location.state.group);
+    const ctx = useContext(UserContext);
 
-    const [open, setOpen] = React.useState(false)
-    const [newListName, setNewListName] = React.useState('')
-    const handleOpen = () => setOpen(true)
+    const [open, setOpen] = React.useState(false);
+    const [newListName, setNewListName] = React.useState('');
+    const handleOpen = () => setOpen(true);
+
     const handleClose = () => {
         setOpen(false)
         setNewListName('')

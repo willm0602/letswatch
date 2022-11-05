@@ -56,11 +56,11 @@ const Groups = () => {
         ctx.setUserInfo(userInfo)
 
         //This function doesn't have the backend setup as of right now
-        makeNewGroup(newGroupName, ctx.userInfo.userID).then(
-            userMetadata().then((res) => ctx.setUserInfo(res))
-        )
-
-        handleClose()
+        // makeNewGroup(newGroupName, ctx.userInfo.userID)
+        //     .then(userMetadata()
+        //             .then((res) => ctx.setUserInfo(res)))
+        
+        handleClose();
     }
 
     const style = {
