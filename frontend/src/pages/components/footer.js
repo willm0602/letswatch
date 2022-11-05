@@ -15,7 +15,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 const Footer = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
-    const userInfo = ctx.userInfo;
+    const userInfo = ctx.userInfo
 
     return (
         <Paper

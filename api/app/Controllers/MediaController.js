@@ -15,57 +15,54 @@ async function mediaSearch(ctx) {
         .join('+')}`
 
     return new Promise(async (res, rej) => {
-        const resp = await axios.get(url);
-        console.log(`resp is`, resp.data.results);
+        const resp = await axios.get(url)
+        console.log(`resp is`, resp.data.results)
         const tmdbData = resp.data.results.map((media) => {
-                            if (
-                                !Object.values(C.MEDIA_TYPES).includes(media.media_type)
-                            ) {
-                                return undefined
-                            }
-                            return media.title
-                                ? {
-                                        title: media.title,
-                                        tmdbID: media.id,
-                                        synopsis: media.overview,
-                                        image: getPosterPath(media.poster_path),
-                                        rating: media.vote_average * 10,
-                                        releaseDate: new Date(
-                                            moment(media.release_date, 'YYYY-MM-DD')
-                                        ),
-                                        type: media.media_type,
-                                    }
-                                : media.name
-                                ? {
-                                        title: media.name,
-                                        tmdbID: media.id,
-                                        synopsis: media.overview,
-                                        image: getPosterPath(media.poster_path),
-                                        rating: media.vote_average * 10,
-                                        releaseDate: new Date(
-                                            moment(media.first_air_date, 'YYYY-MM-DD')
-                                        ),
-                                        type: media.media_type,
-                                    }
-                                : undefined
-                        });
+            if (!Object.values(C.MEDIA_TYPES).includes(media.media_type)) {
+                return undefined
+            }
+            return media.title
+                ? {
+                      title: media.title,
+                      tmdbID: media.id,
+                      synopsis: media.overview,
+                      image: getPosterPath(media.poster_path),
+                      rating: media.vote_average * 10,
+                      releaseDate: new Date(
+                          moment(media.release_date, 'YYYY-MM-DD')
+                      ),
+                      type: media.media_type,
+                  }
+                : media.name
+                ? {
+                      title: media.name,
+                      tmdbID: media.id,
+                      synopsis: media.overview,
+                      image: getPosterPath(media.poster_path),
+                      rating: media.vote_average * 10,
+                      releaseDate: new Date(
+                          moment(media.first_air_date, 'YYYY-MM-DD')
+                      ),
+                      type: media.media_type,
+                  }
+                : undefined
+        })
 
         const validTMDBData = tmdbData.filter((val) => val !== undefined)
-        
-        let letsWatchSearchResults = [];
-        for(let media of validTMDBData)
-        {
-            const id = await saveMediaToDB(media);
+
+        let letsWatchSearchResults = []
+        for (let media of validTMDBData) {
+            const id = await saveMediaToDB(media)
             letsWatchSearchResults.push({
                 ...media,
-                id
-            });
+                id,
+            })
         }
 
-        ctx.body = letsWatchSearchResults;
-        console.log(`ctxBody is ${ctx.body}`);
-        
-        return res(letsWatchSearchResults);
+        ctx.body = letsWatchSearchResults
+        console.log(`ctxBody is ${ctx.body}`)
+
+        return res(letsWatchSearchResults)
     })
 }
 
@@ -99,7 +96,7 @@ async function existsInDatabase(mediaID, mediaType) {
             },
             (err, tuples) => {
                 if (err) return rej('unable to access database')
-                console.log(`got packet for exists`, tuples[0]);
+                console.log(`got packet for exists`, tuples[0])
                 if (tuples.length) return res(tuples[0].id)
                 return res(false)
             }
@@ -129,7 +126,7 @@ async function saveMediaToDB(media) {
                     )`
     return new Promise(async (res, rej) => {
         if (alreadyExists) {
-            return res(alreadyExists );
+            return res(alreadyExists)
         }
         conn.query(
             {
@@ -149,7 +146,7 @@ async function saveMediaToDB(media) {
                     console.error('Error saving media:', err)
                     return false
                 }
-                return res(await existsInDatabase(media.tmdbID, media.type));
+                return res(await existsInDatabase(media.tmdbID, media.type))
             }
         )
     })

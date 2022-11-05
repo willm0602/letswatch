@@ -1,8 +1,7 @@
-import {get} from './Utils';
+import { get } from './Utils'
 
-export async function mediaSearch(query)
-{
+export async function mediaSearch(query) {
     return get(`/media/search`, {
-        query
-    });
+        query,
+    })
 }
