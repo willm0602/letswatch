@@ -1,5 +1,9 @@
 const conn = require('../../database/mySQLconnect')
-const { apiResponse, getIDFromAccessToken } = require('../../MiscUtils')
+const {
+    apiResponse,
+    getIDFromAccessToken,
+    userIsInGroup,
+} = require('../../MiscUtils')
 const { createSinglePersonGroup } = require('./GroupController')
 
 async function getUserGroupID(userID) {
@@ -19,8 +23,7 @@ async function getUserGroupID(userID) {
     })
 }
 
-async function createList(userID, listName) {
-    console.log(getUserGroupID)
+async function createListForSingleUser(userID, listName) {
     let groupID = await getUserGroupID(userID)
     if (!groupID) {
         await createSinglePersonGroup(userID)
@@ -65,6 +68,95 @@ async function createList(userID, listName) {
     })
 }
 
+async function addUserToList(userID, listID) {
+    const userAlreadyInList = await userInList(userID, listID);
+    const sql = `INSERT INTO user_list_memberships(user_id, list_id) VALUES (?, ?)`;
+    
+    return new Promise((res, rej) => {
+        if (userAlreadyInList) return res(userAlreadyInList);
+        conn.query({
+            sql,
+            values: [
+                userID,
+                listID
+            ]
+        }, async (err, rows) => {
+            if(err)
+                return rej(err)
+            const userInListID = await userInList(userID, listID);
+            return res(userInListID);
+        })
+    })
+}
+
+async function userInList(userID, listID) {
+    const sql = `SELECT * FROM user_list_memberships WHERE user_id=? AND list_id=?`
+
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+                values: [userID, listID],
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                if (rows.length === 0) return res(false)
+                return res(rows[0].id)
+            }
+        )
+    })
+}
+
+async function createList(ctx) {
+    const queryParams = ctx.request.query
+    const { groupID, listName, accessToken } = queryParams
+
+    const userInGroup = await userIsInGroup(accessToken, groupID)
+
+    const sql = `INSERT INTO watch_lists(Name, group_id) VALUES(?, ?)`
+
+    return new Promise(async (res, rej) => {
+        if (userInGroup === false) return rej('Error: user is not in group')
+
+        await conn.query(
+            {
+                sql,
+                values: [listName, groupID],
+            },
+            async (err, rows) => {
+                if (err) return rej(err);
+                const listID = await guessListMade(listName, groupID);
+                const userID = await getIDFromAccessToken(accessToken);
+                await addUserToList(userID, listID);
+                return res(true);
+            }
+        )
+
+    })
+}
+
+// this will guess the list made, it might technically have some errors at some point but that's
+// future will's problem
+// this just guesses which list was just made by a group (I'd be surprised if this was ever wrong)
+async function guessListMade(listName, groupID){
+    const sql = `SELECT * FROM watch_lists WHERE group_id=? AND Name=? ORDER BY id DESC;`
+    return new Promise((res, rej) => {
+        conn.query({
+            sql,
+            values: [
+                groupID,
+                listName
+            ]
+        }, (err, rows) => {
+            if(err)
+                return rej(err);
+            if(rows.length === 0)
+                return rej(`No list found`);
+            return res(rows[0].id);
+        })
+    });
+}
+
 async function getListsForGroup(groupID) {
     const sql = `SELECT * FROM watch_lists WHERE group_id=? ORDER BY id`
     return new Promise((res, rej) => {
@@ -76,34 +168,35 @@ async function getListsForGroup(groupID) {
             async (err, tuples) => {
                 if (err)
                     return rej('Unable to query database for lists for group')
-                let watchLists = [];
-                for(let tuple of tuples)
-                {
-                    const listMembers = await getUsersForList(tuple.id);
-                    const media = await getMediaForWatchList(tuple.id);
+                let watchLists = []
+                for (let tuple of tuples) {
+                    const listMembers = await getUsersForList(tuple.id)
+                    const media = await getMediaForWatchList(tuple.id)
                     const watchList = {
                         listName: tuple.Name,
                         listID: tuple.id,
-                        listMembers: listMembers.map((member) => {return {
-                            username: member.Username,
-                            profileID: member.ProfileImageID
-                        }}),
-                        media
-                    };
-                    watchLists.push(watchList);
+                        listMembers: listMembers.map((member) => {
+                            return {
+                                username: member.Username,
+                                profileID: member.ProfileImageID,
+                            }
+                        }),
+                        media,
+                    }
+                    watchLists.push(watchList)
                 }
-                return res(watchLists);
+                return res(watchLists)
             }
         )
     })
 }
 
 async function getUsersForList(listID) {
-    const sql = `SELECT Username, ProfileImageID FROM letswatch.watch_lists
-	                LEFT JOIN letswatch.user_list_memberships 
-		                ON letswatch.watch_lists.id=letswatch.user_list_memberships.list_id
-	                RIGHT JOIN letswatch.users
-		                ON letswatch.users.id=letswatch.user_list_memberships.user_id
+    const sql = `SELECT Username, ProfileImageID FROM watch_lists
+	                LEFT JOIN user_list_memberships 
+		                ON watch_lists.id=user_list_memberships.list_id
+	                RIGHT JOIN users
+		                ON users.id=user_list_memberships.user_id
 	            WHERE list_id=?;`
     return new Promise((res, rej) => {
         conn.query(
@@ -120,11 +213,11 @@ async function getUsersForList(listID) {
 }
 
 async function addMediaToWatchlist(ctx) {
-    const mediaID = ctx.request.query.mediaID;
-    const listID = ctx.request.query.listID;
-    const accessToken = ctx.request.query.accessToken;
+    const mediaID = ctx.request.query.mediaID
+    const listID = ctx.request.query.listID
+    const accessToken = ctx.request.query.accessToken
 
-    const userID = await getIDFromAccessToken(accessToken);
+    const userID = await getIDFromAccessToken(accessToken)
 
     const sql = `INSERT INTO watch_list_items(
                     watchlist_id,
@@ -138,59 +231,61 @@ async function addMediaToWatchlist(ctx) {
                     ?
                 );`
     return new Promise((res, rej) => {
-        const query = conn.query({
-            sql,
-            values: [
-                listID,
-                mediaID,
-                userID,
-                new Date()
-            ]
-        }, (err, rows) => {
-            console.log(query.sql);
-            if(err)
+        const query = conn.query(
             {
-                ctx.body = apiResponse(false, err);
-                return rej(err);
+                sql,
+                values: [listID, mediaID, userID, new Date()],
+            },
+            (err, rows) => {
+                console.log(query.sql)
+                if (err) {
+                    ctx.body = apiResponse(false, err)
+                    return rej(err)
+                }
+                ctx.body = apiResponse(true, 'Success')
+                return res('Added media to watch list')
             }
-            ctx.body = apiResponse(true, "Success");
-            return res('Added media to watch list');                
-        })
+        )
     })
 }
 
 async function getMediaForWatchList(watchListID) {
-    const sql = `SELECT * FROM letswatch.watch_list_items
-	INNER JOIN letswatch.media 
-    ON letswatch.watch_list_items.media_id=letswatch.media.id
-    INNER JOIN letswatch.users
-    ON letswatch.watch_list_items.user_added_by_id=letswatch.users.id
+    const sql = `SELECT * FROM watch_list_items
+	INNER JOIN media 
+    ON watch_list_items.media_id=media.id
+    INNER JOIN users
+    ON watch_list_items.user_added_by_id=users.id
     ;`
 
     return new Promise((res, rej) => {
-        conn.query({
-            sql,
-            values: [watchListID]
-        }, (err, rows) => {
-            if(err)
-                return rej(err);
-            let allMedia = [];
-            for(let row of rows)
+        conn.query(
             {
-
-                let media = {
-                    title: row.title,
-                    poster: row.image_url,
-                    synopsis: row.synopsis,
-                    score: row.rating,
-                    addedBy: row.Username
+                sql,
+                values: [watchListID],
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                let allMedia = []
+                for (let row of rows) {
+                    let media = {
+                        title: row.title,
+                        poster: row.image_url,
+                        synopsis: row.synopsis,
+                        score: row.rating,
+                        addedBy: row.Username,
+                    }
+                    console.log(`media is`, media)
+                    allMedia.push(media)
                 }
-                console.log(`media is`, media);
-                allMedia.push(media);
+                return res(allMedia)
             }
-            return res(allMedia);
-        })
+        )
     })
 }
 
-module.exports = { createList, getListsForGroup, addMediaToWatchlist }
+module.exports = {
+    createList,
+    createListForSingleUser,
+    getListsForGroup,
+    addMediaToWatchlist,
+}

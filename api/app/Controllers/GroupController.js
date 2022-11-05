@@ -1,6 +1,6 @@
 const conn = require('../../database/mySQLconnect')
 const AccountController = require('./AccountController')
-const { createList, getListsForGroup } = require('./WatchListController')
+const { createListForSingleUser, getListsForGroup } = require('./WatchListController')
 
 async function createSinglePersonGroup(userID) {
     const sql = `INSERT INTO user_groups(
@@ -19,7 +19,7 @@ async function createSinglePersonGroup(userID) {
             async (err, tuples) => {
                 console.log(query.sql)
                 if (err) return rej(err)
-                await createList(userID, `Watch List for ${userID}`)
+                await createListForSingleUser(userID, `Watch List for ${userID}`)
                 const groupID = await getUserGroupID(userID)
                 await conn.query(
                     {
