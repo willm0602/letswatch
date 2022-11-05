@@ -9,3 +9,7 @@ export async function mediaSearch(query) {
 export async function getMediaByID(id) {
     return get(`/media/${id}`);
 }
+
+export async function allMedia(){
+    return get('/media/all');
+}

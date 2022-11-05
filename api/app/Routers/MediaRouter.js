@@ -4,6 +4,7 @@
  * Routes
  *      Get
  *          /search
+ *          /all
  *
  *      Post
  * ==========================
