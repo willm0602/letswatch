@@ -76,8 +76,9 @@ async function getMediaByID(id) {
                 values: [id],
             },
             async (err, tuples) => {
-                if (err) rej('unable to query our database to get movies')
+                if (err) return rej('unable to query our database to get movies')
                 if (tuples.length > 0) return res(tuples[0])
+                return rej(`media w/ id ${id} doesn't exist`)
             }
         )
     })
