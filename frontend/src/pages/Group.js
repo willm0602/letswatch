@@ -13,12 +13,16 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
 
 import * as React from 'react';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 import { useContext } from 'react'
 import { UserContext } from '../contextSetup'
 import { TextField } from '@mui/material'
+
+//API stuff
+import { makeWatchList } from '../APIInterface/WatchList'
+import { userMetadata } from '../APIInterface/GetUserData'
+
 const Group = () => {
     const location = useLocation()
     const groupInfo = location.state.group
@@ -45,9 +49,7 @@ const Group = () => {
     }
 
     const handleCreateList = () => {
-        console.log(newListName);
         let newLists = ctx.userInfo.groups[location.state.groupIdx].lists
-        console.log(newLists)
         const newList = {
             listID:9,
             listMembers:[{username:ctx.userInfo.username, profileID:ctx.userInfo.profileID}],
@@ -56,8 +58,12 @@ const Group = () => {
         }
         let newDBInfo = ctx.userInfo;
         newDBInfo.groups[location.state.groupIdx].lists = [...newDBInfo.groups[location.state.groupIdx].lists, newList];
-        console.log(newDBInfo);
         ctx.setUserInfo(newDBInfo);
+        
+        makeWatchList(newListName, ctx.userInfo.groups[location.state.groupIdx].groupID)
+            .then(userMetadata()
+                .then((res) => ctx.setUserInfo(res)))
+                    .then(setGroupInfo(ctx.userInfo.groups[location.state.groupIdx]))
         handleClose();
     }
 
@@ -81,6 +87,7 @@ const Group = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 textAlign: 'center',
+                paddingBottom:'100px'
             }}
         >
             <NMHeader />
@@ -142,7 +149,7 @@ const Group = () => {
                 </List>
             </Box>
             
-            <Fab onClick={()=>handleAddList()} color="primary" aria-label="add" style={{position:'absolute', top:'80%', left:'80%', backgroundColor:'#6C63FF'}}>
+            <Fab onClick={()=>handleAddList()} color="primary" aria-label="add" style={{position:'fixed', top:'80%', left:'80%', backgroundColor:'#6C63FF'}}>
                 <AddIcon />
             </Fab>
 
@@ -170,8 +177,6 @@ const Group = () => {
                     </Button>
                 </Box>
             </Modal>
-
-
             <Footer />
         </div>
     )

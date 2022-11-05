@@ -13,6 +13,24 @@ import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
 
+
+
+/*
+
+new for push
+
+Hey you goddamn goon, There's some stuff you gotta fix
+
+-[fixed for groups, add padding bottom to the bottom of pages later]Stuff is falling underneath the bottom nav, add some kinda box at the bottom that sits about the same size as the nav
+
+-[fixed]The button to add stuff doesn't follow along when you scroll, make sure it stays indefinetly.
+
+-[fixed]make sure the lists on the front page only display like 5 things
+*/
+
+
+
+
 const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
@@ -22,7 +40,9 @@ const Home = () => {
     if(ctx.userInfo){
         personalGroup = ctx.userInfo.groups.filter( group => group.members.length === 1 && group.members[0].username === ctx.userInfo.username);
         if(personalGroup)
-            personalLists = personalGroup[0].lists;
+            personalLists = personalGroup[0].lists.slice(0,3);
+
+        
     }
 
     const autoCompletePlaceholderData = [
@@ -171,17 +191,19 @@ const Home = () => {
                     ))}
                 </List>
             </Box>
-            <Button
-                variant="contained"
-                style={{
-                    maxWidth: '300px',
-                    margin: 'auto',
-                    backgroundColor: '#6C63FF',
-                    borderRadius: '15px',
-                }}
-            >
-                See More
-            </Button>
+            <Link to='/groups'>
+                <Button
+                    variant="contained"
+                    style={{
+                        maxWidth: '300px',
+                        margin: 'auto',
+                        backgroundColor: '#6C63FF',
+                        borderRadius: '15px',
+                    }}
+                >
+                    See More
+                </Button>
+            </Link>
             <Footer />
         </div>
         :

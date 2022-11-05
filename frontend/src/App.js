@@ -11,6 +11,8 @@ import User from './pages/User'
 import ManyMedia from './pages/ManyMedia'
 import {userIsSignedIn} from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
+import Groups from './pages/Groups'
+import Groups from './pages/Groups'
 
 function App() {
     const ctx = useContext(UserContext) //context works
