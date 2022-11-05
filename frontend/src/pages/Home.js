@@ -171,17 +171,19 @@ const Home = () => {
                     ))}
                 </List>
             </Box>
-            <Button
-                variant="contained"
-                style={{
-                    maxWidth: '300px',
-                    margin: 'auto',
-                    backgroundColor: '#6C63FF',
-                    borderRadius: '15px',
-                }}
-            >
-                See More
-            </Button>
+            <Link to='/groups'>
+                <Button
+                    variant="contained"
+                    style={{
+                        maxWidth: '300px',
+                        margin: 'auto',
+                        backgroundColor: '#6C63FF',
+                        borderRadius: '15px',
+                    }}
+                >
+                    See More
+                </Button>
+            </Link>
             <Footer />
         </div>
         :
