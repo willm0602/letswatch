@@ -8,11 +8,8 @@ const {
     createSinglePersonGroup,
     getInfoForGroup,
 } = require('./GroupController')
-const { createList } = require('./WatchListController')
 
-async function test(ctx) {
-    return (ctx.body = 'Account Router is Stupid!!!')
-}
+const { createList } = require('./WatchListController')
 
 /*
 DB call to add a user to the database
@@ -115,8 +112,16 @@ async function login(ctx, next) {
     })
 }
 
+/**
+ * Checks if a username is available
+ *
+ * Parameters
+ *  username: str
+ * 
+ * Returns true if the username has been taken, false if the username
+ * hasn't been taken and undefined if there is an error querying the database
+ */
 async function usernameTaken(username) {
-    console.log('checking if username has been taken')
     const query = `SELECT Username FROM Users WHERE Username=?;`
     return new Promise((res, rej) => {
         conn.query(
@@ -125,8 +130,7 @@ async function usernameTaken(username) {
                 values: [username],
             },
             (err, tuples) => {
-                console.log('got usernames', tuples)
-                if (err) return rej(undefined)
+                if (err) return rej(`Unable to query database`);
                 if (tuples.length === 0) {
                     return res(false)
                 }
@@ -136,13 +140,24 @@ async function usernameTaken(username) {
     })
 }
 
+
+/**
+ * Gets an access token for a user with a given username and password
+ * 
+ * Parameters
+ * ---------
+ * username: str
+ *      
+ * password: str
+ * 
+ * returns the access token for the user if it is valid, otherwise returns undefined
+ */
 async function getAccessToken(username, password) {
     const query = `SELECT * FROM Users 
                         WHERE Username=?
                         AND User_Password=?;`
 
     return new Promise((res, rej) => {
-        console.log('getting access token from database')
         const execution = conn.query(
             {
                 sql: query,
@@ -158,6 +173,16 @@ async function getAccessToken(username, password) {
     })
 }
 
+/**
+ * Gets a list of ids of groups that a user is in
+ * 
+ * Parameters
+ * ---------
+ * id: int
+ *      the id of the user that we are getting the groups for
+ *      
+ * returns the ids of each group that the user is in
+ */
 async function allGroupsForUser(id) {
     const sql = `SELECT * FROM user_group_memberships WHERE user_id=?`
 
@@ -179,6 +204,153 @@ async function allGroupsForUser(id) {
     })
 }
 
+/**
+ * DB call to get all information a user might need 
+ * 
+ * Accessible through route at /account/info
+ * 
+ * Parameters (passed through ctx)
+    ---------------------------
+    accessToken: str
+        accessToken of the user that we are getting the information for
+
+    Returns an object with the following structure:
+    {
+    "id",
+    "username",
+    "profileID",
+    "bio",
+    "accessToken",
+    "dateJoined",
+    "groups": [
+        {
+            "groupID": 13,
+            "groupName": "23-sologroup",
+            "members": [
+                {
+                    "username": "willmigdol11112",
+                    "profileID": 0,
+                    "id": 23
+                }...
+            ],
+            "lists": [
+                {
+                    "listName": "Watch List for 23",
+                    "listID": 11,
+                    "listMembers": [
+                        {
+                            "username": "willmigdol11112",
+                            "profileID": 0
+                        },
+                        {
+                            "username": "willmigdol11112",
+                            "profileID": 0
+                        }
+                    ],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "willmigdol11112's Watch List",
+                    "listID": 12,
+                    "listMembers": [],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "A List",
+                    "listID": 15,
+                    "listMembers": [],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "A List",
+                    "listID": 16,
+                    "listMembers": [],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "A List",
+                    "listID": 17,
+                    "listMembers": [],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "A List",
+                    "listID": 18,
+                    "listMembers": [],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                },
+                {
+                    "listName": "A List",
+                    "listID": 19,
+                    "listMembers": [
+                        {
+                            "username": "willmigdol11112",
+                            "profileID": 0
+                        }
+                    ],
+                    "media": [
+                        {
+                            "title": "The Avengers",
+                            "poster": "https://image.tmdb.org/t/p/original/uU7CrpWkD7W04HBpuK4CSbtSKRi.jpg",
+                            "synopsis": "The Avengers is a British television series created in the 1960s. It initially focused on Dr. David Keel and his assistant John Steed. Hendry left after the first series and Steed became the main character, partnered with a succession of assistants. His most famous assistants were intelligent, stylish and assertive women: Cathy Gale, Emma Peel and Tara King. Later episodes increasingly incorporated elements of science fiction and fantasy, parody and British eccentricity.",
+                            "score": 79,
+                            "addedBy": "willmigdol1111244"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+*/
 async function allInfo(ctx) {
     const accessToken = ctx.request.query.accessToken
     return new Promise(async (res, rej) => {
@@ -238,7 +410,6 @@ async function allInfo(ctx) {
 }
 
 module.exports = {
-    test,
     getAccessToken,
     signup,
     login,

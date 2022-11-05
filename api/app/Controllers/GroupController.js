@@ -6,6 +6,14 @@ const {
     getListsForGroup,
 } = require('./WatchListController')
 
+/**
+ * Function that makes a group with a single list for a single user
+ * 
+ * Parameters
+ * ----------
+ * userID: int
+ *      the id of the user to make the list and group for
+ */
 async function createSinglePersonGroup(userID) {
     const sql = `INSERT INTO user_groups(
                                 Name
@@ -27,7 +35,7 @@ async function createSinglePersonGroup(userID) {
                     userID,
                     `Watch List for ${userID}`
                 )
-                const groupID = await getUserGroupID(userID)
+                const groupID = await getUserSoloGroupID(userID)
                 await conn.query(
                     {
                         sql: `INSERT INTO user_group_memberships(
@@ -51,7 +59,7 @@ async function createSinglePersonGroup(userID) {
 }
 
 // in both here and WatchListController to prevent circular imports
-async function getUserGroupID(userID) {
+async function getUserSoloGroupID(userID) {
     const query = `SELECT * FROM user_groups WHERE Name=?;`
     return new Promise((res, rej) => {
         conn.query(
@@ -68,6 +76,18 @@ async function getUserGroupID(userID) {
     })
 }
 
+/**
+ * Adds a user to a group
+ * 
+ * Parameters
+ * ----------
+ * userID: int
+ *      the id of the user to add to a group
+ * groupID: int
+ *      the id of the group that the user is going to be added to
+ * 
+ * returns true if user is succesfully added to group, otherwise it is rejected
+ */
 async function addUserToGroup(userID, groupID)
 {
     const usersAlreadyInGroup = await getUsersForGroup(groupID);
@@ -94,8 +114,16 @@ async function addUserToGroup(userID, groupID)
     }) 
 }
 
+
+/**
+ * Gets all information for a group 
+ * 
+ * Parameters
+ * ---------------
+ * id: int
+ *      the id of the group we are getting the information for
+ */
 async function getInfoForGroup(id) {
-    console.log('getting info for group')
     const sql = `SELECT * FROM user_groups WHERE id=?`
     const members = await getUsersForGroup(id)
 
