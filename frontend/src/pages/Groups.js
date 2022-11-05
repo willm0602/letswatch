@@ -39,7 +39,7 @@ const Groups = () => {
              {
                 groupID:9999,
                 groupName:newGroupName,
-                lists:[
+                lists:[ //Do we want to start new groups off with a starter list?
                     {
                         listID:89,
                         listMembers:[{username:ctx.userInfo.username, profileID:ctx.userInfo.profileID}],
