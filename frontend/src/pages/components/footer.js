@@ -67,9 +67,11 @@ const Footer = () => {
                     />
                 </Link>
 
-                <BottomNavigationAction
-                    icon={<ListIcon style={{ color: 'white' }} />}
-                />
+                <Link to="/lists" style={{ display: 'flex' }}>
+                    <BottomNavigationAction
+                        icon={<ListIcon style={{ color: 'white' }} />}
+                    />
+                </Link>
             </BottomNavigation>
         </Paper>
     )

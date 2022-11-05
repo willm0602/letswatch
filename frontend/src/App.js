@@ -8,10 +8,12 @@ import Login from './pages/Login'
 import Group from './pages/Group'
 import List from './pages/List'
 import User from './pages/User'
+import Groups from './pages/Groups'
+import Lists from './pages/Lists'
 import ManyMedia from './pages/ManyMedia'
 import {userIsSignedIn} from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
-import Groups from './pages/Groups'
+
 
 function App() {
     const ctx = useContext(UserContext) //context works
@@ -27,6 +29,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/group/*" element={<Group />} />
                   <Route path="/list/*" element={<List />} />
+                  <Route path="/lists" element={<Lists />} />
                   <Route path="/user/*" element={<User />} />
                   <Route path="/media" element={<ManyMedia />} />
                   <Route path="/groups" element={<Groups />} />
