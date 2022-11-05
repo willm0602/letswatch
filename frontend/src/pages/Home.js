@@ -17,6 +17,8 @@ import Button from '@mui/material/Button'
 
 /*
 
+new for push
+
 Hey you goddamn goon, There's some stuff you gotta fix
 
 -[fixed for groups, add padding bottom to the bottom of pages later]Stuff is falling underneath the bottom nav, add some kinda box at the bottom that sits about the same size as the nav
