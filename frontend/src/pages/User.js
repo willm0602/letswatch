@@ -7,8 +7,7 @@ import { UserContext } from '../contextSetup'
 const User = () => {
     const location = useLocation()
     const ctx = useContext(UserContext)
-    
-    
+
     const userInfo = ctx.userInfo
 
     return (

@@ -1,5 +1,9 @@
 const conn = require('../../database/mySQLconnect')
-const { apiResponse, getIDFromAccessToken, randomStr } = require('../../MiscUtils')
+const {
+    apiResponse,
+    getIDFromAccessToken,
+    randomStr,
+} = require('../../MiscUtils')
 const {
     createSinglePersonGroup,
     getInfoForGroup,

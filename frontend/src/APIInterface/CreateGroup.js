@@ -1,11 +1,10 @@
-import { getAccessToken } from "../LocalStorageInterface";
-import { post } from "./Utils";
+import { getAccessToken } from '../LocalStorageInterface'
+import { post } from './Utils'
 
-export async function makeNewGroup(name, userID)
-{
+export async function makeNewGroup(name, userID) {
     post('/group/create', {
         groupName: name,
         userID,
-        accessToken: getAccessToken()
+        accessToken: getAccessToken(),
     })
 }
