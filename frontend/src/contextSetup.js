@@ -23,9 +23,9 @@ const UserContextProvider = ({ children }) => {
 
     const fakeMediaSearch = [
         {
-            id:99,
-            tmdbID:999,
-            type:'movie',
+            id: 99,
+            tmdbID: 999,
+            type: 'movie',
             title: 'Everything Everywhere All at Once',
             image: 'https://www.themoviedb.org/t/p/original/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg',
             synopsis:
@@ -33,9 +33,9 @@ const UserContextProvider = ({ children }) => {
             rating: 81,
         },
         {
-            id:19,
-            tmdbID:199,
-            type:'movie',
+            id: 19,
+            tmdbID: 199,
+            type: 'movie',
             title: "Don't Worry Darling",
             image: 'https://www.themoviedb.org/t/p/original/jOqxKIOC92BVyinYO1Fm73XY7Tc.jpg',
             synopsis:
@@ -43,9 +43,9 @@ const UserContextProvider = ({ children }) => {
             rating: 69, //nice
         },
         {
-            id:29,
-            tmdbID:299,
-            type:'movie',
+            id: 29,
+            tmdbID: 299,
+            type: 'movie',
             title: 'Stranger Things',
             image: 'https://www.themoviedb.org/t/p/original/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
             synopsis:

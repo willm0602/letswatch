@@ -59,8 +59,8 @@ const Groups = () => {
         // makeNewGroup(newGroupName, ctx.userInfo.userID)
         //     .then(userMetadata()
         //             .then((res) => ctx.setUserInfo(res)))
-        
-        handleClose();
+
+        handleClose()
     }
 
     const style = {

@@ -11,13 +11,13 @@ import { Button } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
-import Modal from '@mui/material/Modal';
+import Modal from '@mui/material/Modal'
 
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 
 //API stuff
-import {mediaSearch} from '../APIInterface/MediaSearch';
+import { mediaSearch } from '../APIInterface/MediaSearch'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
@@ -30,37 +30,35 @@ const ListOfMedia = () => {
     const fakeMedia = ctx.fakeMediaSearch
 
     //search bar stuff
-    const [searchInputValue, setSearchInputValue] = useState('');
+    const [searchInputValue, setSearchInputValue] = useState('')
 
+    //modal
+    const [open, setOpen] = useState(false)
+    const [newMediaFromSearch, setNewMediaFromSearch] = useState(null)
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 300,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
+    }
+    const handleMediaNotFound = () => {
+        handleOpen()
 
-        //modal
-        const [open,setOpen] = useState(false);
-        const [newMediaFromSearch, setNewMediaFromSearch] = useState(null);
-        const handleOpen = () => setOpen(true);
-        const handleClose = () => setOpen(false);
-        const style = {
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 300,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-        };
-        const handleMediaNotFound = () => {
-            handleOpen();
-
-            const callThing = async (search) => {
-                await mediaSearch(search).then(res=> setNewMediaFromSearch(res));
-            }
-
-            callThing(searchInputValue);
+        const callThing = async (search) => {
+            await mediaSearch(search).then((res) => setNewMediaFromSearch(res))
         }
 
+        callThing(searchInputValue)
+    }
 
     const handleClick = (mediaTitle) => {
-        console.log(searchInputValue);
+        console.log(searchInputValue)
         if (
             listContent.filter((item) => item.title === mediaTitle).length >
                 0 ||
@@ -135,7 +133,7 @@ const ListOfMedia = () => {
                     sx={{ width: '90%', border: '1px solid lightgrey' }}
                     freeSolo={true}
                     inputValue={searchInputValue}
-                    onInputChange={(event, value)=>setSearchInputValue(value)}
+                    onInputChange={(event, value) => setSearchInputValue(value)}
                     options={fakeMedia}
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, options) => (
@@ -174,11 +172,15 @@ const ListOfMedia = () => {
                         />
                     )}
                 ></Autocomplete>
-                {searchInputValue !== '' ?
-                    <Button onClick={()=>handleMediaNotFound()} style={{margin:'5px'}} variant="contained">Media not found?</Button>
-                    :
-                    null
-                }
+                {searchInputValue !== '' ? (
+                    <Button
+                        onClick={() => handleMediaNotFound()}
+                        style={{ margin: '5px' }}
+                        variant="contained"
+                    >
+                        Media not found?
+                    </Button>
+                ) : null}
 
                 <Box>
                     <List>
@@ -308,44 +310,56 @@ const ListOfMedia = () => {
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <Box sx={style} style={{overflow:'scroll', maxHeight:'75%'}}>
+                    <Box
+                        sx={style}
+                        style={{ overflow: 'scroll', maxHeight: '75%' }}
+                    >
                         <h3>Extended Search</h3>
-                        <p>Search based off input: <b>{searchInputValue}</b></p>
-                        {
-                            newMediaFromSearch ?
-                                newMediaFromSearch.map( (newMedia, newMediaIndex) =>
-                                    <div style={{display:'flex', padding:'15px', justifyContent:'space-evenly'}}>
-                                        <Button
-                                                style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    paddingTop: '10px',
-                                                    width: '100%',
-                                                    textTransform: 'none',
-                                                }}
-                                            >
-                                                {' '}
-                                                <img
-                                                    style={{ maxWidth: '50px' }}
-                                                    src={newMedia.image}
-                                                />
-                                                <p style={{ marginLeft: '15px' }}>
-                                                    {newMedia.title}
-                                                </p>
-                                                <AddCircleIcon
-                                                    onClick={() => {
-                                                        handleClick(newMedia.title)
-                                                    }}
-                                                />
-                                            </Button>
-                                    </div>
-                                )
-                            :null
-                        }
+                        <p>
+                            Search based off input: <b>{searchInputValue}</b>
+                        </p>
+                        {newMediaFromSearch
+                            ? newMediaFromSearch.map(
+                                  (newMedia, newMediaIndex) => (
+                                      <div
+                                          style={{
+                                              display: 'flex',
+                                              padding: '15px',
+                                              justifyContent: 'space-evenly',
+                                          }}
+                                      >
+                                          <Button
+                                              style={{
+                                                  display: 'flex',
+                                                  justifyContent:
+                                                      'space-between',
+                                                  paddingTop: '10px',
+                                                  width: '100%',
+                                                  textTransform: 'none',
+                                              }}
+                                          >
+                                              {' '}
+                                              <img
+                                                  style={{ maxWidth: '50px' }}
+                                                  src={newMedia.image}
+                                              />
+                                              <p style={{ marginLeft: '15px' }}>
+                                                  {newMedia.title}
+                                              </p>
+                                              <AddCircleIcon
+                                                  onClick={() => {
+                                                      handleClick(
+                                                          newMedia.title
+                                                      )
+                                                  }}
+                                              />
+                                          </Button>
+                                      </div>
+                                  )
+                              )
+                            : null}
                     </Box>
                 </Modal>
-
-
 
                 <Footer />
             </div>

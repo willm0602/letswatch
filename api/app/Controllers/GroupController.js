@@ -8,7 +8,7 @@ const {
 
 /**
  * Function that makes a group with a single list for a single user
- * 
+ *
  * Parameters
  * ----------
  * userID: int
@@ -78,46 +78,41 @@ async function getUserSoloGroupID(userID) {
 
 /**
  * Adds a user to a group
- * 
+ *
  * Parameters
  * ----------
  * userID: int
  *      the id of the user to add to a group
  * groupID: int
  *      the id of the group that the user is going to be added to
- * 
+ *
  * returns true if user is succesfully added to group, otherwise it is rejected
  */
-async function addUserToGroup(userID, groupID)
-{
-    const usersAlreadyInGroup = await getUsersForGroup(groupID);
-    const userAlreadyInGroup = usersAlreadyInGroup.reduce(
-        (prev, curr) => {
-            if(prev)
-                return true;
-            if(curr.id === userID)
-                return true;
-            return false;
-        }, false
-    );
+async function addUserToGroup(userID, groupID) {
+    const usersAlreadyInGroup = await getUsersForGroup(groupID)
+    const userAlreadyInGroup = usersAlreadyInGroup.reduce((prev, curr) => {
+        if (prev) return true
+        if (curr.id === userID) return true
+        return false
+    }, false)
     return new Promise((res, rej) => {
-        if(userAlreadyInGroup)
-            return rej('User already in group');
-        conn.query({
-            sql: `INSERT INTO user_group_memberships(user_id, group_id) VALUES(?, ?)`,
-            values: [userID, groupID]
-        }, (err, rows) => {
-            if(err)
-                return rej(`Unable to add user to group`);
-            return res(true);
-        })
-    }) 
+        if (userAlreadyInGroup) return rej('User already in group')
+        conn.query(
+            {
+                sql: `INSERT INTO user_group_memberships(user_id, group_id) VALUES(?, ?)`,
+                values: [userID, groupID],
+            },
+            (err, rows) => {
+                if (err) return rej(`Unable to add user to group`)
+                return res(true)
+            }
+        )
+    })
 }
 
-
 /**
- * Gets all information for a group 
- * 
+ * Gets all information for a group
+ *
  * Parameters
  * ---------------
  * id: int
@@ -145,7 +140,7 @@ async function getInfoForGroup(id) {
                         return {
                             username: member.Username,
                             profileID: member.ProfileImageID,
-                            id: member.id
+                            id: member.id,
                         }
                     }),
                     lists,
@@ -199,49 +194,44 @@ async function createGroup(ctx) {
                 values: [groupName],
             },
             async (err, rows) => {
-                if (err){
-                    ctx.body = err;
+                if (err) {
+                    ctx.body = err
                     return rej(err)
                 }
-                const groupID = await guessNewGroupID(groupName);
-                const userID = await getIDFromAccessToken(accessToken);
-                addUserToGroup(userID, groupID).then(
-                    () => {
-                        ctx.body = groupID;
-                        return res(groupID);
-                    }
-                )
-                .catch(
-                    (err) => {
-                        ctx.body = err;
-                        return rej(err);
-                    }
-                )
+                const groupID = await guessNewGroupID(groupName)
+                const userID = await getIDFromAccessToken(accessToken)
+                addUserToGroup(userID, groupID)
+                    .then(() => {
+                        ctx.body = groupID
+                        return res(groupID)
+                    })
+                    .catch((err) => {
+                        ctx.body = err
+                        return rej(err)
+                    })
             }
-        );
+        )
     })
 }
 
-
 // guesses the id of a newly created group given a name
-async function guessNewGroupID(groupName){
-    const getIDSql = `SELECT * FROM user_groups WHERE NAME=? ORDER BY ID DESC LIMIT 1`;
+async function guessNewGroupID(groupName) {
+    const getIDSql = `SELECT * FROM user_groups WHERE NAME=? ORDER BY ID DESC LIMIT 1`
 
     return new Promise((res, rej) => {
         conn.query(
             {
                 sql: getIDSql,
-                values: [groupName]
-            }, (err, rows) => {
-                if(err)
-                {
-                    return rej(err);
+                values: [groupName],
+            },
+            (err, rows) => {
+                if (err) {
+                    return rej(err)
                 }
-                if(rows.length === 0)
-                {
-                    return rej(warningMessage);
+                if (rows.length === 0) {
+                    return rej(warningMessage)
                 }
-                return res(rows[0].id);
+                return res(rows[0].id)
             }
         )
     })

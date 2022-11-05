@@ -1,14 +1,14 @@
-import Footer from "./components/footer";
-import NMHeader from "./components/nonMediaHeader";
+import Footer from './components/footer'
+import NMHeader from './components/nonMediaHeader'
 
 const Lists = () => {
-    return(
+    return (
         <>
-        <NMHeader />
-        lists
-        <Footer />
+            <NMHeader />
+            lists
+            <Footer />
         </>
     )
 }
 
-export default Lists;
+export default Lists
