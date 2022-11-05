@@ -5,3 +5,7 @@ export async function mediaSearch(query) {
         query,
     })
 }
+
+export async function getMediaByID(id) {
+    return get(`/media/${id}`);
+}
