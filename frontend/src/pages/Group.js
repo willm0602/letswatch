@@ -25,13 +25,12 @@ import { userMetadata } from '../APIInterface/GetUserData'
 
 const Group = () => {
     const location = useLocation()
-    // let groupInfo = location.state.group
-    
-    const [groupInfo, setGroupInfo] = React.useState(location.state.group)
-    
+    const groupInfo = location.state.group
+    console.log(location.state.groupIdx);
     const ctx = useContext(UserContext)
+    console.log(ctx.userInfo.groups[location.state.groupIdx]);
 
-    const [forceUpdate, setForceUpdate] = React.useState(false)
+
 
     const [open, setOpen] = React.useState(false);
     const [newListName, setNewListName] = React.useState('');
