@@ -19,7 +19,6 @@ const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
     const [listContent, setListContent] = useState([])
     const ctx = useContext(UserContext)
-    const { fakeDBInfo, setFakeDBInfo } = ctx
     const location = useLocation()
     const groupIdx = location.state.groupIdx
     const listIdx = location.state.listIdx
@@ -30,7 +29,7 @@ const ListOfMedia = () => {
         if (
             listContent.filter((item) => item.title === mediaTitle).length >
                 0 ||
-            ctx.fakeDBInfo.groups[groupIdx].lists[listIdx].media.filter(
+            ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(
                 (item) => item.title === mediaTitle
             ).length > 0
         )
@@ -42,22 +41,22 @@ const ListOfMedia = () => {
         let chosenMedia = fakeMedia.filter(
             (media) => media.title === mediaTitle
         )
-        chosenMedia = { ...chosenMedia[0], addedBy: ctx.fakeDBInfo.username }
+        chosenMedia = { ...chosenMedia[0], addedBy: ctx.userInfo.username }
 
-        let newDBInfo = ctx.fakeDBInfo
+        let newDBInfo = ctx.userInfo
         let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice()
         newMedia = [...newMedia, chosenMedia]
         newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        setFakeDBInfo(newDBInfo)
+        ctx.setUserInfo(newDBInfo)
         setListContent([...listContent, chosenMedia])
     }
 
     const handleRemove = (itemToRemove) => {
-        let newDBInfo = fakeDBInfo
+        let newDBInfo = ctx.userInfo
         let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice()
         newMedia = newMedia.filter((item) => item.title !== itemToRemove)
         newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        setFakeDBInfo(newDBInfo)
+        ctx.setUserInfo(newDBInfo)
 
         const newList = listContent.filter(
             (item) => item.title !== itemToRemove

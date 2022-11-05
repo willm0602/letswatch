@@ -42,6 +42,7 @@ module.exports.decrypt = (phrase) => {
     return decrypted
 }
 
+// API utilities
 module.exports.getIDFromAccessToken = async (accessToken) => {
     const query = `SELECT * FROM Users 
                         WHERE Access_Token=?;`
@@ -59,5 +60,31 @@ module.exports.getIDFromAccessToken = async (accessToken) => {
                 return res(tuples[0].id)
             }
         )
+    })
+}
+
+module.exports.userIsInGroup = async (accessToken, groupID) => {
+    console.log('checking if user is in group');
+    const userID = await this.getIDFromAccessToken(accessToken);
+    console.log(`got userID ${userID}`);
+    const sql = `SELECT * FROM user_group_memberships WHERE user_id=? and group_id=?`;
+
+    return new Promise((res, rej) => {
+        if(userID === undefined)
+            return rej(`user ${userID} does not exist`);
+        conn.query({
+            sql,
+            values: [
+                userID,
+                groupID
+            ]
+        }, (err, rows) => {
+            console.log(err, rows);
+            if(err)
+                return rej(err);
+            if(rows.length > 0)
+                return res(rows[0].id);
+            return res(false);
+        })
     })
 }

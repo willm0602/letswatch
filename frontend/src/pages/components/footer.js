@@ -15,6 +15,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 const Footer = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
+    const userInfo = ctx.userInfo;
 
     return (
         <Paper
@@ -27,7 +28,7 @@ const Footer = () => {
                 }}
             >
                 <Link
-                    to={`/user/${fakeData.id}`}
+                    to={`/user/${userInfo.id}`}
                     style={{ display: 'flex' }}
                     state={{
                         userInfo: fakeData,
@@ -36,7 +37,7 @@ const Footer = () => {
                     <BottomNavigationAction
                         icon={
                             <img
-                                src={`/profileImages/${fakeData.profileID}.jpg`}
+                                src={`/profileImages/${userInfo.profileID}.jpg`}
                                 style={{
                                     color: 'white',
                                     maxWidth: '30px',
@@ -60,9 +61,12 @@ const Footer = () => {
                     />
                 </Link>
 
-                <BottomNavigationAction
-                    icon={<GroupsIcon style={{ color: 'white' }} />}
-                />
+                <Link to="/groups" style={{ display: 'flex' }}>
+                    <BottomNavigationAction
+                        icon={<GroupsIcon style={{ color: 'white' }} />}
+                    />
+                </Link>
+
                 <BottomNavigationAction
                     icon={<ListIcon style={{ color: 'white' }} />}
                 />
