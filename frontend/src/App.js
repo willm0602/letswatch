@@ -23,13 +23,13 @@ function App() {
     return (
         <Routes>
             {userIsSignedIn() ? (
-                <Route path="/" element={<Home />} />
                 <>
                   <Route path="/" element={<Home />} />
                   <Route path="/group/*" element={<Group />} />
                   <Route path="/list/*" element={<List />} />
                   <Route path="/user/*" element={<User />} />
                   <Route path="/media" element={<ManyMedia />} />
+                  <Route path="/groups" element={<Groups />} />
                 </>
             ) : (
                 <Route path="/" element={<Login />} />
