@@ -18,8 +18,10 @@ import Button from '@mui/material/Button'
 import { makeNewGroup } from '../APIInterface/CreateGroup'
 import { userMetadata } from '../APIInterface/GetUserData'
 const Groups = () => {
-    const ctx = useContext(UserContext)
-    const userGroups = ctx.userInfo.groups
+    const ctx = useContext(UserContext);
+    // const userGroups = ctx.userInfo.groups;
+    console.log(ctx);
+    const [userGroups, setUserGroups] = React.useState(ctx.userInfo.groups);
 
     const [open, setOpen] = React.useState(false)
     const [newGroupName, setNewGroupName] = React.useState('')
@@ -34,32 +36,17 @@ const Groups = () => {
     }
 
     const handleCreateGroup = () => {
-        console.log(newGroupName)
-        const currentGroups = ctx.userInfo.groups
-        let userInfo = ctx.userInfo
-
-        const newGroups = [
-            ...currentGroups,
-            {
-                groupID: 9999,
-                groupName: newGroupName,
-                lists: [],
-                members: [
-                    {
-                        username: ctx.userInfo.username,
-                        profileID: ctx.userInfo.profileID,
-                    },
-                ],
-            },
-        ]
-        userInfo.groups = newGroups
-        ctx.setUserInfo(userInfo)
-
-        //This function doesn't have the backend setup as of right now
-        // makeNewGroup(newGroupName, ctx.userInfo.userID)
-        //     .then(userMetadata()
-        //             .then((res) => ctx.setUserInfo(res)))
-
+        const createNewGroup = async() => {
+            await makeNewGroup(newGroupName,ctx.userInfo.userID)
+                .then((res)=>userMetadata()
+                    .then((res)=>{
+                        ctx.setUserInfo(res);
+                        setUserGroups(res.groups);
+                    }))
+        }
+        createNewGroup();
+        //no idea why this works :shrug:
+        userMetadata().then((res) => console.log(res));
         handleClose()
     }
 
@@ -87,6 +74,7 @@ const Groups = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
+                            paddingBottom: '100px',
                         }}
                     >
                         <h2>Groups</h2>
