@@ -13,6 +13,9 @@ import Lists from './pages/Lists'
 import ManyMedia from './pages/ManyMedia'
 import { userIsSignedIn } from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
+import { allMedia } from './APIInterface/MediaSearch'
+import SingleMedia from './pages/SingleMedia'
+
 
 function App() {
     const ctx = useContext(UserContext) //context works
@@ -20,17 +23,21 @@ function App() {
     //set user information from the db into context
     if (!ctx.userInfo) userMetadata().then((res) => ctx.setUserInfo(res))
 
+    if(!ctx.autoFillMedia)
+      allMedia().then((res) => ctx.setAutoFillMedia(res));
+
     return (
         <Routes>
             {userIsSignedIn() ? (
                 <>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/group/*" element={<Group />} />
-                    <Route path="/list/*" element={<List />} />
-                    <Route path="/lists" element={<Lists />} />
-                    <Route path="/user/*" element={<User />} />
-                    <Route path="/media" element={<ManyMedia />} />
-                    <Route path="/groups" element={<Groups />} />
+                  <Route path="/" element={<Home />} />
+                  <Route path="/group/*" element={<Group />} />
+                  <Route path="/list/*" element={<List />} />
+                  <Route path="/lists" element={<Lists />} />
+                  <Route path="/user/*" element={<User />} />
+                  <Route path="/media" element={<ManyMedia />} />
+                  <Route path="/media/*" element={<SingleMedia />} />
+                  <Route path="/groups" element={<Groups />} />
                 </>
             ) : (
                 <Route path="/" element={<Login />} />

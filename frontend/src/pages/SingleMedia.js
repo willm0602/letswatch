@@ -1,11 +1,28 @@
 import { useLocation } from 'react-router-dom'
 import Footer from './components/footer'
+import { useContext, useEffect } from 'react'
+import { UserContext } from '../contextSetup'
+
+import {getMediaByID} from '../APIInterface/MediaSearch';
 
 const SingleMedia = () => {
     const location = useLocation()
-    const cm = location.state.chainsawMan
+    // const cm = location.state.chainsawMan
+    const ctx = useContext(UserContext)
+    const cm = ctx.chainsawMan;
+
+    console.log(cm);
+
+
+    useEffect(()=>{
+        const loadThing = async() => {
+            await getMediaByID(345).then((res)=> console.log(res))
+        }
+        loadThing();
+    },[])
+
     return (
-        <>
+        <div style={{paddingBottom: '100px'}}>
             <div
                 style={{
                     backgroundImage: `url(https://www.themoviedb.org/t/p/original${cm.backdrop_path})`,
@@ -45,11 +62,8 @@ const SingleMedia = () => {
                 >
                     <h3>Trailer</h3>
 
-                    <div style={{ maxWidth: '1000px' }}>
-                        <div
-                            className="video-container"
-                            style={{ margin: 'auto' }}
-                        >
+                    <div style={{ maxWidth: '100%' }}>
+                        <div className="video-container">
                             <iframe
                                 width="560"
                                 height="315"
@@ -79,7 +93,7 @@ const SingleMedia = () => {
                 */}
             </div>
             <Footer />
-        </>
+        </div>
     )
 }
 
