@@ -84,6 +84,8 @@ async function mediaSearch(ctx) {
 
 async function getTrailerPath(media) {
     let trailerURL;
+    if(media === undefined)
+        return undefined;
     if(media.type === C.MEDIA_TYPES.MOVIE)
         trailerURL = `https://api.themoviedb.org/3/movie/${media.tmdbID}/videos?api_key=${tmdbAPIToken}`
     if(media.type === C.MEDIA_TYPES.TV)
