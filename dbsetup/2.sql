@@ -17,7 +17,8 @@ CREATE TABLE Media(
     synopsis TEXT(1048576),
     type VARCHAR(32) NOT NULL,
     tmdb_id BIGINT NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    trailer_path VARCHAR(512)
 );
 
 CREATE TABLE Watch_List_Items(

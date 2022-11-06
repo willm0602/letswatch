@@ -7,13 +7,29 @@ const C = require('../../config/Constants')
 
 const tmdbAPIToken = process.env.TMDB
 
+async function addTrailers(mediaList)
+{
+    let mediaWithTrailers = [];
+    for(let media of mediaList)
+    {
+        let trailerURL = await getTrailerPath(media);
+        if(trailerURL!=undefined)
+        {   
+            media['trailerPath'] = trailerURL;
+            mediaWithTrailers.push(media);
+        }
+        
+    }
+    return mediaWithTrailers;
+}
+
 async function mediaSearch(ctx) {
     const queryParams = ctx.request.query
     const query = queryParams.query
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbAPIToken}&language=en-US&page=1&include_adult=false&query=${query
         .split(' ')
         .join('+')}`
-
+    
     return new Promise(async (res, rej) => {
         const resp = await axios.get(url)
         console.log(`resp is`, resp.data.results)
@@ -48,7 +64,9 @@ async function mediaSearch(ctx) {
                 : undefined
         })
 
-        const validTMDBData = tmdbData.filter((val) => val !== undefined)
+        const tmdbDataWithTrailers = await addTrailers(tmdbData);
+
+        const validTMDBData = tmdbDataWithTrailers.filter((val) => val !== undefined)
 
         let letsWatchSearchResults = []
         for (let media of validTMDBData) {
@@ -60,10 +78,31 @@ async function mediaSearch(ctx) {
         }
 
         ctx.body = letsWatchSearchResults
-        console.log(`ctxBody is ${ctx.body}`)
-
         return res(letsWatchSearchResults)
     })
+}
+
+async function getTrailerPath(media) {
+    let trailerURL;
+    if(media.type === C.MEDIA_TYPES.MOVIE)
+        trailerURL = `https://api.themoviedb.org/3/movie/${media.tmdbID}/videos?api_key=${tmdbAPIToken}`
+    if(media.type === C.MEDIA_TYPES.TV)
+        trailerURL = `https://api.themoviedb.org/3/tv/${media.tmdbID}/videos?api_key=${tmdbAPIToken}`
+    return axios.get(trailerURL).then(
+        (res) => {
+            for(const vid of res.data.results)
+            {
+                if(vid.type == 'Trailer' && vid.site == 'YouTube')
+                    return `https://www.youtube.com/watch?v=${vid.key}`;
+            }
+            return undefined;
+        }
+    ).catch(
+        (err) => {
+            console.error(err);
+            return undefined;
+        }
+    )
 }
 
 async function getMediaByID(id) {
@@ -98,7 +137,6 @@ async function existsInDatabase(mediaID, mediaType) {
             },
             (err, tuples) => {
                 if (err) return rej('unable to access database')
-                console.log(`got packet for exists`, tuples[0])
                 if (tuples.length) return res(tuples[0].id)
                 return res(false)
             }
@@ -116,8 +154,10 @@ async function saveMediaToDB(media) {
                         rating,
                         release_date,
                         synopsis,
-                        type
+                        type,
+                        trailer_path
                     ) VALUES(
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -138,9 +178,10 @@ async function saveMediaToDB(media) {
                     media.title,
                     media.image,
                     media.rating,
-                    media.release_date,
+                    media.releaseDate,
                     media.synopsis,
                     media.type,
+                    media.trailerURL
                 ],
             },
             async (err, tuples) => {
