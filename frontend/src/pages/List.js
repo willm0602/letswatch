@@ -12,6 +12,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
 import Modal from '@mui/material/Modal';
+import Skeleton from '@mui/material/Skeleton';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
@@ -21,23 +23,27 @@ import {mediaSearch} from '../APIInterface/MediaSearch';
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
-    const [listContent, setListContent] = useState([])
-    const ctx = useContext(UserContext)
-    const location = useLocation()
-    const groupIdx = location.state.groupIdx
-    const listIdx = location.state.listIdx
-    const listInfo = location.state.list
-    const fakeMedia = ctx.fakeMediaSearch
+    const [listContent, setListContent] = useState([]);
+    
+    const ctx = useContext(UserContext);
+    const location = useLocation();
+    const groupIdx = location.state.groupIdx;
+    const listIdx = location.state.listIdx;
+    const listInfo = location.state.list;
+    const fakeMedia = ctx.fakeMediaSearch;
+    const autoFillMedia = ctx.autoFillMedia.filter(media => media.image_url && media.rating > 0);
 
     //search bar stuff
     const [searchInputValue, setSearchInputValue] = useState('');
-
-
         //modal
         const [open,setOpen] = useState(false);
         const [newMediaFromSearch, setNewMediaFromSearch] = useState(null);
         const handleOpen = () => setOpen(true);
-        const handleClose = () => setOpen(false);
+        const handleClose = () => {
+            setOpen(false);
+            setNewMediaFromSearch(null);
+            setSearchInputValue('');
+        }
         const style = {
             position: 'absolute',
             top: '50%',
@@ -48,55 +54,40 @@ const ListOfMedia = () => {
             boxShadow: 24,
             p: 4,
         };
+
         const handleMediaNotFound = () => {
             handleOpen();
+            const searchMedia = async (search) => await mediaSearch(search).then(res=> setNewMediaFromSearch(res));
+            searchMedia(searchInputValue);
+        }
 
-            const callThing = async (search) => {
-                await mediaSearch(search).then(res=> setNewMediaFromSearch(res));
+        const addMediaFromNotFoundSearch = (mediaIdx) => {
+            let mediaToAdd = newMediaFromSearch[mediaIdx];
+            mediaToAdd = {
+                ...mediaToAdd,
+                image_url:mediaToAdd.image,
             }
-
-            callThing(searchInputValue);
+            setListContent([...listContent, mediaToAdd])
+            const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), mediaToAdd]
+            ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         }
 
 
-    const handleClick = (mediaTitle) => {
-        console.log(searchInputValue);
-        if (
-            listContent.filter((item) => item.title === mediaTitle).length >
-                0 ||
-            ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(
-                (item) => item.title === mediaTitle
-            ).length > 0
-        )
-            return
-        addToCTXList(mediaTitle)
+    const newHandleClick = (mediaID) => {
+        if( listContent.filter(media => media.id === mediaID) > 0)
+            return;
+
+        const targetMedia = autoFillMedia.filter(media => media.id === mediaID)[0];
+        setListContent([...listContent, targetMedia]);
+        const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), targetMedia]
+        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
+        //update db
     }
-
-    const addToCTXList = (mediaTitle) => {
-        let chosenMedia = fakeMedia.filter(
-            (media) => media.title === mediaTitle
-        )
-        chosenMedia = { ...chosenMedia[0], addedBy: ctx.userInfo.username }
-
-        let newDBInfo = ctx.userInfo
-        let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice()
-        newMedia = [...newMedia, chosenMedia]
-        newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        ctx.setUserInfo(newDBInfo)
-        setListContent([...listContent, chosenMedia])
-    }
-
-    const handleRemove = (itemToRemove) => {
-        let newDBInfo = ctx.userInfo
-        let newMedia = newDBInfo.groups[groupIdx].lists[listIdx].media.slice()
-        newMedia = newMedia.filter((item) => item.title !== itemToRemove)
-        newDBInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        ctx.setUserInfo(newDBInfo)
-
-        const newList = listContent.filter(
-            (item) => item.title !== itemToRemove
-        )
-        setListContent(newList)
+    const handleRemove = (mediaIDtoRemove) => {
+        const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
+        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
+        setListContent(newMedia);
+        //update db
     }
 
     useEffect(() => {
@@ -131,12 +122,15 @@ const ListOfMedia = () => {
                     ))}
                 </Stack>
                 <Autocomplete
+
+                    
+
                     id="add-media"
                     sx={{ width: '90%', border: '1px solid lightgrey' }}
                     freeSolo={true}
                     inputValue={searchInputValue}
                     onInputChange={(event, value)=>setSearchInputValue(value)}
-                    options={fakeMedia}
+                    options={autoFillMedia}
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, options) => (
                         <Button
@@ -149,16 +143,19 @@ const ListOfMedia = () => {
                             }}
                         >
                             {' '}
+                            {options.image_url ?
                             <img
                                 style={{ maxWidth: '50px' }}
-                                src={options.poster}
+                                src={options.image_url}
                             />
+                            :<Skeleton animation={false} variant="rectangular" width={50} height={75} />
+                            }
                             <p style={{ marginLeft: '15px' }}>
                                 {options.title}
                             </p>
                             <AddCircleIcon
                                 onClick={() => {
-                                    handleClick(options.title)
+                                    newHandleClick(options.id) //was handleClick
                                 }}
                             />
                         </Button>
@@ -185,7 +182,7 @@ const ListOfMedia = () => {
                         {listContent.map(
                             (
                                 mediaItem,
-                                mediaIndex //was listContent
+                                mediaIndex
                             ) => (
                                 <ListItem>
                                     <div
@@ -208,7 +205,7 @@ const ListOfMedia = () => {
                                                         maxWidth: '90px',
                                                         margin: '15px',
                                                     }}
-                                                    src={mediaItem.poster}
+                                                    src={mediaItem.image_url}
                                                 />
 
                                                 <div
@@ -225,9 +222,9 @@ const ListOfMedia = () => {
                                                         left: '70%',
                                                         color: 'black',
                                                         backgroundColor:
-                                                            mediaItem.score > 70
+                                                            mediaItem.rating > 70
                                                                 ? '#66FF63'
-                                                                : mediaItem.score >
+                                                                : mediaItem.rating >
                                                                   50
                                                                 ? '#FFF963'
                                                                 : '#FFC165',
@@ -241,7 +238,7 @@ const ListOfMedia = () => {
                                                             fontSize: '0.75em',
                                                         }}
                                                     >
-                                                        <b>{mediaItem.score}</b>
+                                                        <b>{mediaItem.rating}</b>
                                                     </span>
                                                     <span
                                                         style={{
@@ -257,7 +254,7 @@ const ListOfMedia = () => {
                                                 variant="contained"
                                                 onClick={() => {
                                                     handleRemove(
-                                                        mediaItem.title
+                                                        mediaItem.id
                                                     )
                                                 }}
                                                 style={{
@@ -334,13 +331,16 @@ const ListOfMedia = () => {
                                                 </p>
                                                 <AddCircleIcon
                                                     onClick={() => {
-                                                        handleClick(newMedia.title)
+                                                        addMediaFromNotFoundSearch(newMediaIndex)
                                                     }}
                                                 />
                                             </Button>
                                     </div>
                                 )
-                            :null
+                            :
+                            <Box sx={{ display: 'flex' }}>
+                                <CircularProgress />
+                            </Box>
                         }
                     </Box>
                 </Modal>

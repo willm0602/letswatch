@@ -32,6 +32,10 @@ const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
 
+    const autoFillMedia = ctx.autoFillMedia;
+
+    console.log(ctx);
+
     userMetadata().then((res) => {
         console.log(res)
     })

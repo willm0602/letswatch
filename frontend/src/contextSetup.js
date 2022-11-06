@@ -233,6 +233,7 @@ const UserContextProvider = ({ children }) => {
     })
 
     const [userInfo, setUserInfo] = useState(false)
+    const [autoFillMedia, setAutoFillMedia] = useState(false);
 
     return (
         <Fragment>
@@ -244,6 +245,8 @@ const UserContextProvider = ({ children }) => {
                     chainsawMan,
                     userInfo,
                     setUserInfo,
+                    autoFillMedia,
+                    setAutoFillMedia
                 }}
             >
                 {children}
