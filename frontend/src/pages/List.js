@@ -76,6 +76,7 @@ const ListOfMedia = () => {
     
 
     const newHandleClick = (mediaID) => {
+        //this return needs to be changed
         if( listContent.filter(media => media.id === mediaID) > 0)
             return;
         
@@ -86,35 +87,13 @@ const ListOfMedia = () => {
                     .then((res)=>{
                         console.log(res);
                         console.log(listContent);
+                        console.log(listIdx);
                         ctx.setUserInfo(res);
                         setListContent([...res.groups[groupIdx].lists[listIdx].media]);
                     }))
-        }
-        
+        } 
         creatNewListItem();
         userMetadata().then((res) => console.log(res));//no op
-
-        // const handleCreateGroup = () => {
-        //     const createNewGroup = async() => {
-        //         await makeNewGroup(newGroupName,ctx.userInfo.userID)
-        //             .then((res)=>userMetadata()
-        //                 .then((res)=>{
-        //                     ctx.setUserInfo(res);
-        //                     setUserGroups(res.groups);
-        //                 }))
-        //     }
-        //     createNewGroup();
-        //     //no idea why this works :shrug:
-        //     userMetadata().then((res) => console.log(res));
-        //     handleClose()
-        // }
-    
-
-
-        // setListContent([...listContent, targetMedia]);
-        // const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), targetMedia]
-        // ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        //update db
     }
 
     const handleRemove = (mediaIDtoRemove) => {
@@ -125,6 +104,7 @@ const ListOfMedia = () => {
     }
 
     useEffect(() => {
+        console.log(ctx)
         setListContent([...listInfo.media])
     }, [])
 
@@ -244,7 +224,7 @@ const ListOfMedia = () => {
                                                         maxWidth: '90px',
                                                         margin: '15px',
                                                     }}
-                                                    src={mediaItem.image_url}
+                                                    src={mediaItem.image}
                                                 />
 
                                                 <div
