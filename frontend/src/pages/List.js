@@ -15,11 +15,12 @@ import Modal from '@mui/material/Modal';
 import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
 
+
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 
 //API stuff
-import {mediaSearch} from '../APIInterface/MediaSearch';
+import { mediaSearch } from '../APIInterface/MediaSearch'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
@@ -71,7 +72,6 @@ const ListOfMedia = () => {
             const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), mediaToAdd]
             ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         }
-
 
     const newHandleClick = (mediaID) => {
         if( listContent.filter(media => media.id === mediaID) > 0)
@@ -131,6 +131,7 @@ const ListOfMedia = () => {
                     inputValue={searchInputValue}
                     onInputChange={(event, value)=>setSearchInputValue(value)}
                     options={autoFillMedia}
+
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, options) => (
                         <Button
@@ -171,11 +172,15 @@ const ListOfMedia = () => {
                         />
                     )}
                 ></Autocomplete>
-                {searchInputValue !== '' ?
-                    <Button onClick={()=>handleMediaNotFound()} style={{margin:'5px'}} variant="contained">Media not found?</Button>
-                    :
-                    null
-                }
+                {searchInputValue !== '' ? (
+                    <Button
+                        onClick={() => handleMediaNotFound()}
+                        style={{ margin: '5px' }}
+                        variant="contained"
+                    >
+                        Media not found?
+                    </Button>
+                ) : null}
 
                 <Box>
                     <List>
@@ -305,7 +310,10 @@ const ListOfMedia = () => {
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <Box sx={style} style={{overflow:'scroll', maxHeight:'75%'}}>
+                    <Box
+                        sx={style}
+                        style={{ overflow: 'scroll', maxHeight: '75%' }}
+                    >
                         <h3>Extended Search</h3>
                         <p>Search based off input: <b>{searchInputValue}</b></p>
                         {
@@ -342,10 +350,9 @@ const ListOfMedia = () => {
                                 <CircularProgress />
                             </Box>
                         }
+
                     </Box>
                 </Modal>
-
-
 
                 <Footer />
             </div>

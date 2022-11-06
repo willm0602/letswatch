@@ -11,17 +11,17 @@ import User from './pages/User'
 import Groups from './pages/Groups'
 import Lists from './pages/Lists'
 import ManyMedia from './pages/ManyMedia'
-import {userIsSignedIn} from './LocalStorageInterface'
+import { userIsSignedIn } from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
 import { allMedia } from './APIInterface/MediaSearch'
 import SingleMedia from './pages/SingleMedia'
+
 
 function App() {
     const ctx = useContext(UserContext) //context works
 
     //set user information from the db into context
-    if(!ctx.userInfo)
-      userMetadata().then((res) => ctx.setUserInfo(res))
+    if (!ctx.userInfo) userMetadata().then((res) => ctx.setUserInfo(res))
 
     if(!ctx.autoFillMedia)
       allMedia().then((res) => ctx.setAutoFillMedia(res));
@@ -42,7 +42,6 @@ function App() {
             ) : (
                 <Route path="/" element={<Login />} />
             )}
-            
         </Routes>
     )
 }

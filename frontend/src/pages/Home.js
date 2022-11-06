@@ -197,7 +197,7 @@ const Home = () => {
                     ))}
                 </List>
             </Box>
-            <Link to='/groups' style={{textDecoration:'none'}}>
+            <Link to="/groups" style={{ textDecoration: 'none' }}>
                 <Button
                     variant="contained"
                     style={{

@@ -5,10 +5,10 @@
  *      Get
  *          /account/login
  *              username, password
- * 
+ *
  *          /account/info
  *
- * 
+ *
  *      Post
  *          /account/signup
  * ==========================

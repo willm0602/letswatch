@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { UserContext } from '../contextSetup'
+import { deleteAccessToken } from '../LocalStorageInterface'
 
 const User = () => {
     const location = useLocation()
@@ -45,6 +46,15 @@ const User = () => {
                 <h3>Lists</h3>
 
                 <h3>Groups</h3>
+
+                <button
+                    onClick={(e) => {
+                        deleteAccessToken()
+                        window.location = '/'
+                    }}
+                >
+                    Sign Out
+                </button>
             </div>
             <Footer />
         </>

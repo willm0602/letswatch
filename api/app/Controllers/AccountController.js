@@ -117,7 +117,7 @@ async function login(ctx, next) {
  *
  * Parameters
  *  username: str
- * 
+ *
  * Returns true if the username has been taken, false if the username
  * hasn't been taken and undefined if there is an error querying the database
  */
@@ -130,7 +130,7 @@ async function usernameTaken(username) {
                 values: [username],
             },
             (err, tuples) => {
-                if (err) return rej(`Unable to query database`);
+                if (err) return rej(`Unable to query database`)
                 if (tuples.length === 0) {
                     return res(false)
                 }
@@ -140,16 +140,15 @@ async function usernameTaken(username) {
     })
 }
 
-
 /**
  * Gets an access token for a user with a given username and password
- * 
+ *
  * Parameters
  * ---------
  * username: str
- *      
+ *
  * password: str
- * 
+ *
  * returns the access token for the user if it is valid, otherwise returns undefined
  */
 async function getAccessToken(username, password) {
@@ -175,12 +174,12 @@ async function getAccessToken(username, password) {
 
 /**
  * Gets a list of ids of groups that a user is in
- * 
+ *
  * Parameters
  * ---------
  * id: int
  *      the id of the user that we are getting the groups for
- *      
+ *
  * returns the ids of each group that the user is in
  */
 async function allGroupsForUser(id) {
