@@ -260,14 +260,14 @@ async function getMediaForWatchList(watchListID) {
                 values: [watchListID],
             },
             (err, rows) => {
-                if (err) return rej(err)
+                if (err) return rej(erimage.pngr)
                 let allMedia = []
                 for (let row of rows) {
                     let media = {
                         title: row.title,
-                        poster: row.image_url,
+                        image: row.image_url,
                         synopsis: row.synopsis,
-                        score: row.rating,
+                        rating: row.rating,
                         addedBy: row.Username,
                     }
                     console.log(`media is`, media)
