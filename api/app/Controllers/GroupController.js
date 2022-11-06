@@ -1,5 +1,9 @@
 const conn = require('../../database/mySQLconnect')
-const { apiResponse, getIDFromAccessToken } = require('../../MiscUtils')
+const {
+    apiResponse,
+    getIDFromAccessToken,
+    userIsInGroup,
+} = require('../../MiscUtils')
 const AccountController = require('./AccountController')
 const {
     createListForSingleUser,
@@ -237,8 +241,61 @@ async function guessNewGroupID(groupName) {
     })
 }
 
+/**
+ * Adds a user to a group from an API call at /group/add_user
+ *
+ * Parameters (passed through ctx)
+ * ------------------------------------
+ * accessToken: str
+ *      access token of the user requesting the other user to join the group
+ * userID: int
+ *      the id of the user that is going to be added to the group (assuming they are
+ *      able to)
+ * groupID: int
+ *      the id of the group that the user is being added to
+ */
+async function ajaxAddUserToGroup(ctx) {
+    const { accessToken, userID, groupID } = ctx.request.query
+    const requestingUserInGroup = await userIsInGroup(accessToken, groupID)
+    return new Promise(async (res, rej) => {
+        if (requestingUserInGroup) {
+            const userAlreadyInGroup = await userIsInGroup(undefined, groupID, userID)
+            console.log(`userAlreadyInGroup is`, userAlreadyInGroup);
+            if (userAlreadyInGroup) {
+                const errorMessage = apiResponse(
+                    false,
+                    'User is already in group'
+                )
+                ctx.body = errorMessage
+                return rej(errorMessage)
+            }
+            return addUserToGroup(userID, groupID)
+                .then(() => {
+                    const success = apiResponse(true, 'Added user to group')
+                    ctx.body = success
+                    return res(success)
+                })
+                .catch((err) => {
+                    const error = apiResponse(false, err)
+                    ctx.body = error
+                    return rej(err)
+                })
+
+        }
+        console.log(requestingUserInGroup, 'requesting user in group')
+        const errorMessage = apiResponse(
+            false,
+            `Error: Requesting User Does Not Belong to Group`
+        )
+        ctx.body = errorMessage
+        return rej(errorMessage)
+    })
+}
+
 module.exports = {
     createSinglePersonGroup,
     getInfoForGroup,
     createGroup,
+    addUserToGroup,
+    ajaxAddUserToGroup,
 }

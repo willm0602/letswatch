@@ -12,6 +12,7 @@ export async function makeWatchList(name, groupID) {
 export async function addMediaToWatchlist(listID, mediaID){
     post('/watchlist/add_media', {
         mediaID,
-        listID
+        listID,
+        accessToken: getAccessToken()
     });
 }

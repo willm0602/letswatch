@@ -11,5 +11,6 @@ const GroupRouter = KoaRouter({
 })
 
 GroupRouter.post('/create', GroupController.createGroup)
+GroupRouter.post('/add_user', GroupController.ajaxAddUserToGroup)
 
 module.exports = GroupRouter

@@ -63,10 +63,11 @@ module.exports.getIDFromAccessToken = async (accessToken) => {
     })
 }
 
-module.exports.userIsInGroup = async (accessToken, groupID) => {
-    console.log('checking if user is in group')
-    const userID = await this.getIDFromAccessToken(accessToken)
-    console.log(`got userID ${userID}`)
+module.exports.userIsInGroup = async (accessToken, groupID, id = undefined) => {
+    const userID =
+        accessToken !== undefined
+            ? await this.getIDFromAccessToken(accessToken)
+            : id
     const sql = `SELECT * FROM user_group_memberships WHERE user_id=? and group_id=?`
 
     return new Promise((res, rej) => {
