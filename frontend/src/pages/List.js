@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react'
-
 import { useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
@@ -14,13 +13,13 @@ import Stack from '@mui/material/Stack'
 import Modal from '@mui/material/Modal';
 import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
-
-
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch'
+import {addMediaToWatchlist} from '../APIInterface/WatchList'
+import { userMetadata } from '../APIInterface/GetUserData'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
@@ -73,16 +72,51 @@ const ListOfMedia = () => {
             ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         }
 
+
+    
+
     const newHandleClick = (mediaID) => {
         if( listContent.filter(media => media.id === mediaID) > 0)
             return;
+        
+        const creatNewListItem = async() =>{
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+            await addMediaToWatchlist(listID, mediaID)
+                .then((res)=>userMetadata()
+                    .then((res)=>{
+                        console.log(res);
+                        console.log(listContent);
+                        ctx.setUserInfo(res);
+                        setListContent([...res.groups[groupIdx].lists[listIdx].media]);
+                    }))
+        }
+        
+        creatNewListItem();
+        userMetadata().then((res) => console.log(res));//no op
 
-        const targetMedia = autoFillMedia.filter(media => media.id === mediaID)[0];
-        setListContent([...listContent, targetMedia]);
-        const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), targetMedia]
-        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
+        // const handleCreateGroup = () => {
+        //     const createNewGroup = async() => {
+        //         await makeNewGroup(newGroupName,ctx.userInfo.userID)
+        //             .then((res)=>userMetadata()
+        //                 .then((res)=>{
+        //                     ctx.setUserInfo(res);
+        //                     setUserGroups(res.groups);
+        //                 }))
+        //     }
+        //     createNewGroup();
+        //     //no idea why this works :shrug:
+        //     userMetadata().then((res) => console.log(res));
+        //     handleClose()
+        // }
+    
+
+
+        // setListContent([...listContent, targetMedia]);
+        // const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), targetMedia]
+        // ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         //update db
     }
+
     const handleRemove = (mediaIDtoRemove) => {
         const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
