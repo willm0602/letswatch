@@ -16,16 +16,10 @@ import { userMetadata } from '../APIInterface/GetUserData'
 import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 /*
-
-new for push
-
-Hey you goddamn goon, There's some stuff you gotta fix
-
--[fixed for groups, add padding bottom to the bottom of pages later]Stuff is falling underneath the bottom nav, add some kinda box at the bottom that sits about the same size as the nav
-
--[fixed]The button to add stuff doesn't follow along when you scroll, make sure it stays indefinetly.
-
--[fixed]make sure the lists on the front page only display like 5 things
+    There's an issue with auto-complete adding to the media list, i'll need to re-call the function that gets the media lists
+    cause right now the app needs to be reloaded for the new media to apply to the lists
+    something like:
+        allMedia().then((res) => ctx.setAutoFillMedia(res));
 */
 
 const Home = () => {
