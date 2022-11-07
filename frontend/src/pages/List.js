@@ -70,6 +70,7 @@ const ListOfMedia = () => {
             setListContent([...listContent, mediaToAdd])
             const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), mediaToAdd]
             ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
+            //db stuff
         }
 
 
