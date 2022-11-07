@@ -251,6 +251,7 @@ async function getMediaForWatchList(watchListID) {
     ON watch_list_items.media_id=media.id
     INNER JOIN users
     ON watch_list_items.user_added_by_id=users.id
+    WHERE watch_list_items.watchlist_id = ?
     ;`
 
     return new Promise((res, rej) => {
