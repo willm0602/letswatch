@@ -1,6 +1,7 @@
 import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
 import { Fragment, useState } from "react";
 import { login, signup} from "../APIInterface/AccountManagement";
+import { getAccessToken } from "../LocalStorageInterface";
 import LoginFooter from "./components/LoginFooter";
 
 const Login = () => {
@@ -13,8 +14,7 @@ const Login = () => {
     const [cPasswordError, setCPasswordError] = useState(false);
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        
+        e.preventDefault();
         setUsernameError(false);
         setPasswordError(false);
         setCPasswordError(false);
@@ -28,12 +28,14 @@ const Login = () => {
             if(cPassword !== password) { 
                 setCPasswordError(true);
             }
+            console.log(!cPasswordError, !passwordError);
             if(username === '') { 
                 setUsernameError(true);
             } else if(!cPasswordError && !passwordError) {
-                signup(username, password)
+                signup(username, password);
+            } else {
+                e.preventDefault()
             }
-
         }
     }
 
