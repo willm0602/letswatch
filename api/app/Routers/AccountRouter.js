@@ -3,11 +3,14 @@
  * Router @ /account
  * Routes
  *      Get
- *          /account/test
- *          /login
+ *          /account/login
+ *              username, password
+ *
+ *          /account/info
+ *
  *
  *      Post
- *          /signup
+ *          /account/signup
  * ==========================
  */
 
@@ -19,7 +22,6 @@ const AccountRouter = KoaRouter({
     prefix: '/account',
 })
 
-AccountRouter.get('/test', AccountController.test)
 AccountRouter.post('/signup', AccountController.signup)
 AccountRouter.get('/login', AccountController.login)
 AccountRouter.get('/info', AccountController.allInfo)

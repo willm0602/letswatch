@@ -23,25 +23,34 @@ const UserContextProvider = ({ children }) => {
 
     const fakeMediaSearch = [
         {
+            id: 99,
+            tmdbID: 999,
+            type: 'movie',
             title: 'Everything Everywhere All at Once',
-            poster: 'https://www.themoviedb.org/t/p/original/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg',
+            image: 'https://www.themoviedb.org/t/p/original/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg',
             synopsis:
                 "An aging Chinese immigrant is swept up in an insane adventure, where she alone can save what's important to her by connecting with the lives she could have led in other universes.",
-            score: 81,
+            rating: 81,
         },
         {
+            id: 19,
+            tmdbID: 199,
+            type: 'movie',
             title: "Don't Worry Darling",
-            poster: 'https://www.themoviedb.org/t/p/original/jOqxKIOC92BVyinYO1Fm73XY7Tc.jpg',
+            image: 'https://www.themoviedb.org/t/p/original/jOqxKIOC92BVyinYO1Fm73XY7Tc.jpg',
             synopsis:
                 'Alice and Jack are lucky to be living in the idealized community of Victory, the experimental company town housing the men who work for the top-secret Victory Project and their families. But when cracks in their idyllic life begin to appear, exposing flashes of something much more sinister lurking beneath the attractive façade, Alice can’t help questioning exactly what they’re doing in Victory, and why.',
-            score: 69, //nice
+            rating: 69, //nice
         },
         {
+            id: 29,
+            tmdbID: 299,
+            type: 'movie',
             title: 'Stranger Things',
-            poster: 'https://www.themoviedb.org/t/p/original/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
+            image: 'https://www.themoviedb.org/t/p/original/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
             synopsis:
                 ' When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.',
-            score: 86,
+            rating: 86,
         },
         {
             title: 'Doctor Who',
@@ -223,7 +232,8 @@ const UserContextProvider = ({ children }) => {
         ],
     })
 
-    const [userInfo, setUserInfo] = useState(false);
+    const [userInfo, setUserInfo] = useState(false)
+    const [autoFillMedia, setAutoFillMedia] = useState(false);
 
     return (
         <Fragment>
@@ -234,7 +244,9 @@ const UserContextProvider = ({ children }) => {
                     fakeMediaSearch,
                     chainsawMan,
                     userInfo,
-                    setUserInfo
+                    setUserInfo,
+                    autoFillMedia,
+                    setAutoFillMedia
                 }}
             >
                 {children}

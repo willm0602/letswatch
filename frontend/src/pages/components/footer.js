@@ -15,7 +15,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 const Footer = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
-    const userInfo = ctx.userInfo;
+    const userInfo = ctx.userInfo
 
     return (
         <Paper
@@ -67,9 +67,11 @@ const Footer = () => {
                     />
                 </Link>
 
-                <BottomNavigationAction
-                    icon={<ListIcon style={{ color: 'white' }} />}
-                />
+                <Link to="/lists" style={{ display: 'flex' }}>
+                    <BottomNavigationAction
+                        icon={<ListIcon style={{ color: 'white' }} />}
+                    />
+                </Link>
             </BottomNavigation>
         </Paper>
     )

@@ -69,23 +69,22 @@ async function createListForSingleUser(userID, listName) {
 }
 
 async function addUserToList(userID, listID) {
-    const userAlreadyInList = await userInList(userID, listID);
-    const sql = `INSERT INTO user_list_memberships(user_id, list_id) VALUES (?, ?)`;
-    
+    const userAlreadyInList = await userInList(userID, listID)
+    const sql = `INSERT INTO user_list_memberships(user_id, list_id) VALUES (?, ?)`
+
     return new Promise((res, rej) => {
-        if (userAlreadyInList) return res(userAlreadyInList);
-        conn.query({
-            sql,
-            values: [
-                userID,
-                listID
-            ]
-        }, async (err, rows) => {
-            if(err)
-                return rej(err)
-            const userInListID = await userInList(userID, listID);
-            return res(userInListID);
-        })
+        if (userAlreadyInList) return res(userAlreadyInList)
+        conn.query(
+            {
+                sql,
+                values: [userID, listID],
+            },
+            async (err, rows) => {
+                if (err) return rej(err)
+                const userInListID = await userInList(userID, listID)
+                return res(userInListID)
+            }
+        )
     })
 }
 
@@ -124,37 +123,34 @@ async function createList(ctx) {
                 values: [listName, groupID],
             },
             async (err, rows) => {
-                if (err) return rej(err);
-                const listID = await guessListMade(listName, groupID);
-                const userID = await getIDFromAccessToken(accessToken);
-                await addUserToList(userID, listID);
-                return res(true);
+                if (err) return rej(err)
+                const listID = await guessListMade(listName, groupID)
+                const userID = await getIDFromAccessToken(accessToken)
+                await addUserToList(userID, listID)
+                return res(true)
             }
         )
-
     })
 }
 
 // this will guess the list made, it might technically have some errors at some point but that's
 // future Will's problem
 // this just guesses which list was just made by a group (I'd be surprised if this was ever wrong)
-async function guessListMade(listName, groupID){
+async function guessListMade(listName, groupID) {
     const sql = `SELECT * FROM watch_lists WHERE group_id=? AND Name=? ORDER BY id DESC;`
     return new Promise((res, rej) => {
-        conn.query({
-            sql,
-            values: [
-                groupID,
-                listName
-            ]
-        }, (err, rows) => {
-            if(err)
-                return rej(err);
-            if(rows.length === 0)
-                return rej(`No list found`);
-            return res(rows[0].id);
-        })
-    });
+        conn.query(
+            {
+                sql,
+                values: [groupID, listName],
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                if (rows.length === 0) return rej(`No list found`)
+                return res(rows[0].id)
+            }
+        )
+    })
 }
 
 async function getListsForGroup(groupID) {
@@ -255,6 +251,7 @@ async function getMediaForWatchList(watchListID) {
     ON watch_list_items.media_id=media.id
     INNER JOIN users
     ON watch_list_items.user_added_by_id=users.id
+    WHERE watch_list_items.watchlist_id = ?
     ;`
 
     return new Promise((res, rej) => {
@@ -264,14 +261,14 @@ async function getMediaForWatchList(watchListID) {
                 values: [watchListID],
             },
             (err, rows) => {
-                if (err) return rej(err)
+                if (err) return rej(erimage.pngr)
                 let allMedia = []
                 for (let row of rows) {
                     let media = {
                         title: row.title,
-                        poster: row.image_url,
+                        image: row.image_url,
                         synopsis: row.synopsis,
-                        score: row.rating,
+                        rating: row.rating,
                         addedBy: row.Username,
                     }
                     console.log(`media is`, media)
