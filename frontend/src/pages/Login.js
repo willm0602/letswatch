@@ -1,14 +1,8 @@
-import {
-    Stack,
-    FilledInput,
-    ToggleButtonGroup,
-    ToggleButton,
-    Button,
-    Box,
-} from '@mui/material'
-import { Fragment, useState } from 'react'
-import { login, signup } from '../APIInterface/AccountManagement'
-import LoginFooter from './components/LoginFooter'
+import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
+import { Fragment, useState } from "react";
+import { login, signup} from "../APIInterface/AccountManagement";
+import { getAccessToken } from "../LocalStorageInterface";
+import LoginFooter from "./components/LoginFooter";
 
 const Login = () => {
     const [action, setAction] = useState('Login')
@@ -20,11 +14,10 @@ const Login = () => {
     const [cPasswordError, setCPasswordError] = useState(false)
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-
-        setUsernameError(false)
-        setPasswordError(false)
-        setCPasswordError(false)
+        e.preventDefault();
+        setUsernameError(false);
+        setPasswordError(false);
+        setCPasswordError(false);
 
         if (action === 'Login') {
             login(username, password)
@@ -35,10 +28,12 @@ const Login = () => {
             if (cPassword !== password) {
                 setCPasswordError(true)
             }
-            if (username === '') {
-                setUsernameError(true)
-            } else if (!cPasswordError && !passwordError) {
-                signup(username, password)
+            if(username === '') { 
+                setUsernameError(true);
+            } else if(!cPasswordError && !passwordError) {
+                signup(username, password);
+            } else {
+                e.preventDefault()
             }
         }
     }
