@@ -29,7 +29,7 @@ async function mediaSearch(ctx) {
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbAPIToken}&language=en-US&page=1&include_adult=false&query=${query
         .split(' ')
         .join('+')}`
-    
+    console.log(`url is`, url);
     return new Promise(async (res, rej) => {
         const resp = await axios.get(url)
         console.log(`resp is`, resp.data.results)

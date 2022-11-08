@@ -4,6 +4,7 @@ import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { UserContext } from '../contextSetup'
 import { deleteAccessToken } from '../LocalStorageInterface'
+import { Button } from '@mui/material'
 
 const User = () => {
     const location = useLocation()
@@ -47,14 +48,21 @@ const User = () => {
 
                 <h3>Groups</h3>
 
-                <button
+                <Button
+                    variant="contained"
+                    style={{
+                        maxWidth: '300px',
+                        margin: 'auto',
+                        backgroundColor: '#6C63FF',
+                        borderRadius: '15px',
+                    }}
                     onClick={(e) => {
                         deleteAccessToken()
                         window.location = '/'
                     }}
                 >
                     Sign Out
-                </button>
+                </Button>
             </div>
             <Footer />
         </>
