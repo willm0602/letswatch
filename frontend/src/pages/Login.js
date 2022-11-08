@@ -1,7 +1,7 @@
+import {useNavigate} from 'react-router-dom';
 import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
 import { Fragment, useState } from "react";
 import { login, signup} from "../APIInterface/AccountManagement";
-import { getAccessToken } from "../LocalStorageInterface";
 import LoginFooter from "./components/LoginFooter";
 
 const Login = () => {
@@ -12,6 +12,7 @@ const Login = () => {
     const [usernameError, setUsernameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [cPasswordError, setCPasswordError] = useState(false);
+    const navigate = useNavigate(); // For when Will add's something to be returned when finished, will route it to home page
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,7 +21,14 @@ const Login = () => {
         setCPasswordError(false);
 
         if(action === 'Login'){
-            login(username, password);
+            if(username === '') { 
+                setUsernameError(true);
+            }
+            if(password === '') { 
+                setPasswordError(true);
+            } else {
+                login(username, password);
+            }
         } else if( action === 'Register') {
             if(password === '') { 
                 setPasswordError(true);
@@ -28,13 +36,10 @@ const Login = () => {
             if(cPassword !== password) { 
                 setCPasswordError(true);
             }
-            console.log(!cPasswordError, !passwordError);
             if(username === '') { 
                 setUsernameError(true);
-            } else if(!cPasswordError && !passwordError) {
+            } else if(cPasswordError && passwordError) {
                 signup(username, password);
-            } else {
-                e.preventDefault()
             }
         }
     }
@@ -43,6 +48,9 @@ const Login = () => {
         if(newAction !== null)
         {
             setAction(newAction);
+            setUsernameError(false);
+            setPasswordError(false);
+            setCPasswordError(false);
         }
     };
 
@@ -80,12 +88,14 @@ const Login = () => {
                         placeholder="Username"
                         error = {usernameError} 
                     />
+                    {usernameError && (<Fragment>Username can't be empty</Fragment>)}
                     <FilledInput
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
                         type="password"
                         error = {passwordError}
                     />
+                    {passwordError && (<Fragment>Password can't be empty</Fragment>)}
             </Stack>
             )}
 
