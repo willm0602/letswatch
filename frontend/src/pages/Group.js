@@ -4,16 +4,16 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import Fab from '@mui/material/Fab'
+import AddIcon from '@mui/icons-material/Add'
 
 import Paper from '@mui/material/Paper'
 import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import Button from '@mui/material/Button'
 
-import * as React from 'react';
-import Modal from '@mui/material/Modal';
+import * as React from 'react'
+import Modal from '@mui/material/Modal'
 
 import { useContext } from 'react'
 import { UserContext } from '../contextSetup'
@@ -25,19 +25,16 @@ import { userMetadata } from '../APIInterface/GetUserData'
 
 const Group = () => {
     const location = useLocation()
-    const groupInfo = location.state.group
-    console.log(location.state.groupIdx);
+    const [groupInfo, setGroupInfo] = React.useState(location.state.group)
     const ctx = useContext(UserContext)
-    console.log(ctx.userInfo.groups[location.state.groupIdx]);
 
+    const [open, setOpen] = React.useState(false)
+    const [newListName, setNewListName] = React.useState('')
+    const handleOpen = () => setOpen(true)
 
-
-    const [open, setOpen] = React.useState(false);
-    const [newListName, setNewListName] = React.useState('');
-    const handleOpen = () => setOpen(true);
     const handleClose = () => {
-        setOpen(false);
-        setNewListName('');
+        setOpen(false)
+        setNewListName('')
     }
 
     const handleAddList = () => {
@@ -45,25 +42,21 @@ const Group = () => {
     }
 
     const handleInputChange = (event) => {
-        setNewListName(event.target.value);
+        setNewListName(event.target.value)
     }
 
     const handleCreateList = () => {
-        let newLists = ctx.userInfo.groups[location.state.groupIdx].lists
-        const newList = {
-            listID:9,
-            listMembers:[{username:ctx.userInfo.username, profileID:ctx.userInfo.profileID}],
-            listName:newListName,
-            media:[]
+        const createNewList = async() =>{
+            await makeWatchList(newListName, ctx.userInfo.groups[location.state.groupIdx].groupID)
+                .then((res)=>userMetadata()
+                    .then((res)=>{
+                        ctx.setUserInfo(res);
+                        setGroupInfo(res.groups[location.state.groupIdx]);
+                    }))
         }
-        let newDBInfo = ctx.userInfo;
-        newDBInfo.groups[location.state.groupIdx].lists = [...newDBInfo.groups[location.state.groupIdx].lists, newList];
-        ctx.setUserInfo(newDBInfo);
-        
-        makeWatchList(newListName, ctx.userInfo.groups[location.state.groupIdx].groupID)
-            .then(userMetadata()
-                .then((res) => ctx.setUserInfo(res)))
-                    .then(setGroupInfo(ctx.userInfo.groups[location.state.groupIdx]))
+        createNewList();
+        //functions as no-op?
+        userMetadata().then((res) => console.log(res));
         handleClose();
     }
 
@@ -77,9 +70,9 @@ const Group = () => {
         border: '2px solid #000',
         boxShadow: 24,
         p: 4,
-        display:'flex',
-        flexDirection:'column'
-    };
+        display: 'flex',
+        flexDirection: 'column',
+    }
 
     return (
         <div
@@ -87,7 +80,7 @@ const Group = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 textAlign: 'center',
-                paddingBottom:'100px'
+                paddingBottom: '100px',
             }}
         >
             <NMHeader />
@@ -148,8 +141,18 @@ const Group = () => {
                     ))}
                 </List>
             </Box>
-            
-            <Fab onClick={()=>handleAddList()} color="primary" aria-label="add" style={{position:'fixed', top:'80%', left:'80%', backgroundColor:'#6C63FF'}}>
+
+            <Fab
+                onClick={() => handleAddList()}
+                color="primary"
+                aria-label="add"
+                style={{
+                    position: 'fixed',
+                    top: '80%',
+                    left: '80%',
+                    backgroundColor: '#6C63FF',
+                }}
+            >
                 <AddIcon />
             </Fab>
 
@@ -161,16 +164,21 @@ const Group = () => {
             >
                 <Box sx={style}>
                     <h3>Create New List?</h3>
-                    <TextField id="filled-basic" label="List Name" variant="filled" onChange={handleInputChange}/>
+                    <TextField
+                        id="filled-basic"
+                        label="List Name"
+                        variant="filled"
+                        onChange={handleInputChange}
+                    />
                     <Button
-                        onClick={()=>handleCreateList()}
+                        onClick={() => handleCreateList()}
                         variant="contained"
                         style={{
                             maxWidth: '300px',
                             margin: 'auto',
                             backgroundColor: '#6C63FF',
                             borderRadius: '15px',
-                            margin:'5%'
+                            margin: '5%',
                         }}
                     >
                         Submit

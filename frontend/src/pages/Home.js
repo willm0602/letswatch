@@ -16,34 +16,33 @@ import { userMetadata } from '../APIInterface/GetUserData'
 import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 /*
-
-new for push
-
-Hey you goddamn goon, There's some stuff you gotta fix
-
--[fixed for groups, add padding bottom to the bottom of pages later]Stuff is falling underneath the bottom nav, add some kinda box at the bottom that sits about the same size as the nav
-
--[fixed]The button to add stuff doesn't follow along when you scroll, make sure it stays indefinetly.
-
--[fixed]make sure the lists on the front page only display like 5 things
+    There's an issue with auto-complete adding to the media list, i'll need to re-call the function that gets the media lists
+    cause right now the app needs to be reloaded for the new media to apply to the lists
+    something like:
+        allMedia().then((res) => ctx.setAutoFillMedia(res));
 */
 
 const Home = () => {
     const ctx = useContext(UserContext)
     const fakeData = ctx.fakeDBInfo
 
-    userMetadata().then(
-        (res) => {
-            console.log(res);
-        }
-    )
+    const autoFillMedia = ctx.autoFillMedia;
 
-    let personalGroup=[];
-    let personalLists=[];
-    if(ctx.userInfo){
-        personalGroup = ctx.userInfo.groups.filter( group => group.members.length === 1 && group.members[0].username === ctx.userInfo.username);
-        if(personalGroup)
-            personalLists = personalGroup[0].lists.slice(0,3);        
+    console.log(ctx);
+
+    userMetadata().then((res) => {
+        console.log(res)
+    })
+
+    let personalGroup = []
+    let personalLists = []
+    if (ctx.userInfo) {
+        personalGroup = ctx.userInfo.groups.filter(
+            (group) =>
+                group.members.length === 1 &&
+                group.members[0].username === ctx.userInfo.username
+        )
+        if (personalGroup) personalLists = personalGroup[0].lists.slice(0, 3)
     }
 
     const autoCompletePlaceholderData = [
@@ -58,10 +57,7 @@ const Home = () => {
         },
     ]
 
-    return (
-
-        ctx.userInfo ?
-
+    return ctx.userInfo ? (
         <div
             style={{
                 display: 'flex',
@@ -94,46 +90,49 @@ const Home = () => {
             <h2>My Lists</h2>
             <Box style={{ margin: 'auto' }}>
                 <List>
-                    {!personalLists? <p>No Lists yet, ya goober :)</p> :
+                    {!personalLists ? (
+                        <p>No Lists yet, ya goober :)</p>
+                    ) : (
                         personalLists.map((list, listIdx) => (
-                        <ListItem>
-                            <Paper
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    width: '300px',
-                                    padding: '4%',
-                                    margin: 'auto',
-                                    borderRadius: '25px',
-                                }}
-                                elevation={3}
-                            >
-                                <Link
-                                    to={`/list/${list.listID}`}
+                            <ListItem>
+                                <Paper
                                     style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        width: '300px',
+                                        padding: '4%',
                                         margin: 'auto',
-                                        textDecoration: 'none',
-                                        color: 'black',
+                                        borderRadius: '25px',
                                     }}
-                                    state={{
-                                        list: list,
-                                        listIdx: listIdx,
-                                        groupIdx: 0,
-                                    }}
+                                    elevation={3}
                                 >
-                                    {list.listName}
-                                </Link>
-                                <AvatarGroup max={2}>
-                                    {list.listMembers.map((member) => (
-                                        <Avatar
-                                            alt={member.username}
-                                            src={`/profileImages/${member.profileID}.jpg`}
-                                        />
-                                    ))}
-                                </AvatarGroup>
-                            </Paper>
-                        </ListItem>
-                    ))}
+                                    <Link
+                                        to={`/list/${list.listID}`}
+                                        style={{
+                                            margin: 'auto',
+                                            textDecoration: 'none',
+                                            color: 'black',
+                                        }}
+                                        state={{
+                                            list: list,
+                                            listIdx: listIdx,
+                                            groupIdx: 0,
+                                        }}
+                                    >
+                                        {list.listName}
+                                    </Link>
+                                    <AvatarGroup max={2}>
+                                        {list.listMembers.map((member) => (
+                                            <Avatar
+                                                alt={member.username}
+                                                src={`/profileImages/${member.profileID}.jpg`}
+                                            />
+                                        ))}
+                                    </AvatarGroup>
+                                </Paper>
+                            </ListItem>
+                        ))
+                    )}
                 </List>
             </Box>
 
@@ -192,7 +191,7 @@ const Home = () => {
                     ))}
                 </List>
             </Box>
-            <Link to='/groups'>
+            <Link to="/groups" style={{ textDecoration: 'none' }}>
                 <Button
                     variant="contained"
                     style={{
@@ -207,9 +206,7 @@ const Home = () => {
             </Link>
             <Footer />
         </div>
-        :
-        null
-    )
+    ) : null
 }
 
 export default Home
