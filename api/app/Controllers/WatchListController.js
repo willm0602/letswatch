@@ -265,13 +265,14 @@ async function getMediaForWatchList(watchListID) {
                 if (err) return rej(erimage.pngr)
                 let allMedia = []
                 for (let row of rows) {
+                    console.log('row is ', row);
                     let media = {
                         title: row.title,
                         image: row.image_url,
                         synopsis: row.synopsis,
                         rating: row.rating,
                         addedBy: row.Username,
-                        id: row.id,
+                        id: row.media_id,
                         tmdbID: row.tmdb_id,
                         type: row.type
                     }
