@@ -16,3 +16,10 @@ export async function addMediaToWatchlist(listID, mediaID){
         accessToken: getAccessToken()
     });
 }
+
+export function removeMediaFromWatchList(listID, mediaID){
+    post('/watchlist/remove_media', {
+        listID,
+        mediaID
+    })
+}
