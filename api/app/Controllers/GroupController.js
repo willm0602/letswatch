@@ -259,8 +259,12 @@ async function ajaxAddUserToGroup(ctx) {
     const requestingUserInGroup = await userIsInGroup(accessToken, groupID)
     return new Promise(async (res, rej) => {
         if (requestingUserInGroup) {
-            const userAlreadyInGroup = await userIsInGroup(undefined, groupID, userID)
-            console.log(`userAlreadyInGroup is`, userAlreadyInGroup);
+            const userAlreadyInGroup = await userIsInGroup(
+                undefined,
+                groupID,
+                userID
+            )
+            console.log(`userAlreadyInGroup is`, userAlreadyInGroup)
             if (userAlreadyInGroup) {
                 const errorMessage = apiResponse(
                     false,
@@ -280,7 +284,6 @@ async function ajaxAddUserToGroup(ctx) {
                     ctx.body = error
                     return rej(err)
                 })
-
         }
         console.log(requestingUserInGroup, 'requesting user in group')
         const errorMessage = apiResponse(

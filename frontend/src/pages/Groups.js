@@ -18,10 +18,10 @@ import Button from '@mui/material/Button'
 import { makeNewGroup } from '../APIInterface/CreateGroup'
 import { userMetadata } from '../APIInterface/GetUserData'
 const Groups = () => {
-    const ctx = useContext(UserContext);
+    const ctx = useContext(UserContext)
     // const userGroups = ctx.userInfo.groups;
-    console.log(ctx);
-    const [userGroups, setUserGroups] = React.useState(ctx.userInfo.groups);
+    console.log(ctx)
+    const [userGroups, setUserGroups] = React.useState(ctx.userInfo.groups)
 
     const [open, setOpen] = React.useState(false)
     const [newGroupName, setNewGroupName] = React.useState('')
@@ -36,17 +36,17 @@ const Groups = () => {
     }
 
     const handleCreateGroup = () => {
-        const createNewGroup = async() => {
-            await makeNewGroup(newGroupName,ctx.userInfo.userID)
-                .then((res)=>userMetadata()
-                    .then((res)=>{
-                        ctx.setUserInfo(res);
-                        setUserGroups(res.groups);
-                    }))
+        const createNewGroup = async () => {
+            await makeNewGroup(newGroupName, ctx.userInfo.userID).then((res) =>
+                userMetadata().then((res) => {
+                    ctx.setUserInfo(res)
+                    setUserGroups(res.groups)
+                })
+            )
         }
-        createNewGroup();
+        createNewGroup()
         //no idea why this works :shrug:
-        userMetadata().then((res) => console.log(res));
+        userMetadata().then((res) => console.log(res))
         handleClose()
     }
 

@@ -46,18 +46,21 @@ const Group = () => {
     }
 
     const handleCreateList = () => {
-        const createNewList = async() =>{
-            await makeWatchList(newListName, ctx.userInfo.groups[location.state.groupIdx].groupID)
-                .then((res)=>userMetadata()
-                    .then((res)=>{
-                        ctx.setUserInfo(res);
-                        setGroupInfo(res.groups[location.state.groupIdx]);
-                    }))
+        const createNewList = async () => {
+            await makeWatchList(
+                newListName,
+                ctx.userInfo.groups[location.state.groupIdx].groupID
+            ).then((res) =>
+                userMetadata().then((res) => {
+                    ctx.setUserInfo(res)
+                    setGroupInfo(res.groups[location.state.groupIdx])
+                })
+            )
         }
-        createNewList();
+        createNewList()
         //functions as no-op?
-        userMetadata().then((res) => console.log(res));
-        handleClose();
+        userMetadata().then((res) => console.log(res))
+        handleClose()
     }
 
     const style = {
