@@ -24,9 +24,9 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 
     TODO:
-        [] fix the thing above?
-        [] have extended media search add to the backend
-        [] play with media(plural) page and get it setup
+        [x] fix the thing above?
+        [x] have extended media search add to the backend
+        [~] play with media(plural) page and get it setup
 */
 
 const Home = () => {

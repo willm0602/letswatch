@@ -123,6 +123,7 @@ const ListOfMedia = () => {
     const handleRemove = (mediaIDtoRemove) => {
 
         console.log(listContent);
+        console.log(mediaIDtoRemove);
 
         const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
