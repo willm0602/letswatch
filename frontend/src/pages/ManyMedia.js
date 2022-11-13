@@ -9,6 +9,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import { Button } from '@mui/material'
 import Skeleton from '@mui/material/Skeleton';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import getFromTMDB from '../APIInterface/TMDB';
 import FrontPageMedia from './components/frontPageMedia'
@@ -40,6 +41,8 @@ const ManyMedia = () => {
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/person/popular?language=en-US&page=1').then((res)=> setPopularActor(res.results));
+            // await getFromTMDB('/movie/upcoming?language=en-US&page=1').then((res)=> console.log(res.results));
+
         }
         setup()
     }, [])
@@ -123,26 +126,32 @@ const ManyMedia = () => {
             </div>
             
             <div style={{display:'flex', flexDirection:'column', margin:'15px'}}>
-                <h3>Trending</h3>                        
-                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                    { trending ? trending.map( trendingMedia => <FrontPageMedia mediaInfo={trendingMedia} />) : null}
-                </div>
+                
+                {trending && popularMovies && popularTV && popularActor ?
+                    <>
+                        <h3>Trending</h3>                        
+                        <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                            {trending.map( trendingMedia => <FrontPageMedia mediaInfo={trendingMedia} />)}
+                        </div>
 
-                <h3>Popular Movies</h3>                        
-                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                    { popularMovies ? popularMovies.map( movie => <FrontPageMedia mediaInfo={movie} />) : null}
-                </div>
+                        <h3>Popular Movies</h3>                        
+                        <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                            {popularMovies.map( movie => <FrontPageMedia mediaInfo={movie} />)}
+                        </div>
 
-                <h3>Popular TV</h3>                        
-                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                    { popularTV ? popularTV.map( tv => <FrontPageMedia mediaInfo={tv} />) : null}
-                </div>
+                        <h3>Popular TV</h3>                        
+                        <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                            {popularTV.map( tv => <FrontPageMedia mediaInfo={tv} />)}
+                        </div>
 
-                <h3>Popular Actors</h3>                        
-                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                    { popularActor ? popularActor.map( actor => <FrontPageActors actorInfo={actor}/>) : null}
-                </div>
-
+                        <h3>Popular Actors</h3>                        
+                        <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                            {popularActor.map( actor => <FrontPageActors actorInfo={actor}/>)}
+                        </div>
+                    </>
+                    :
+                    <CircularProgress style={{color:'#6C63FF', width:'75px', height:'75px', display:'flex', margin:'auto', alignItems:'center', height:'500px'}}/>
+                }
                 
             </div>
             <Footer />
