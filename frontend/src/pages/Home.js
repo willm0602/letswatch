@@ -20,6 +20,13 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
     cause right now the app needs to be reloaded for the new media to apply to the lists
     something like:
         allMedia().then((res) => ctx.setAutoFillMedia(res));
+
+
+
+    TODO:
+        [] fix the thing above?
+        [] have extended media search add to the backend
+        [] play with media(plural) page and get it setup
 */
 
 const Home = () => {

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, createTheme, TextField } from '@mui/material'
 import { UserContext } from '../contextSetup'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Button } from '@mui/material'
@@ -20,6 +20,7 @@ import NMHeader from './components/nonMediaHeader'
 import { mediaSearch } from '../APIInterface/MediaSearch'
 import {addMediaToWatchlist} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
+import { allMedia } from '../APIInterface/MediaSearch'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
@@ -71,6 +72,24 @@ const ListOfMedia = () => {
             const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), mediaToAdd]
             ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
             //db stuff
+            console.log(mediaToAdd);
+
+            const createNewListItem = async(mediaID) => {
+                const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+                await addMediaToWatchlist(listID, mediaID)
+                    .then((res)=>userMetadata()
+                        .then((res)=>{
+                            console.log(res);
+                            console.log(listContent);
+                            console.log(listIdx);
+                            ctx.setUserInfo(res);
+                            setListContent([...res.groups[groupIdx].lists[listIdx].media]);
+                            allMedia().then((res) => ctx.setAutoFillMedia(res));
+                        }))
+            }
+
+            createNewListItem(mediaToAdd.id)
+            userMetadata().then((res) => console.log(res));//no op
         }
 
 
@@ -91,6 +110,7 @@ const ListOfMedia = () => {
                         console.log(listIdx);
                         ctx.setUserInfo(res);
                         setListContent([...res.groups[groupIdx].lists[listIdx].media]);
+                        allMedia().then((res) => ctx.setAutoFillMedia(res));
                     }))
         } 
         creatNewListItem();

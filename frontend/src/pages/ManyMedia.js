@@ -10,31 +10,42 @@ import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import { Button } from '@mui/material'
 import Skeleton from '@mui/material/Skeleton';
 
+import getFromTMDB from '../APIInterface/TMDB';
+import FrontPageMedia from './components/frontPageMedia'
+import FrontPageActors from './components/frontPageActors'
+
+
 const ManyMedia = () => {
     const ctx = useContext(UserContext)
     const autoFillMedia = ctx.autoFillMedia;
 
     const [randomBackground, setRandomBackground] = useState(0)
-
+    const [popularMovies, setPopularMovies] = useState(null);
+    const [popularTV, setPopularTV] = useState(null);
+    const [trending, setTrending] = useState(null);
+    const [popularActor, setPopularActor] = useState(null);
+    
+    const handlePageTransition = (mediaInfo) => {
+        ctx.setCurrentMediaPage(
+            {gather:true, type:mediaInfo.type, id:mediaInfo.tmdb_id}
+        );
+    }
 
     useEffect(() => {
         const randomNumber = Math.floor(Math.random() * 21)
         setRandomBackground(randomNumber)
+        const setup = async() => {
+            await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> setPopularMovies(res.results));
+            await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> setPopularTV(res.results));
+            await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
+            await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
+            await getFromTMDB('/person/popular?language=en-US&page=1').then((res)=> setPopularActor(res.results));
+        }
+        setup()
     }, [])
 
-    const autoCompletePlaceholderData = [
-        {
-            label: 'test1',
-        },
-        {
-            label: 'test2',
-        },
-        {
-            label: 'test3',
-        },
-    ]
     return (
-        <>
+        <div style={{paddingBottom: '100px',}}>
             <div
                 style={{
                     backgroundImage: `url(/mediaBackgroundImages/${randomBackground}.jpg)`,
@@ -93,7 +104,7 @@ const ManyMedia = () => {
                             <p style={{ marginLeft: '15px' }}>
                                 {options.title}
                             </p>
-                            <Link to={`media/${options.id}`} style={{color:'#1976d2'}}>
+                            <Link onClick={()=>handlePageTransition(options)} state={{gather:true, type:options.type, id:options.tmdb_id}} to={`media/${options.id}`} style={{color:'#1976d2'}}>
                                 <ArrowCircleRightIcon/>
                             </Link>
                         </Button>
@@ -110,10 +121,32 @@ const ManyMedia = () => {
                     )}
                 />
             </div>
+            
+            <div style={{display:'flex', flexDirection:'column', margin:'15px'}}>
+                <h3>Trending</h3>                        
+                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                    { trending ? trending.map( trendingMedia => <FrontPageMedia mediaInfo={trendingMedia} />) : null}
+                </div>
 
-            <>medias</>
+                <h3>Popular Movies</h3>                        
+                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                    { popularMovies ? popularMovies.map( movie => <FrontPageMedia mediaInfo={movie} />) : null}
+                </div>
+
+                <h3>Popular TV</h3>                        
+                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                    { popularTV ? popularTV.map( tv => <FrontPageMedia mediaInfo={tv} />) : null}
+                </div>
+
+                <h3>Popular Actors</h3>                        
+                <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
+                    { popularActor ? popularActor.map( actor => <FrontPageActors actorInfo={actor}/>) : null}
+                </div>
+
+                
+            </div>
             <Footer />
-        </>
+        </div>
     )
 }
 
