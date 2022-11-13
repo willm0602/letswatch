@@ -21,7 +21,7 @@ function App() {
     const ctx = useContext(UserContext) //context works
 
     //set user information from the db into context
-    if (!ctx.userInfo) userMetadata().then((res) => ctx.setUserInfo(res))
+    if (!ctx.userInfo) userMetadata().then((res) => ctx.setUserInfo(res));
 
     if(!ctx.autoFillMedia)
       allMedia().then((res) => ctx.setAutoFillMedia(res));

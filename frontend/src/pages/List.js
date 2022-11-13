@@ -18,7 +18,7 @@ import NMHeader from './components/nonMediaHeader'
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch'
-import {addMediaToWatchlist} from '../APIInterface/WatchList'
+import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { allMedia } from '../APIInterface/MediaSearch'
 
@@ -30,7 +30,10 @@ const ListOfMedia = () => {
     const location = useLocation();
     const groupIdx = location.state.groupIdx;
     const listIdx = location.state.listIdx;
-    const listInfo = location.state.list;
+    // const listInfo = location.state.list;
+
+    const listInfo = ctx.userInfo.groups[groupIdx].lists[listIdx]
+
     const fakeMedia = ctx.fakeMediaSearch;
     const autoFillMedia = ctx.autoFillMedia.filter(media => media.image_url && media.rating > 0);
 
@@ -118,10 +121,19 @@ const ListOfMedia = () => {
     }
 
     const handleRemove = (mediaIDtoRemove) => {
+
+        console.log(listContent);
+
         const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
         setListContent(newMedia);
         //update db
+        // const removeItem = async() => {
+        //     const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+        //     await removeMediaFromWatchList(listID, mediaIDtoRemove);
+        // }
+        // removeItem()
+        // userMetadata().then((res) => console.log(res));//no op
     }
 
     useEffect(() => {
@@ -289,7 +301,7 @@ const ListOfMedia = () => {
                                                     </span>
                                                 </div>
                                             </div>
-
+                                            
                                             <Button
                                                 variant="contained"
                                                 onClick={() => {
