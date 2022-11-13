@@ -271,6 +271,9 @@ async function getMediaForWatchList(watchListID) {
                         synopsis: row.synopsis,
                         rating: row.rating,
                         addedBy: row.Username,
+                        id: row.id,
+                        tmdbID: row.tmdb_id,
+                        type: row.type
                     }
                     console.log(`media is`, media)
                     allMedia.push(media)
