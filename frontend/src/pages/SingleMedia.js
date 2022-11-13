@@ -4,30 +4,34 @@ import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../contextSetup'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton';
-
+import CircularProgress from '@mui/material/CircularProgress';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 //API
 import getFromTMDB from '../APIInterface/TMDB';
 import FrontPageRatingBubble from './components/frontPageRatingBubble';
+import FrontPageMedia from './components/frontPageMedia'
 
 const SingleMedia = () => {
-    const location = useLocation()
     const [currentMedia, setCurrentMedia] = useState(null);
     const ctx = useContext(UserContext)
     const [trailer, setTrailer] = useState(null);
     const [cast, setCast] = useState(null);
+    const [similarMedia, setSimilarMedia] = useState(null);
+
+    const [pageReady, setPageReady] = useState(false);
 
     useEffect(()=>{
+        setPageReady(false);
         const setThingsUp = async(mediaType) => {
             await getFromTMDB(`${mediaType}/${ctx.currentMediaPage.id}`).then((res)=>{
                 console.log(res)
                 setCurrentMedia(res)
                 getFromTMDB(`${mediaType}/${res.id}/videos?`).then((res)=>{
                     const YTvids = res.results.filter(res => res.site==="YouTube" && res.name.toLowerCase().includes('trailer'));
-                    console.log(YTvids)
                     YTvids.length > 0 ? setTrailer(`https://www.youtube.com/embed/${YTvids[0].key}`) : setTrailer(null)
-                    
                 })
                 getFromTMDB(`${mediaType}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
+                getFromTMDB(`${mediaType}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
             });
         }
         ctx.currentMediaPage.title ? 
@@ -37,11 +41,11 @@ const SingleMedia = () => {
                 setThingsUp(ctx.currentMediaPage.type) 
                 : 
                 setThingsUp('tv');
-    },[])
+    },[ctx.currentMediaPage])
 
     return (
-        currentMedia ?
-        <div style={{paddingBottom: '1000px'}}>
+        pageReady ?
+        <div style={{paddingBottom: '1200px'}}>
             <div
                 style={{
                     backgroundImage: `url(https://www.themoviedb.org/t/p/original${currentMedia.backdrop_path})`,
@@ -99,7 +103,8 @@ const SingleMedia = () => {
                     }}
                 >
                     <h3 style={{marginTop:'3em'}}>Trailer</h3>
-
+                    
+                    {trailer?
                     <div style={{ maxWidth: '100%' }}>
                         <div className="video-container">
                             <iframe
@@ -113,6 +118,8 @@ const SingleMedia = () => {
                             ></iframe>
                         </div>
                     </div>
+                    :
+                    <p>Sorry, no available trailer</p>}
 
                     <h3>Synopsis</h3>
                     <p>{currentMedia.overview}</p>
@@ -127,18 +134,31 @@ const SingleMedia = () => {
                                         :
                                         <Skeleton variant="rectangular" width={120} height={180} />
                                     }
-                                    <p style={{margin:0}}>{c.name}</p>
-                                    <b style={{margin:0}}>{c.character}</b>
+                                    <b style={{margin:0}}>{c.name}</b>
+                                    <i style={{margin:0}}>{c.character}</i>
                                 </div>
                             ):null}
                         </div>
                     </div>
+
+                    <h3>Similar Media</h3>
+                    <div>
+                        <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px', maxWidth:'350px', alignItems:'start',}}>
+                            {similarMedia ?  similarMedia.map(media =>
+                                <div style={{display:'flex', flexDirection:'column', margin:'0 10px'}}>
+                                    <FrontPageMedia mediaInfo={media} />
+                                </div>
+                            ):null}
+                        </div>
+                    </div>                
                 </div>
             </div>
             <Footer />
         </div>
         : 
-        <p>Loading...</p>
+        <div style={{margin:'auto'}}>
+            <CircularProgress style={{color:'#6C63FF', width:'100px', height:'100px', display:'flex', margin:'auto', alignItems:'center', height:'800px'}}/>
+        </div>
     )
 }
 
