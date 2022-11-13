@@ -4,5 +4,5 @@ module.exports.MEDIA_TYPES = {
 }
 
 module.exports.TMDB_COL_NAMES = {
-    VIDEO_TRAILER: 'Trailer'
+    VIDEO_TRAILER: 'Trailer',
 }

@@ -15,6 +15,6 @@ const TMDBRouter = KoaRouter({
     prefix: '/tmdb',
 })
 
-TMDBRouter.get('/', TMDBController.queryTMDBFromLW);
+TMDBRouter.get('/', TMDBController.queryTMDBFromLW)
 
-module.exports = TMDBRouter;
+module.exports = TMDBRouter

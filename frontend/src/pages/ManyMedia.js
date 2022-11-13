@@ -6,30 +6,31 @@ import { TextField } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight'
 import { Button } from '@mui/material'
 import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import getFromTMDB from '../APIInterface/TMDB';
+import getFromTMDB from '../APIInterface/TMDB'
 import FrontPageMedia from './components/frontPageMedia'
 import FrontPageActors from './components/frontPageActors'
 
-
 const ManyMedia = () => {
     const ctx = useContext(UserContext)
-    const autoFillMedia = ctx.autoFillMedia;
+    const autoFillMedia = ctx.autoFillMedia
 
     const [randomBackground, setRandomBackground] = useState(0)
-    const [popularMovies, setPopularMovies] = useState(null);
-    const [popularTV, setPopularTV] = useState(null);
-    const [trending, setTrending] = useState(null);
-    const [popularActor, setPopularActor] = useState(null);
-    
+    const [popularMovies, setPopularMovies] = useState(null)
+    const [popularTV, setPopularTV] = useState(null)
+    const [trending, setTrending] = useState(null)
+    const [popularActor, setPopularActor] = useState(null)
+
     const handlePageTransition = (mediaInfo) => {
-        ctx.setCurrentMediaPage(
-            {gather:true, type:mediaInfo.type, id:mediaInfo.tmdb_id}
-        );
+        ctx.setCurrentMediaPage({
+            gather: true,
+            type: mediaInfo.type,
+            id: mediaInfo.tmdb_id,
+        })
     }
 
     useEffect(() => {
@@ -48,7 +49,7 @@ const ManyMedia = () => {
     }, [])
 
     return (
-        <div style={{paddingBottom: '100px',}}>
+        <div style={{ paddingBottom: '100px' }}>
             <div
                 style={{
                     backgroundImage: `url(/mediaBackgroundImages/${randomBackground}.jpg)`,
@@ -85,9 +86,7 @@ const ManyMedia = () => {
                     }}
                     renderOption={(props, options) => (
                         <Button
-                            
-                            onClick={()=> console.log(options)}
-                            
+                            onClick={() => console.log(options)}
                             style={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
@@ -97,18 +96,33 @@ const ManyMedia = () => {
                             }}
                         >
                             {' '}
-                            {options.image_url ?
-                            <img
-                                style={{ maxWidth: '50px' }}
-                                src={options.image_url}
-                            />
-                            :<Skeleton animation={false} variant="rectangular" width={50} height={75} />
-                            }
+                            {options.image_url ? (
+                                <img
+                                    style={{ maxWidth: '50px' }}
+                                    src={options.image_url}
+                                />
+                            ) : (
+                                <Skeleton
+                                    animation={false}
+                                    variant="rectangular"
+                                    width={50}
+                                    height={75}
+                                />
+                            )}
                             <p style={{ marginLeft: '15px' }}>
                                 {options.title}
                             </p>
-                            <Link onClick={()=>handlePageTransition(options)} state={{gather:true, type:options.type, id:options.tmdb_id}} to={`media/${options.id}`} style={{color:'#1976d2'}}>
-                                <ArrowCircleRightIcon/>
+                            <Link
+                                onClick={() => handlePageTransition(options)}
+                                state={{
+                                    gather: true,
+                                    type: options.type,
+                                    id: options.tmdb_id,
+                                }}
+                                to={`media/${options.id}`}
+                                style={{ color: '#1976d2' }}
+                            >
+                                <ArrowCircleRightIcon />
                             </Link>
                         </Button>
                     )}

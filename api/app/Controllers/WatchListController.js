@@ -265,15 +265,16 @@ async function getMediaForWatchList(watchListID) {
                 if (err) return rej(erimage.pngr)
                 let allMedia = []
                 for (let row of rows) {
+                    console.log('row is ', row)
                     let media = {
                         title: row.title,
                         image: row.image_url,
                         synopsis: row.synopsis,
                         rating: row.rating,
                         addedBy: row.Username,
-                        id: row.id,
+                        id: row.media_id,
                         tmdbID: row.tmdb_id,
-                        type: row.type
+                        type: row.type,
                     }
                     console.log(`media is`, media)
                     allMedia.push(media)
@@ -285,8 +286,8 @@ async function getMediaForWatchList(watchListID) {
 }
 
 async function removeMediaFromWatchList(ctx) {
-    const queryParams = ctx.request.query;
-    const {mediaID, listID} = queryParams;
+    const queryParams = ctx.request.query
+    const { mediaID, listID } = queryParams
 
     const sql = `DELETE FROM watch_list_items 
                     WHERE watchlist_id=?
@@ -295,28 +296,27 @@ async function removeMediaFromWatchList(ctx) {
                 `
 
     return new Promise((res, rej) => {
-        conn.query({
-            sql,
-            values: [listID, mediaID]
-        }, (err, rows) => {
-            if(err)
+        conn.query(
             {
-                ctx.body = undefined;
-                return rej('unable to remove media from list');
-            }     
-            ctx.body = true;
-            return res('succesfully removed media from list')
-
-            
-        })
+                sql,
+                values: [listID, mediaID],
+            },
+            (err, rows) => {
+                if (err) {
+                    ctx.body = undefined
+                    return rej('unable to remove media from list')
+                }
+                ctx.body = true
+                return res('succesfully removed media from list')
+            }
+        )
     })
 }
-
 
 module.exports = {
     createList,
     createListForSingleUser,
     getListsForGroup,
     addMediaToWatchlist,
-    removeMediaFromWatchList
+    removeMediaFromWatchList,
 }

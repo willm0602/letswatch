@@ -7,20 +7,16 @@ const C = require('../../config/Constants')
 
 const tmdbAPIToken = process.env.TMDB
 
-async function addTrailers(mediaList)
-{
-    let mediaWithTrailers = [];
-    for(let media of mediaList)
-    {
-        let trailerURL = await getTrailerPath(media);
-        if(trailerURL!=undefined)
-        {   
-            media['trailerPath'] = trailerURL;
-            mediaWithTrailers.push(media);
+async function addTrailers(mediaList) {
+    let mediaWithTrailers = []
+    for (let media of mediaList) {
+        let trailerURL = await getTrailerPath(media)
+        if (trailerURL != undefined) {
+            media['trailerPath'] = trailerURL
+            mediaWithTrailers.push(media)
         }
-        
     }
-    return mediaWithTrailers;
+    return mediaWithTrailers
 }
 
 async function mediaSearch(ctx) {
@@ -29,7 +25,7 @@ async function mediaSearch(ctx) {
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbAPIToken}&language=en-US&page=1&include_adult=false&query=${query
         .split(' ')
         .join('+')}`
-    console.log(`url is`, url);
+    console.log(`url is`, url)
     return new Promise(async (res, rej) => {
         const resp = await axios.get(url)
         console.log(`resp is`, resp.data.results)
@@ -64,9 +60,11 @@ async function mediaSearch(ctx) {
                 : undefined
         })
 
-        const tmdbDataWithTrailers = await addTrailers(tmdbData);
+        const tmdbDataWithTrailers = await addTrailers(tmdbData)
 
-        const validTMDBData = tmdbDataWithTrailers.filter((val) => val !== undefined)
+        const validTMDBData = tmdbDataWithTrailers.filter(
+            (val) => val !== undefined
+        )
 
         let letsWatchSearchResults = []
         for (let media of validTMDBData) {
@@ -83,28 +81,25 @@ async function mediaSearch(ctx) {
 }
 
 async function getTrailerPath(media) {
-    let trailerURL;
-    if(media === undefined)
-        return undefined;
-    if(media.type === C.MEDIA_TYPES.MOVIE)
+    let trailerURL
+    if (media === undefined) return undefined
+    if (media.type === C.MEDIA_TYPES.MOVIE)
         trailerURL = `https://api.themoviedb.org/3/movie/${media.tmdbID}/videos?api_key=${tmdbAPIToken}`
-    if(media.type === C.MEDIA_TYPES.TV)
+    if (media.type === C.MEDIA_TYPES.TV)
         trailerURL = `https://api.themoviedb.org/3/tv/${media.tmdbID}/videos?api_key=${tmdbAPIToken}`
-    return axios.get(trailerURL).then(
-        (res) => {
-            for(const vid of res.data.results)
-            {
-                if(vid.type == 'Trailer' && vid.site == 'YouTube')
-                    return `https://www.youtube.com/watch?v=${vid.key}`;
+    return axios
+        .get(trailerURL)
+        .then((res) => {
+            for (const vid of res.data.results) {
+                if (vid.type == 'Trailer' && vid.site == 'YouTube')
+                    return `https://www.youtube.com/watch?v=${vid.key}`
             }
-            return undefined;
-        }
-    ).catch(
-        (err) => {
-            console.error(err);
-            return undefined;
-        }
-    )
+            return undefined
+        })
+        .catch((err) => {
+            console.error(err)
+            return undefined
+        })
 }
 
 async function getMediaByID(id) {
@@ -183,7 +178,7 @@ async function saveMediaToDB(media) {
                     media.releaseDate,
                     media.synopsis,
                     media.type,
-                    media.trailerURL
+                    media.trailerURL,
                 ],
             },
             async (err, tuples) => {
@@ -224,83 +219,84 @@ async function allMedia(ctx) {
 }
 
 async function axiosAddMedia(ctx) {
-    const queryParams = ctx.request.query;
-    const {tmdbID, type} = queryParams;
+    const queryParams = ctx.request.query
+    const { tmdbID, type } = queryParams
     return new Promise(async (res, rej) => {
-        if(!(tmdbID && type))
-        {
-            ctx.body = undefined;
+        if (!(tmdbID && type)) {
+            ctx.body = undefined
             return rej('Missing TMDB ID or type')
         }
-        const currentID = await existsInDatabase(tmdbID, type);
-        if(currentID)
-        {
-            ctx.body = currentID;
-            return res(ctx.body);
+        const currentID = await existsInDatabase(tmdbID, type)
+        if (currentID) {
+            ctx.body = currentID
+            return res(ctx.body)
         }
-        const media = type == "tv" ? await getTVFromTMDB(tmdbID) : await getMovieFromTMDB(tmdbID)
+        const media =
+            type == 'tv'
+                ? await getTVFromTMDB(tmdbID)
+                : await getMovieFromTMDB(tmdbID)
         const cleanedMediaData = media.title
-        ? {
-              title: media.title,
-              tmdbID: media.id,
-              synopsis: media.overview,
-              image: getPosterPath(media.poster_path),
-              rating: media.vote_average * 10,
-              releaseDate: new Date(
-                  moment(media.release_date, 'YYYY-MM-DD')
-              ),
-              type,
-          }
-        : media.name
-        ? {
-              title: media.name,
-              tmdbID: media.id,
-              synopsis: media.overview,
-              image: getPosterPath(media.poster_path),
-              rating: media.vote_average * 10,
-              releaseDate: new Date(
-                  moment(media.first_air_date, 'YYYY-MM-DD')
-              ),
-              type
-          }
-        : undefined
-        saveMediaToDB(cleanedMediaData).then(
-            (resp) => {
-                ctx.body = resp;
-                return res(resp);
-            }
-        ).catch(
-            (err) => {
-                ctx.body = undefined;
+            ? {
+                  title: media.title,
+                  tmdbID: media.id,
+                  synopsis: media.overview,
+                  image: getPosterPath(media.poster_path),
+                  rating: media.vote_average * 10,
+                  releaseDate: new Date(
+                      moment(media.release_date, 'YYYY-MM-DD')
+                  ),
+                  type,
+              }
+            : media.name
+            ? {
+                  title: media.name,
+                  tmdbID: media.id,
+                  synopsis: media.overview,
+                  image: getPosterPath(media.poster_path),
+                  rating: media.vote_average * 10,
+                  releaseDate: new Date(
+                      moment(media.first_air_date, 'YYYY-MM-DD')
+                  ),
+                  type,
+              }
+            : undefined
+        saveMediaToDB(cleanedMediaData)
+            .then((resp) => {
+                ctx.body = resp
+                return res(resp)
+            })
+            .catch((err) => {
+                ctx.body = undefined
                 return rej()
-            }
-        )
+            })
     })
 }
 
-async function getTVFromTMDB(id){
+async function getTVFromTMDB(id) {
     const url = `https://api.themoviedb.org/3/tv/${id}?api_key=${tmdbAPIToken}`
     return new Promise((res, rej) => {
-        axios.get(url).then(
-            (resp) => {
-                return res(resp.data);
-            }
-        ).catch((err) => {
-            return rej(err);
-        })
+        axios
+            .get(url)
+            .then((resp) => {
+                return res(resp.data)
+            })
+            .catch((err) => {
+                return rej(err)
+            })
     })
 }
 
-async function getMovieFromTMDB(id){
+async function getMovieFromTMDB(id) {
     const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbAPIToken}`
     return new Promise((res, rej) => {
-        axios.get(url).then(
-            (resp) => {
-                return res(resp.data);
-            }
-        ).catch((err) => {
-            return rej(err);
-        })
+        axios
+            .get(url)
+            .then((resp) => {
+                return res(resp.data)
+            })
+            .catch((err) => {
+                return rej(err)
+            })
     })
 }
 
@@ -308,5 +304,5 @@ module.exports = {
     mediaSearch,
     getMediaByID,
     allMedia,
-    axiosAddMedia
+    axiosAddMedia,
 }
