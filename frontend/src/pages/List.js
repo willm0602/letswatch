@@ -15,26 +15,39 @@ import Skeleton from '@mui/material/Skeleton'
 import CircularProgress from '@mui/material/CircularProgress'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
+import { Link } from 'react-router-dom'
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch'
-import { addMediaToWatchlist } from '../APIInterface/WatchList'
+import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { allMedia } from '../APIInterface/MediaSearch'
+import ListAutoCompleteBar from './components/listAutoCompleteBar'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
-    const [listContent, setListContent] = useState([])
+    const [listContent, setListContent] = useState([]);
+    
+    
+    
+    const handlePageTransition = (mediaInfo) => {
+        console.log(mediaInfo);
+        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
+    };
 
-    const ctx = useContext(UserContext)
-    const location = useLocation()
-    const groupIdx = location.state.groupIdx
-    const listIdx = location.state.listIdx
-    const listInfo = location.state.list
-    const fakeMedia = ctx.fakeMediaSearch
-    const autoFillMedia = ctx.autoFillMedia.filter(
-        (media) => media.image_url && media.rating > 0
-    )
+
+
+
+    const ctx = useContext(UserContext);
+    const location = useLocation();
+    const groupIdx = location.state.groupIdx;
+    const listIdx = location.state.listIdx;
+    // const listInfo = location.state.list;
+
+    const listInfo = ctx.userInfo.groups[groupIdx].lists[listIdx]
+
+    const fakeMedia = ctx.fakeMediaSearch;
+    const autoFillMedia = ctx.autoFillMedia.filter(media => media.image_url && media.rating > 0);
 
     //search bar stuff
     const [searchInputValue, setSearchInputValue] = useState('')
@@ -124,14 +137,20 @@ const ListOfMedia = () => {
     }
 
     const handleRemove = (mediaIDtoRemove) => {
-        const newMedia = [
-            ...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(
-                (media) => media.id !== mediaIDtoRemove
-            ),
-        ]
-        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        setListContent(newMedia)
+
+        console.log(listContent);
+        console.log(mediaIDtoRemove);
+
+        const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
+        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
+        setListContent(newMedia);
         //update db
+        const removeItem = async() => {
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+            await removeMediaFromWatchList(listID, mediaIDtoRemove);
+        }
+        removeItem()
+        userMetadata().then((res) => console.log(res));//no op
     }
 
     useEffect(() => {
@@ -184,23 +203,25 @@ const ListOfMedia = () => {
                                 textTransform: 'none',
                             }}
                         >
-                            {' '}
-                            {options.image_url ? (
-                                <img
-                                    style={{ maxWidth: '50px' }}
-                                    src={options.image_url}
-                                />
-                            ) : (
-                                <Skeleton
-                                    animation={false}
-                                    variant="rectangular"
-                                    width={50}
-                                    height={75}
-                                />
-                            )}
-                            <p style={{ marginLeft: '15px' }}>
-                                {options.title}
-                            </p>
+                                {options.image_url ? (
+                                    <Link to={`/media/${options.tmdb_id}`} onClick={()=>handlePageTransition(options)}>
+                                    <img
+                                        style={{ maxWidth: '50px' }}
+                                        src={options.image_url}
+                                    />
+                                    </Link>
+                                ) : (
+                                    <Skeleton
+                                        animation={false}
+                                        variant="rectangular"
+                                        width={50}
+                                        height={75}
+                                    />
+                                )}
+                                <p style={{ marginLeft: '15px' }}>
+                                    {options.title}
+                                </p>
+
                             <AddCircleIcon
                                 onClick={() => {
                                     newHandleClick(options.id) //was handleClick
@@ -233,84 +254,64 @@ const ListOfMedia = () => {
                     <List>
                         {listContent.map((mediaItem, mediaIndex) => (
                             <ListItem>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-around',
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                        }}
-                                    >
+                                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                                        <Link to={`/media/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
                                         <div style={{ position: 'relative' }}>
-                                            <img
-                                                style={{
-                                                    maxWidth: '90px',
-                                                    margin: '15px',
+                                            <img style={{maxWidth: '90px', margin: '15px'}} src={mediaItem.image} />
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        display: 'flex',
+                                                        justifyContent:
+                                                            'center',
+                                                        alignItems: 'center',
+                                                        width: '15px',
+                                                        height: '15px',
+                                                        borderRadius: '50%',
+                                                        bottom: '5px',
+                                                        left: '70%',
+                                                        color: 'black',
+                                                        backgroundColor:
+                                                            mediaItem.rating > 70
+                                                                ? '#66FF63'
+                                                                : mediaItem.rating >
+                                                                  50
+                                                                ? '#FFF963'
+                                                                : '#FFC165',
+                                                        padding: '5px',
+                                                        textAlign: 'start',
+                                                        border: '1px solid black',
+                                                    }}
+                                                >
+                                                    <span style={{fontSize: '0.75em',}}>
+                                                        <b>{mediaItem.rating}</b>
+                                                    </span>
+                                                    <span style={{fontSize: '0.55em'}}>
+                                                        %
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                            
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    handleRemove(
+                                                        mediaItem.id
+                                                    )
                                                 }}
-                                                src={mediaItem.image}
-                                            />
-
-                                            <div
                                                 style={{
-                                                    position: 'absolute',
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    width: '15px',
-                                                    height: '15px',
-                                                    borderRadius: '50%',
-                                                    bottom: '5px',
-                                                    left: '70%',
-                                                    color: 'black',
-                                                    backgroundColor:
-                                                        mediaItem.rating > 70
-                                                            ? '#66FF63'
-                                                            : mediaItem.rating >
-                                                              50
-                                                            ? '#FFF963'
-                                                            : '#FFC165',
-                                                    padding: '5px',
-                                                    textAlign: 'start',
-                                                    border: '1px solid black',
+                                                    backgroundColor: 'crimson',
+                                                    color: 'white',
+                                                    marginLeft: 'auto',
+                                                    marginRight: 'auto',
+                                                    padding: '0',
                                                 }}
                                             >
-                                                <span
-                                                    style={{
-                                                        fontSize: '0.75em',
-                                                    }}
-                                                >
-                                                    <b>{mediaItem.rating}</b>
-                                                </span>
-                                                <span
-                                                    style={{
-                                                        fontSize: '0.55em',
-                                                    }}
-                                                >
-                                                    %
-                                                </span>
-                                            </div>
+                                                <CloseIcon />
+                                            </Button>
                                         </div>
-
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => {
-                                                handleRemove(mediaItem.id)
-                                            }}
-                                            style={{
-                                                backgroundColor: 'crimson',
-                                                color: 'white',
-                                                marginLeft: 'auto',
-                                                marginRight: 'auto',
-                                                padding: '0',
-                                            }}
-                                        >
-                                            <CloseIcon />
-                                        </Button>
-                                    </div>
 
                                     <div>
                                         <p style={{ margin: '5px' }}>

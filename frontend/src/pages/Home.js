@@ -21,20 +21,16 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
     something like:
         allMedia().then((res) => ctx.setAutoFillMedia(res));
 
-
-
     TODO:
-        [] fix the thing above?
-        [] have extended media search add to the backend
-        [] play with media(plural) page and get it setup
+        [x] fix the thing above?
+        [x] have extended media search add to the backend
+        [~] play with media(plural) page and get it setup
+        [] media page needs to be setup for extended search
 */
 
 const Home = () => {
     const ctx = useContext(UserContext)
-    const fakeData = ctx.fakeDBInfo
-
     const autoFillMedia = ctx.autoFillMedia
-
     console.log(ctx)
 
     userMetadata().then((res) => {
@@ -89,6 +85,7 @@ const Home = () => {
                     <TextField {...params} label="Media Search" />
                 )}
             />
+            
             <img
                 style={{ maxWidth: '200px', margin: 'auto', marginTop: '2em' }}
                 src="/undraw1.svg"

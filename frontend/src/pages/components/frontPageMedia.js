@@ -1,16 +1,11 @@
 import FrontPageRatingBubble from './frontPageRatingBubble'
 import { Link } from 'react-router-dom'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { UserContext } from '../../contextSetup'
 
 const FrontPageMedia = ({ mediaInfo }) => {
     const ctx = useContext(UserContext)
-
-    const handlePageTransition = (mediaInfo) => {
-        console.log(mediaInfo)
-        console.log(ctx)
-        ctx.setCurrentMediaPage(mediaInfo)
-    }
+    const handlePageTransition = (mediaInfo) => ctx.setCurrentMediaPage(mediaInfo);
 
     return (
         <Link
