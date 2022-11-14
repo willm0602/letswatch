@@ -64,7 +64,7 @@ const ManyMedia = () => {
 
     useEffect(() => {
         const randomNumber = Math.floor(Math.random() * 21)
-        setRandomBackground(10)
+        setRandomBackground(randomNumber)
         const setup = async() => {
             await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> setPopularMovies(res.results));
             await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> setPopularTV(res.results));
