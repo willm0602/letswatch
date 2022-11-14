@@ -154,6 +154,18 @@ async function getInfoForGroup(id) {
     })
 }
 
+
+/**
+ * Gets all of the users for a group
+ * 
+ * Parameters
+ * ----------
+ * groupID: int
+ *     the id of the group that we are getting the users for
+ * 
+ * returns the username, profile image id and user id of each user in the group
+ * 
+ */ 
 async function getUsersForGroup(groupID) {
     const sql = `SELECT Username, ProfileImageID, users.id FROM letswatch.user_groups 
 	                LEFT JOIN letswatch.user_group_memberships 

@@ -7,6 +7,14 @@ const C = require('../../config/Constants')
 
 const tmdbAPIToken = process.env.TMDB
 
+
+/**
+ * Adds trailer to media objects
+ * 
+ * mediaList: List[Media*]
+ *      the list of media objects to have trailers added to them
+ * 
+ */
 async function addTrailers(mediaList) {
     let mediaWithTrailers = []
     for (let media of mediaList) {
@@ -19,6 +27,18 @@ async function addTrailers(mediaList) {
     return mediaWithTrailers
 }
 
+
+/**
+ * Searches TMDB for media, adds it to our database and then returns the data for everything
+ * in the search query
+ * 
+ * Parameters (passed through ctx)
+ * -------------------------------
+ * query: str
+ *      the query that is being searched for
+ * 
+ * returns media
+ */
 async function mediaSearch(ctx) {
     const queryParams = ctx.request.query
     const query = queryParams.query
@@ -28,7 +48,6 @@ async function mediaSearch(ctx) {
     console.log(`url is`, url)
     return new Promise(async (res, rej) => {
         const resp = await axios.get(url)
-        console.log(`resp is`, resp.data.results)
         const tmdbData = resp.data.results.map((media) => {
             if (!Object.values(C.MEDIA_TYPES).includes(media.media_type)) {
                 return undefined
@@ -80,6 +99,16 @@ async function mediaSearch(ctx) {
     })
 }
 
+
+/**
+ * Returns the url for a trailer of a media object
+ * 
+ * Parameters
+ * ----------
+ * media: media*   
+ *      the media that we are adding the trailer for
+ * 
+ */
 async function getTrailerPath(media) {
     let trailerURL
     if (media === undefined) return undefined
