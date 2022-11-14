@@ -17,7 +17,6 @@ const SingleMedia = () => {
     const [trailer, setTrailer] = useState(null);
     const [cast, setCast] = useState(null);
     const [similarMedia, setSimilarMedia] = useState(null);
-
     const [pageReady, setPageReady] = useState(false);
 
     useEffect(()=>{
@@ -191,6 +190,7 @@ const SingleMedia = () => {
         : 
         <div style={{margin:'auto'}}>
             <CircularProgress style={{color:'#6C63FF', width:'100px', height:'100px', display:'flex', margin:'auto', alignItems:'center', height:'800px'}}/>
+            <Footer/>
         </div>
     )
 }

@@ -15,17 +15,29 @@ import Skeleton from '@mui/material/Skeleton'
 import CircularProgress from '@mui/material/CircularProgress'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
+import { Link } from 'react-router-dom'
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch'
 import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { allMedia } from '../APIInterface/MediaSearch'
+import ListAutoCompleteBar from './components/listAutoCompleteBar'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
     const [listContent, setListContent] = useState([]);
     
+    
+    
+    const handlePageTransition = (mediaInfo) => {
+        console.log(mediaInfo);
+        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
+    };
+
+
+
+
     const ctx = useContext(UserContext);
     const location = useLocation();
     const groupIdx = location.state.groupIdx;
@@ -133,12 +145,12 @@ const ListOfMedia = () => {
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
         setListContent(newMedia);
         //update db
-        // const removeItem = async() => {
-        //     const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
-        //     await removeMediaFromWatchList(listID, mediaIDtoRemove);
-        // }
-        // removeItem()
-        // userMetadata().then((res) => console.log(res));//no op
+        const removeItem = async() => {
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+            await removeMediaFromWatchList(listID, mediaIDtoRemove);
+        }
+        removeItem()
+        userMetadata().then((res) => console.log(res));//no op
     }
 
     useEffect(() => {
@@ -191,23 +203,25 @@ const ListOfMedia = () => {
                                 textTransform: 'none',
                             }}
                         >
-                            {' '}
-                            {options.image_url ? (
-                                <img
-                                    style={{ maxWidth: '50px' }}
-                                    src={options.image_url}
-                                />
-                            ) : (
-                                <Skeleton
-                                    animation={false}
-                                    variant="rectangular"
-                                    width={50}
-                                    height={75}
-                                />
-                            )}
-                            <p style={{ marginLeft: '15px' }}>
-                                {options.title}
-                            </p>
+                                {options.image_url ? (
+                                    <Link to={`/media/${options.tmdb_id}`} onClick={()=>handlePageTransition(options)}>
+                                    <img
+                                        style={{ maxWidth: '50px' }}
+                                        src={options.image_url}
+                                    />
+                                    </Link>
+                                ) : (
+                                    <Skeleton
+                                        animation={false}
+                                        variant="rectangular"
+                                        width={50}
+                                        height={75}
+                                    />
+                                )}
+                                <p style={{ marginLeft: '15px' }}>
+                                    {options.title}
+                                </p>
+
                             <AddCircleIcon
                                 onClick={() => {
                                     newHandleClick(options.id) //was handleClick
@@ -240,27 +254,11 @@ const ListOfMedia = () => {
                     <List>
                         {listContent.map((mediaItem, mediaIndex) => (
                             <ListItem>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-around',
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                        }}
-                                    >
+                                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                                        <Link to={`/media/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
                                         <div style={{ position: 'relative' }}>
-                                            <img
-                                                style={{
-                                                    maxWidth: '90px',
-                                                    margin: '15px',
-                                                }}
-                                                src={mediaItem.image}
-                                            />
-
+                                            <img style={{maxWidth: '90px', margin: '15px'}} src={mediaItem.image} />
                                                 <div
                                                     style={{
                                                         position: 'absolute',
@@ -286,22 +284,15 @@ const ListOfMedia = () => {
                                                         border: '1px solid black',
                                                     }}
                                                 >
-                                                    <span
-                                                        style={{
-                                                            fontSize: '0.75em',
-                                                        }}
-                                                    >
+                                                    <span style={{fontSize: '0.75em',}}>
                                                         <b>{mediaItem.rating}</b>
                                                     </span>
-                                                    <span
-                                                        style={{
-                                                            fontSize: '0.55em',
-                                                        }}
-                                                    >
+                                                    <span style={{fontSize: '0.55em'}}>
                                                         %
                                                     </span>
                                                 </div>
                                             </div>
+                                        </Link>
                                             
                                             <Button
                                                 variant="contained"
