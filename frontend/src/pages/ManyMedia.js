@@ -159,7 +159,7 @@ const ManyMedia = () => {
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label="Add Media"
+                            label="Search Media"
                             inputProps={{
                                 ...params.inputProps,
                                 autocomplete: 'new-password',

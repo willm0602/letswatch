@@ -26,6 +26,7 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
         [x] have extended media search add to the backend
         [~] play with media(plural) page and get it setup
         [] media page needs to be setup for extended search
+        [] there's a bug with ID's and TV going from search to media page
 */
 
 const Home = () => {
@@ -85,7 +86,7 @@ const Home = () => {
                     <TextField {...params} label="Media Search" />
                 )}
             />
-            
+
             <img
                 style={{ maxWidth: '200px', margin: 'auto', marginTop: '2em' }}
                 src="/undraw1.svg"
