@@ -22,7 +22,7 @@ Parameters (passed through ctx)
 */
 async function signup(ctx, next) {
     const params = ctx.request.query
-    const defaultProfileImage = 0
+    const defaultProfileImage = undefined
     const defaultProfileBio = ''
     const username = params.username
     const password = params.password

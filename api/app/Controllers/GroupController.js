@@ -154,6 +154,18 @@ async function getInfoForGroup(id) {
     })
 }
 
+
+/**
+ * Gets all of the users for a group
+ * 
+ * Parameters
+ * ----------
+ * groupID: int
+ *     the id of the group that we are getting the users for
+ * 
+ * returns the username, profile image id and user id of each user in the group
+ * 
+ */ 
 async function getUsersForGroup(groupID) {
     const sql = `SELECT Username, ProfileImageID, users.id FROM letswatch.user_groups 
 	                LEFT JOIN letswatch.user_group_memberships 
@@ -259,8 +271,12 @@ async function ajaxAddUserToGroup(ctx) {
     const requestingUserInGroup = await userIsInGroup(accessToken, groupID)
     return new Promise(async (res, rej) => {
         if (requestingUserInGroup) {
-            const userAlreadyInGroup = await userIsInGroup(undefined, groupID, userID)
-            console.log(`userAlreadyInGroup is`, userAlreadyInGroup);
+            const userAlreadyInGroup = await userIsInGroup(
+                undefined,
+                groupID,
+                userID
+            )
+            console.log(`userAlreadyInGroup is`, userAlreadyInGroup)
             if (userAlreadyInGroup) {
                 const errorMessage = apiResponse(
                     false,
@@ -280,7 +296,6 @@ async function ajaxAddUserToGroup(ctx) {
                     ctx.body = error
                     return rej(err)
                 })
-
         }
         console.log(requestingUserInGroup, 'requesting user in group')
         const errorMessage = apiResponse(

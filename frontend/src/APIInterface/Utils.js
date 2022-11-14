@@ -65,8 +65,8 @@ export async function post(
     callback = undefined,
     error = undefined
 ) {
-    const accessToken = getAccessToken();
-    if(accessToken && !Object.keys(extraData).includes('accessToken'))
+    const accessToken = getAccessToken()
+    if (accessToken && !Object.keys(extraData).includes('accessToken'))
         extraData[accessToken] = accessToken
     return axios
         .post(route, undefined, {
