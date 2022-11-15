@@ -315,9 +315,113 @@ async function allInfo(ctx) {
     })
 }
 
+async function addFriend(ctx) {
+    const { accessToken, userID } = ctx.request.query
+    const requestUserID = await getIDFromAccessToken(accessToken)
+
+    const sql = `INSERT INTO friendships (
+                    first_user_id, 
+                    second_user_id
+                ) VALUES(
+                    ?,
+                    ?
+                )`
+
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+                values: [requestUserID, userID],
+            },
+            (err, rows) => {
+                if (err) {
+                    ctx.body = apiResponse(
+                        false,
+                        `Error adding friends ${userID} ${requestUserID}`
+                    )
+                    return rej(ctx.body)
+                }
+                ctx.body = 'Succesfully added friends'
+                return res(ctx.body)
+            }
+        )
+    })
+}
+
+async function getAllUsers() {
+    const sql = `SELECT * FROM users;`
+
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                return res(rows)
+            }
+        )
+    })
+}
+
+async function allFriends(ctx) {
+    const { accessToken } = ctx.request.query
+    console.log('accessToken is', accessToken);
+    const requesterID = await getIDFromAccessToken(accessToken);
+    console.log(`requestion all friends for user ${requesterID}`);
+    const allUsers = await getAllUsers();
+    let friends = [];
+
+    return new Promise(async (res, rej) => {
+
+        for(const user of allUsers)
+        {
+            const areFriends = await checkAreFriends(requesterID, user.id);
+            if(areFriends)
+            friends.push({
+                id: user.id,
+                username: user.Username,
+                profileImageID: user.ProfileImageID,
+                bio: user.Bio,
+                dateJoined: user.Date_joined
+            });
+        }
+        ctx.body = friends;
+        return res(friends);
+    });
+}
+
+async function checkAreFriends(firstUserID, secondUserID) {
+    const sql = `SELECT * FROM friendships WHERE (
+                    (first_user_id=? AND second_user_id=?) OR
+                    (first_user_id=? AND second_user_id=?)
+                )`;
+    return new Promise((res, rej) => {
+        conn.query({
+            sql,
+            values: [
+                firstUserID,
+                secondUserID,
+                secondUserID,
+                firstUserID
+            ]
+        }, (err, rows) => {
+            if(err)
+                return rej(err);
+            if(rows.length === 0)
+                return res(false);
+            return res(true);
+        })
+    })
+}
+
+
+
 module.exports = {
     getAccessToken,
     signup,
     login,
     allInfo,
+    addFriend,
+    allFriends
 }

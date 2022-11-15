@@ -35,10 +35,6 @@ const Home = () => {
     const autoFillMedia = ctx.autoFillMedia
     console.log(ctx)
 
-    userMetadata().then((res) => {
-        console.log(res)
-    })
-
     let personalGroup = []
     let personalLists = {}
     if (ctx.userInfo) {

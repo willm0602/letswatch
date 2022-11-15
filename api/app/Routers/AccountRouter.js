@@ -25,5 +25,7 @@ const AccountRouter = KoaRouter({
 AccountRouter.post('/signup', AccountController.signup)
 AccountRouter.get('/login', AccountController.login)
 AccountRouter.get('/info', AccountController.allInfo)
+AccountRouter.post('/add_friend', AccountController.addFriend)
+AccountRouter.get('/friends', AccountController.allFriends)
 
 module.exports = AccountRouter

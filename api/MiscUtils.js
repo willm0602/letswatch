@@ -55,6 +55,8 @@ module.exports.getIDFromAccessToken = async (accessToken) => {
                 values: [accessToken],
             },
             (err, tuples) => {
+                console.log('got rows', tuples);
+                console.log(execution.sql);
                 if (err) return rej(undefined)
                 if (tuples.length === 0) return res(undefined)
                 return res(tuples[0].id)
