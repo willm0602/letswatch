@@ -7,10 +7,17 @@ const FrontPageMedia = ({ mediaInfo }) => {
     const ctx = useContext(UserContext)
     const handlePageTransition = (mediaInfo) => ctx.setCurrentMediaPage(mediaInfo);
 
+    if(mediaInfo.release_date){
+        mediaInfo = {...mediaInfo, type:'movie'}
+    }
+    else{
+        mediaInfo = {...mediaInfo, type:'tv'}
+    }
+    
     return (
         <Link
             onClick={() => handlePageTransition(mediaInfo)}
-            to={`/media/${mediaInfo.id}`}
+            to={`/media/${mediaInfo.type}/${mediaInfo.id}`}
             style={{ textDecoration: 'none', color: 'black' }}
         >
             <div

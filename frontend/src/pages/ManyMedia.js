@@ -66,8 +66,8 @@ const ManyMedia = () => {
         const randomNumber = Math.floor(Math.random() * 21)
         setRandomBackground(randomNumber)
         const setup = async() => {
-            await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> setPopularMovies(res.results));
-            await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> setPopularTV(res.results));
+            await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> {console.log(res); setPopularMovies(res.results)});
+            await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> {console.log(res); setPopularTV(res.results)});
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/person/popular?language=en-US&page=1').then((res)=> setPopularActor(res.results));
@@ -149,7 +149,7 @@ const ManyMedia = () => {
                                     type: options.type,
                                     id: options.tmdb_id,
                                 }}
-                                to={`media/${options.id}`}
+                                to={`/media/${options.type}/${options.tmdb_id}`}
                                 style={{ color: '#1976d2' }}
                             >
                                 <ArrowCircleRightIcon />
