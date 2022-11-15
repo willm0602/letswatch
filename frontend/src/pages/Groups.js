@@ -19,8 +19,6 @@ import { makeNewGroup } from '../APIInterface/CreateGroup'
 import { userMetadata } from '../APIInterface/GetUserData'
 const Groups = () => {
     const ctx = useContext(UserContext)
-    // const userGroups = ctx.userInfo.groups;
-    console.log(ctx)
     const [userGroups, setUserGroups] = React.useState(ctx.userInfo.groups)
 
     const [open, setOpen] = React.useState(false)
