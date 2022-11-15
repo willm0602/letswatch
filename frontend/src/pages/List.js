@@ -22,7 +22,7 @@ import { mediaSearch } from '../APIInterface/MediaSearch'
 import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { allMedia } from '../APIInterface/MediaSearch'
-import ListAutoCompleteBar from './components/listAutoCompleteBar'
+
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
