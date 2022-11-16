@@ -1,17 +1,22 @@
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Footer from './components/footer'
 import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../contextSetup'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
-import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+
 //API
 import getFromTMDB from '../APIInterface/TMDB';
 import FrontPageRatingBubble from './components/frontPageRatingBubble';
 import FrontPageMedia from './components/frontPageMedia'
 
 const SingleMedia = () => {
+
+    //get parameters from the url with routes
+    let {mediaType, tmdbID} = useParams();
+    console.log(mediaType, tmdbID)
+
     const [currentMedia, setCurrentMedia] = useState(null);
     const ctx = useContext(UserContext)
     const [trailer, setTrailer] = useState(null);
@@ -21,26 +26,21 @@ const SingleMedia = () => {
 
     useEffect(()=>{
         setPageReady(false);
-        const setThingsUp = async(mediaType) => {
-            await getFromTMDB(`${mediaType}/${ctx.currentMediaPage.id}`).then((res)=>{
-                console.log(res)
-                setCurrentMedia(res)
-                getFromTMDB(`${mediaType}/${res.id}/videos?`).then((res)=>{
+        const setup = async(type, id) => {
+            await getFromTMDB(`${type}/${id}`).then((res)=>{
+                console.log(res);
+                setCurrentMedia(res);
+                getFromTMDB(`${type}/${res.id}/videos?`).then((res)=>{
                     const YTvids = res.results.filter(res => res.site==="YouTube" && res.name.toLowerCase().includes('trailer'));
                     YTvids.length > 0 ? setTrailer(`https://www.youtube.com/embed/${YTvids[0].key}`) : setTrailer(null)
                 })
-                getFromTMDB(`${mediaType}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
-                getFromTMDB(`${mediaType}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
-            });
+                getFromTMDB(`${type}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
+                getFromTMDB(`${type}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
+            })
         }
-        ctx.currentMediaPage.title ? 
-            setThingsUp('movie') 
-            : 
-            ctx.currentMediaPage.type? 
-                setThingsUp(ctx.currentMediaPage.type) 
-                : 
-                setThingsUp('tv');
-    },[ctx.currentMediaPage])
+        if(mediaType && tmdbID)
+            setup(mediaType, tmdbID);
+    },[mediaType, tmdbID]);
 
     return (
         pageReady ?

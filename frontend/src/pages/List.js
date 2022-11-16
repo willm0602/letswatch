@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -27,27 +27,26 @@ import ListAutoCompleteBar from './components/listAutoCompleteBar'
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
     const [listContent, setListContent] = useState([]);
-    
-    
-    
-    const handlePageTransition = (mediaInfo) => {
-        console.log(mediaInfo);
-        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
-    };
-
-
-
-
+    const [listInfo, setListInfo] = useState();
+    const [autoFillMedia, setAutoFillMedia] = useState();
     const ctx = useContext(UserContext);
     const location = useLocation();
     const groupIdx = location.state.groupIdx;
     const listIdx = location.state.listIdx;
-    // const listInfo = location.state.list;
 
-    const listInfo = ctx.userInfo.groups[groupIdx].lists[listIdx]
+    useEffect(()=>{
+        const setup = async() =>{
+            await userMetadata()
+                .then(res=>{
+                    setListInfo(res.groups[groupIdx].lists[listIdx]);
+                    setListContent([...res.groups[groupIdx].lists[listIdx].media])
+                });
+            await allMedia().then(res => setAutoFillMedia(res.filter(media => media.image_url && media.rating > 0)));
+        }
+        setup()
+    },[])
 
-    const fakeMedia = ctx.fakeMediaSearch;
-    const autoFillMedia = ctx.autoFillMedia.filter(media => media.image_url && media.rating > 0);
+
 
     //search bar stuff
     const [searchInputValue, setSearchInputValue] = useState('')
@@ -71,6 +70,11 @@ const ListOfMedia = () => {
         p: 4,
     }
 
+    const handlePageTransition = (mediaInfo) => {
+        console.log(mediaInfo);
+        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
+    };
+
     const handleMediaNotFound = () => {
         handleOpen()
         const searchMedia = async (search) =>
@@ -90,9 +94,6 @@ const ListOfMedia = () => {
             mediaToAdd,
         ]
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
-        //db stuff
-        console.log(mediaToAdd)
-
         const createNewListItem = async (mediaID) => {
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
@@ -108,14 +109,13 @@ const ListOfMedia = () => {
                 })
             )
         }
-
         createNewListItem(mediaToAdd.id)
         userMetadata().then((res) => console.log(res)) //no op
     }
 
     const newHandleClick = (mediaID) => {
         //this return needs to be changed
-        if (listContent.filter((media) => media.id === mediaID) > 0) return
+        if (listContent.filter((media) => media.id === mediaID) > 0) return;
 
         const creatNewListItem = async () => {
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
@@ -153,12 +153,8 @@ const ListOfMedia = () => {
         userMetadata().then((res) => console.log(res));//no op
     }
 
-    useEffect(() => {
-        console.log(ctx)
-        setListContent([...listInfo.media])
-    }, [])
-
     return (
+        listInfo ?
         <>
             <NMHeader />
             <div
@@ -204,7 +200,7 @@ const ListOfMedia = () => {
                             }}
                         >
                                 {options.image_url ? (
-                                    <Link to={`/media/${options.tmdb_id}`} onClick={()=>handlePageTransition(options)}>
+                                    <Link to={`/media/${options.type}/${options.tmdb_id}`} onClick={()=>handlePageTransition(options)}>
                                     <img
                                         style={{ maxWidth: '50px' }}
                                         src={options.image_url}
@@ -256,7 +252,7 @@ const ListOfMedia = () => {
                             <ListItem>
                                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
                                     <div style={{display: 'flex', flexDirection: 'column'}}>
-                                        <Link to={`/media/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
+                                        <Link to={`/media/${mediaItem.type}/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
                                         <div style={{ position: 'relative' }}>
                                             <img style={{maxWidth: '90px', margin: '15px'}} src={mediaItem.image} />
                                                 <div
@@ -341,7 +337,6 @@ const ListOfMedia = () => {
                     </List>
                 </Box>
 
-                {/* Search modal */}
                 <Modal
                     open={open}
                     onClose={handleClose}
@@ -405,6 +400,8 @@ const ListOfMedia = () => {
                 <Footer />
             </div>
         </>
+        :
+        <>uh oh, loading those bad boys up</> //add spinner
     )
 }
 export default ListOfMedia

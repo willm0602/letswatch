@@ -1,19 +1,25 @@
-import { useLocation } from 'react-router-dom'
-import { useContext } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
+import { useContext, useEffect, useState } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { UserContext } from '../contextSetup'
 import { Button } from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { Button } from '@mui/material'
+import { userMetadata } from '../APIInterface/GetUserData'
 
 const User = () => {
-    const location = useLocation()
-    const ctx = useContext(UserContext)
+    const [userInfo,setUserInfo] = useState(null)
+    //fixes refresh problem
+    useEffect(()=>{
+        const setup = async() =>{
+            await userMetadata().then(res=> setUserInfo(res));
+        }
+        setup()
+    },[])
 
-    const userInfo = ctx.userInfo
-
-    return (
+    return ( 
+        userInfo ?
         <>
             <NMHeader />
             <div
@@ -76,6 +82,8 @@ const User = () => {
             </div>
             <Footer />
         </>
+        :
+        <></>//add loading circle thing here later
     )
 }
 
