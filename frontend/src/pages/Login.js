@@ -1,51 +1,56 @@
-import {
-    Stack,
-    FilledInput,
-    ToggleButtonGroup,
-    ToggleButton,
-    Button,
-    Box,
-} from '@mui/material'
-import { Fragment, useState } from 'react'
-import { login, signup } from '../APIInterface/AccountManagement'
-import LoginFooter from './components/LoginFooter'
+import {useNavigate} from 'react-router-dom';
+import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
+import { Fragment, useState } from "react";
+import { login, signup} from "../APIInterface/AccountManagement";
+import LoginFooter from "./components/LoginFooter";
 
 const Login = () => {
-    const [action, setAction] = useState('Login')
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [cPassword, setCPassword] = useState('')
-    const [usernameError, setUsernameError] = useState(false)
-    const [passwordError, setPasswordError] = useState(false)
-    const [cPasswordError, setCPasswordError] = useState(false)
+    const [action, setAction] = useState('Login');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [cPassword, setCPassword] = useState('');
+    const [usernameError, setUsernameError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
+    const [cPasswordError, setCPasswordError] = useState(false);
+    const navigate = useNavigate(); // For when Will add's something to be returned when finished, will route it to home page
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
+        setUsernameError(false);
+        setPasswordError(false);
+        setCPasswordError(false);
 
-        setUsernameError(false)
-        setPasswordError(false)
-        setCPasswordError(false)
-
-        if (action === 'Login') {
-            login(username, password)
-        } else if (action === 'Register') {
-            if (password === '') {
-                setPasswordError(true)
+        if(action === 'Login'){
+            if(username === '') { 
+                setUsernameError(true);
+            }
+            if(password === '') { 
+                setPasswordError(true);
+            } else {
+                login(username, password);
+            }
+        } else if( action === 'Register') {
+            if(password === '') { 
+                setPasswordError(true);
             }
             if (cPassword !== password) {
                 setCPasswordError(true)
             }
-            if (username === '') {
-                setUsernameError(true)
-            } else if (!cPasswordError && !passwordError) {
-                signup(username, password)
+            if(username === '') { 
+                setUsernameError(true);
+            } else if(cPasswordError && passwordError) {
+                signup(username, password);
             }
         }
     }
 
     const handleAction = (event, newAction) => {
-        if (newAction !== null) {
-            setAction(newAction)
+        if(newAction !== null)
+        {
+            setAction(newAction);
+            setUsernameError(false);
+            setPasswordError(false);
+            setCPasswordError(false);
         }
     }
 
@@ -79,12 +84,18 @@ const Login = () => {
                             placeholder="Username"
                             error={usernameError}
                         />
+                        {usernameError && (
+                            <Fragment>Username can't be empty</Fragment>
+                        )}
                         <FilledInput
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
                             type="password"
                             error={passwordError}
                         />
+                        {passwordError && (
+                            <Fragment>Password can't be empty</Fragment>
+                        )}
                     </Stack>
                 )}
 

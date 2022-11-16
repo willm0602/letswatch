@@ -1,8 +1,8 @@
 import { setAccessToken } from '../LocalStorageInterface'
 import { get, post } from './Utils'
 
-export function signup(username, password) {
-    post(
+export async function signup(username, password) {
+    await post(
         '/account/signup',
         {
             username,
@@ -19,8 +19,8 @@ export function signup(username, password) {
     )
 }
 
-export function login(username, password) {
-    get(
+export async function login(username, password) {
+    await get(
         '/account/login',
         {
             username,
@@ -29,6 +29,7 @@ export function login(username, password) {
         (res) => {
             if (res.status === 'PASS') {
                 setAccessToken(res.data)
+                console.log('Access Token set');
             }
         },
         (rej) => {

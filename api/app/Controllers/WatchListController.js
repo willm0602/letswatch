@@ -134,7 +134,7 @@ async function createList(ctx) {
 }
 
 // this will guess the list made, it might technically have some errors at some point but that's
-// future will's problem
+// future Will's problem
 // this just guesses which list was just made by a group (I'd be surprised if this was ever wrong)
 async function guessListMade(listName, groupID) {
     const sql = `SELECT * FROM watch_lists WHERE group_id=? AND Name=? ORDER BY id DESC;`
