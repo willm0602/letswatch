@@ -84,12 +84,18 @@ const Login = () => {
                             placeholder="Username"
                             error={usernameError}
                         />
+                        {usernameError && (
+                            <Fragment>Username can't be empty</Fragment>
+                        )}
                         <FilledInput
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
                             type="password"
                             error={passwordError}
                         />
+                        {passwordError && (
+                            <Fragment>Password can't be empty</Fragment>
+                        )}
                     </Stack>
                 )}
 
