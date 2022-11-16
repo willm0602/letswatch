@@ -8,5 +8,8 @@ const WatchListRouter = KoaRouter({
 
 WatchListRouter.post('/create', WatchListController.createList)
 WatchListRouter.post('/add_media', WatchListController.addMediaToWatchlist)
-
+WatchListRouter.post(
+    '/remove_media',
+    WatchListController.removeMediaFromWatchList
+)
 module.exports = WatchListRouter

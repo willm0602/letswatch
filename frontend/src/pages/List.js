@@ -1,115 +1,160 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, createTheme, TextField } from '@mui/material'
 import { UserContext } from '../contextSetup'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Button } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
-import Modal from '@mui/material/Modal';
-import Skeleton from '@mui/material/Skeleton';
-import CircularProgress from '@mui/material/CircularProgress';
+import Modal from '@mui/material/Modal'
+import Skeleton from '@mui/material/Skeleton'
+import CircularProgress from '@mui/material/CircularProgress'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
+import { Link } from 'react-router-dom'
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch'
-import {addMediaToWatchlist} from '../APIInterface/WatchList'
+import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
+import { allMedia } from '../APIInterface/MediaSearch'
+import ListAutoCompleteBar from './components/listAutoCompleteBar'
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
     const [listContent, setListContent] = useState([]);
-    
+    const [listInfo, setListInfo] = useState();
+    const [autoFillMedia, setAutoFillMedia] = useState();
     const ctx = useContext(UserContext);
     const location = useLocation();
     const groupIdx = location.state.groupIdx;
     const listIdx = location.state.listIdx;
-    const listInfo = location.state.list;
-    const fakeMedia = ctx.fakeMediaSearch;
-    const autoFillMedia = ctx.autoFillMedia.filter(media => media.image_url && media.rating > 0);
+
+    useEffect(()=>{
+        const setup = async() =>{
+            await userMetadata()
+                .then(res=>{
+                    setListInfo(res.groups[groupIdx].lists[listIdx]);
+                    setListContent([...res.groups[groupIdx].lists[listIdx].media])
+                });
+            await allMedia().then(res => setAutoFillMedia(res.filter(media => media.image_url && media.rating > 0)));
+        }
+        setup()
+    },[])
+
+
 
     //search bar stuff
-    const [searchInputValue, setSearchInputValue] = useState('');
-        //modal
-        const [open,setOpen] = useState(false);
-        const [newMediaFromSearch, setNewMediaFromSearch] = useState(null);
-        const handleOpen = () => setOpen(true);
-        const handleClose = () => {
-            setOpen(false);
-            setNewMediaFromSearch(null);
-            setSearchInputValue('');
+    const [searchInputValue, setSearchInputValue] = useState('')
+    //modal
+    const [open, setOpen] = useState(false)
+    const [newMediaFromSearch, setNewMediaFromSearch] = useState(null)
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => {
+        setOpen(false)
+        setNewMediaFromSearch(null)
+        setSearchInputValue('')
+    }
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 300,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
+    }
+
+    const handlePageTransition = (mediaInfo) => {
+        console.log(mediaInfo);
+        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
+    };
+
+    const handleMediaNotFound = () => {
+        handleOpen()
+        const searchMedia = async (search) =>
+            await mediaSearch(search).then((res) => setNewMediaFromSearch(res))
+        searchMedia(searchInputValue)
+    }
+
+    const addMediaFromNotFoundSearch = (mediaIdx) => {
+        let mediaToAdd = newMediaFromSearch[mediaIdx]
+        mediaToAdd = {
+            ...mediaToAdd,
+            image_url: mediaToAdd.image,
         }
-        const style = {
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 300,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-        };
-
-        const handleMediaNotFound = () => {
-            handleOpen();
-            const searchMedia = async (search) => await mediaSearch(search).then(res=> setNewMediaFromSearch(res));
-            searchMedia(searchInputValue);
+        setListContent([...listContent, mediaToAdd])
+        const newMedia = [
+            ...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(),
+            mediaToAdd,
+        ]
+        ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
+        const createNewListItem = async (mediaID) => {
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
+            await addMediaToWatchlist(listID, mediaID).then((res) =>
+                userMetadata().then((res) => {
+                    console.log(res)
+                    console.log(listContent)
+                    console.log(listIdx)
+                    ctx.setUserInfo(res)
+                    setListContent([
+                        ...res.groups[groupIdx].lists[listIdx].media,
+                    ])
+                    allMedia().then((res) => ctx.setAutoFillMedia(res))
+                })
+            )
         }
-
-        const addMediaFromNotFoundSearch = (mediaIdx) => {
-            let mediaToAdd = newMediaFromSearch[mediaIdx];
-            mediaToAdd = {
-                ...mediaToAdd,
-                image_url:mediaToAdd.image,
-            }
-            setListContent([...listContent, mediaToAdd])
-            const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(), mediaToAdd]
-            ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
-            //db stuff
-        }
-
-
-    
+        createNewListItem(mediaToAdd.id)
+        userMetadata().then((res) => console.log(res)) //no op
+    }
 
     const newHandleClick = (mediaID) => {
         //this return needs to be changed
-        if( listContent.filter(media => media.id === mediaID) > 0)
-            return;
-        
-        const creatNewListItem = async() =>{
-            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
-            await addMediaToWatchlist(listID, mediaID)
-                .then((res)=>userMetadata()
-                    .then((res)=>{
-                        console.log(res);
-                        console.log(listContent);
-                        console.log(listIdx);
-                        ctx.setUserInfo(res);
-                        setListContent([...res.groups[groupIdx].lists[listIdx].media]);
-                    }))
-        } 
-        creatNewListItem();
-        userMetadata().then((res) => console.log(res));//no op
+        if (listContent.filter((media) => media.id === mediaID) > 0) return;
+
+        const creatNewListItem = async () => {
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
+            await addMediaToWatchlist(listID, mediaID).then((res) =>
+                userMetadata().then((res) => {
+                    console.log(res)
+                    console.log(listContent)
+                    console.log(listIdx)
+                    ctx.setUserInfo(res)
+                    setListContent([
+                        ...res.groups[groupIdx].lists[listIdx].media,
+                    ])
+                    allMedia().then((res) => ctx.setAutoFillMedia(res))
+                })
+            )
+        }
+        creatNewListItem()
+        userMetadata().then((res) => console.log(res)) //no op
     }
 
     const handleRemove = (mediaIDtoRemove) => {
+
+        console.log(listContent);
+        console.log(mediaIDtoRemove);
+
         const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
         setListContent(newMedia);
         //update db
+        const removeItem = async() => {
+            const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID;
+            await removeMediaFromWatchList(listID, mediaIDtoRemove);
+        }
+        removeItem()
+        userMetadata().then((res) => console.log(res));//no op
     }
 
-    useEffect(() => {
-        console.log(ctx)
-        setListContent([...listInfo.media])
-    }, [])
-
     return (
+        listInfo ?
         <>
             <NMHeader />
             <div
@@ -137,16 +182,12 @@ const ListOfMedia = () => {
                     ))}
                 </Stack>
                 <Autocomplete
-
-                    
-
                     id="add-media"
                     sx={{ width: '90%', border: '1px solid lightgrey' }}
                     freeSolo={true}
                     inputValue={searchInputValue}
-                    onInputChange={(event, value)=>setSearchInputValue(value)}
+                    onInputChange={(event, value) => setSearchInputValue(value)}
                     options={autoFillMedia}
-
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, options) => (
                         <Button
@@ -158,17 +199,25 @@ const ListOfMedia = () => {
                                 textTransform: 'none',
                             }}
                         >
-                            {' '}
-                            {options.image_url ?
-                            <img
-                                style={{ maxWidth: '50px' }}
-                                src={options.image_url}
-                            />
-                            :<Skeleton animation={false} variant="rectangular" width={50} height={75} />
-                            }
-                            <p style={{ marginLeft: '15px' }}>
-                                {options.title}
-                            </p>
+                                {options.image_url ? (
+                                    <Link to={`/media/${options.type}/${options.tmdb_id}`} onClick={()=>handlePageTransition(options)}>
+                                    <img
+                                        style={{ maxWidth: '50px' }}
+                                        src={options.image_url}
+                                    />
+                                    </Link>
+                                ) : (
+                                    <Skeleton
+                                        animation={false}
+                                        variant="rectangular"
+                                        width={50}
+                                        height={75}
+                                    />
+                                )}
+                                <p style={{ marginLeft: '15px' }}>
+                                    {options.title}
+                                </p>
+
                             <AddCircleIcon
                                 onClick={() => {
                                     newHandleClick(options.id) //was handleClick
@@ -199,35 +248,13 @@ const ListOfMedia = () => {
 
                 <Box>
                     <List>
-                        {listContent.map(
-                            (
-                                mediaItem,
-                                mediaIndex
-                            ) => (
-                                <ListItem>
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-around',
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                            }}
-                                        >
-                                            <div
-                                                style={{ position: 'relative' }}
-                                            >
-                                                <img
-                                                    style={{
-                                                        maxWidth: '90px',
-                                                        margin: '15px',
-                                                    }}
-                                                    src={mediaItem.image}
-                                                />
-
+                        {listContent.map((mediaItem, mediaIndex) => (
+                            <ListItem>
+                                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                                        <Link to={`/media/${mediaItem.type}/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
+                                        <div style={{ position: 'relative' }}>
+                                            <img style={{maxWidth: '90px', margin: '15px'}} src={mediaItem.image} />
                                                 <div
                                                     style={{
                                                         position: 'absolute',
@@ -253,23 +280,16 @@ const ListOfMedia = () => {
                                                         border: '1px solid black',
                                                     }}
                                                 >
-                                                    <span
-                                                        style={{
-                                                            fontSize: '0.75em',
-                                                        }}
-                                                    >
+                                                    <span style={{fontSize: '0.75em',}}>
                                                         <b>{mediaItem.rating}</b>
                                                     </span>
-                                                    <span
-                                                        style={{
-                                                            fontSize: '0.55em',
-                                                        }}
-                                                    >
+                                                    <span style={{fontSize: '0.55em'}}>
                                                         %
                                                     </span>
                                                 </div>
                                             </div>
-
+                                        </Link>
+                                            
                                             <Button
                                                 variant="contained"
                                                 onClick={() => {
@@ -289,36 +309,34 @@ const ListOfMedia = () => {
                                             </Button>
                                         </div>
 
-                                        <div>
-                                            <p style={{ margin: '5px' }}>
-                                                <b>{mediaItem.title}</b>, added
-                                                by: <b>{mediaItem.addedBy}</b>
-                                            </p>
-                                            <div
+                                    <div>
+                                        <p style={{ margin: '5px' }}>
+                                            <b>{mediaItem.title}</b>, added by:{' '}
+                                            <b>{mediaItem.addedBy}</b>
+                                        </p>
+                                        <div
+                                            style={{
+                                                maxHeight: '250px',
+                                                padding: '5px',
+                                                overflow: 'scroll',
+                                            }}
+                                        >
+                                            <p
                                                 style={{
-                                                    maxHeight: '250px',
-                                                    padding: '5px',
-                                                    overflow: 'scroll',
+                                                    margin: '5px',
+                                                    fontSize: '14px',
                                                 }}
                                             >
-                                                <p
-                                                    style={{
-                                                        margin: '5px',
-                                                        fontSize: '14px',
-                                                    }}
-                                                >
-                                                    {mediaItem.synopsis}
-                                                </p>
-                                            </div>
+                                                {mediaItem.synopsis}
+                                            </p>
                                         </div>
                                     </div>
-                                </ListItem>
-                            )
-                        )}
+                                </div>
+                            </ListItem>
+                        ))}
                     </List>
                 </Box>
 
-                {/* Search modal */}
                 <Modal
                     open={open}
                     onClose={handleClose}
@@ -330,48 +348,60 @@ const ListOfMedia = () => {
                         style={{ overflow: 'scroll', maxHeight: '75%' }}
                     >
                         <h3>Extended Search</h3>
-                        <p>Search based off input: <b>{searchInputValue}</b></p>
-                        {
-                            newMediaFromSearch ?
-                                newMediaFromSearch.map( (newMedia, newMediaIndex) =>
-                                    <div style={{display:'flex', padding:'15px', justifyContent:'space-evenly'}}>
+                        <p>
+                            Search based off input: <b>{searchInputValue}</b>
+                        </p>
+                        {newMediaFromSearch ? (
+                            newMediaFromSearch.map(
+                                (newMedia, newMediaIndex) => (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            padding: '15px',
+                                            justifyContent: 'space-evenly',
+                                        }}
+                                    >
                                         <Button
-                                                style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    paddingTop: '10px',
-                                                    width: '100%',
-                                                    textTransform: 'none',
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                paddingTop: '10px',
+                                                width: '100%',
+                                                textTransform: 'none',
+                                            }}
+                                        >
+                                            {' '}
+                                            <img
+                                                style={{ maxWidth: '50px' }}
+                                                src={newMedia.image}
+                                            />
+                                            <p style={{ marginLeft: '15px' }}>
+                                                {newMedia.title}
+                                            </p>
+                                            <AddCircleIcon
+                                                onClick={() => {
+                                                    addMediaFromNotFoundSearch(
+                                                        newMediaIndex
+                                                    )
                                                 }}
-                                            >
-                                                {' '}
-                                                <img
-                                                    style={{ maxWidth: '50px' }}
-                                                    src={newMedia.image}
-                                                />
-                                                <p style={{ marginLeft: '15px' }}>
-                                                    {newMedia.title}
-                                                </p>
-                                                <AddCircleIcon
-                                                    onClick={() => {
-                                                        addMediaFromNotFoundSearch(newMediaIndex)
-                                                    }}
-                                                />
-                                            </Button>
+                                            />
+                                        </Button>
                                     </div>
                                 )
-                            :
+                            )
+                        ) : (
                             <Box sx={{ display: 'flex' }}>
                                 <CircularProgress />
                             </Box>
-                        }
-
+                        )}
                     </Box>
                 </Modal>
 
                 <Footer />
             </div>
         </>
+        :
+        <>uh oh, loading those bad boys up</> //add spinner
     )
 }
 export default ListOfMedia

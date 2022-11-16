@@ -1,24 +1,35 @@
-import { useContext, useState } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
+import { useContext, useEffect, useState } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { UserContext } from '../contextSetup'
 import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
+import { userMetadata } from '../APIInterface/GetUserData'
 
 const User = () => {
-    const ctx = useContext(UserContext);
+    const [userInfo,setUserInfo] = useState(null)
     const [open, setOpen] = useState(false);
+    
+    const ctx = useContext(UserContext);
+
+    const userInfo = ctx.userInfo;
 
     const handleClick = () => {
         setOpen(!open);
     };
+    
+    //fixes refresh problem
+    useEffect(()=>{
+        const setup = async() =>{
+            await userMetadata().then(res=> setUserInfo(res));
+        }
+        setup()
+    },[])
 
-    const userInfo = ctx.userInfo;
-    let userGroups = [];
-    let userLists = [];
-
-    return (
+    return ( 
+        userInfo ?
         <>
             <div
                 style = 
@@ -111,7 +122,6 @@ const User = () => {
                         </div>
                     </div>
                 </div>
-
                 <hr />
                 <div
                     style={{
@@ -189,6 +199,8 @@ const User = () => {
             </div>
             <Footer />
         </>
+        :
+        <></>//add loading circle thing here later
     )
 }
 

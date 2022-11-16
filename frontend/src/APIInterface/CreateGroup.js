@@ -12,6 +12,6 @@ export async function makeNewGroup(name, userID) {
 export async function addUserToGroup(groupID, userID) {
     post('/group/add_user', {
         groupID,
-        userID
+        userID,
     })
 }

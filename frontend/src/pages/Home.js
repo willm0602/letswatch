@@ -20,29 +20,34 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
     cause right now the app needs to be reloaded for the new media to apply to the lists
     something like:
         allMedia().then((res) => ctx.setAutoFillMedia(res));
+
+    TODO:
+        [x] fix the thing above?
+        [x] have extended media search add to the backend
+        [~] play with media(plural) page and get it setup
+        [] media page needs to be setup for extended search
+        [] there's a bug with ID's and TV going from search to media page
+        [] groups page freaking out if you refresh, but different
 */
 
 const Home = () => {
     const ctx = useContext(UserContext)
-    const fakeData = ctx.fakeDBInfo
-
-    const autoFillMedia = ctx.autoFillMedia;
-
-    console.log(ctx);
+    const autoFillMedia = ctx.autoFillMedia
+    console.log(ctx)
 
     userMetadata().then((res) => {
         console.log(res)
     })
 
     let personalGroup = []
-    let personalLists = []
+    let personalLists = {}
     if (ctx.userInfo) {
         personalGroup = ctx.userInfo.groups.filter(
             (group) =>
                 group.members.length === 1 &&
                 group.members[0].username === ctx.userInfo.username
         )
-        if (personalGroup) personalLists = personalGroup[0].lists.slice(0, 3)
+        if (personalGroup) personalLists = {groupID:personalGroup[0].groupID, lists:personalGroup[0].lists.slice(0, 3)}
     }
 
     const autoCompletePlaceholderData = [
@@ -82,6 +87,7 @@ const Home = () => {
                     <TextField {...params} label="Media Search" />
                 )}
             />
+
             <img
                 style={{ maxWidth: '200px', margin: 'auto', marginTop: '2em' }}
                 src="/undraw1.svg"
@@ -93,7 +99,7 @@ const Home = () => {
                     {!personalLists ? (
                         <p>No Lists yet, ya goober :)</p>
                     ) : (
-                        personalLists.map((list, listIdx) => (
+                        personalLists.lists.map((list, listIdx) => (
                             <ListItem>
                                 <Paper
                                     style={{
@@ -107,7 +113,7 @@ const Home = () => {
                                     elevation={3}
                                 >
                                     <Link
-                                        to={`/list/${list.listID}`}
+                                        to={`/list/${personalLists.groupID}/${list.listID}`}
                                         style={{
                                             margin: 'auto',
                                             textDecoration: 'none',
