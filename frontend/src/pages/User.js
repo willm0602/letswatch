@@ -14,8 +14,6 @@ const User = () => {
     
     const ctx = useContext(UserContext);
 
-    const userInfo = ctx.userInfo;
-
     const handleClick = () => {
         setOpen(!open);
     };
@@ -27,6 +25,8 @@ const User = () => {
         }
         setup()
     },[])
+
+    const userLists = [];
 
     return ( 
         userInfo ?
@@ -92,7 +92,7 @@ const User = () => {
                     </Button>
                 </Stack>
                 <div
-                    style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center' }}
+                    style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                     <div style={{ textAlign: 'center' }}>
                         <img
