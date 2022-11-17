@@ -366,56 +366,91 @@ async function getAllUsers() {
 
 async function allFriends(ctx) {
     const { accessToken } = ctx.request.query
-    console.log('accessToken is', accessToken);
-    const requesterID = await getIDFromAccessToken(accessToken);
-    console.log(`requestion all friends for user ${requesterID}`);
-    const allUsers = await getAllUsers();
-    let friends = [];
+    console.log('accessToken is', accessToken)
+    const requesterID = await getIDFromAccessToken(accessToken)
+    console.log(`requestion all friends for user ${requesterID}`)
+    const allUsers = await getAllUsers()
+    let friends = []
 
     return new Promise(async (res, rej) => {
-
-        for(const user of allUsers)
-        {
-            const areFriends = await checkAreFriends(requesterID, user.id);
-            if(areFriends)
-            friends.push({
-                id: user.id,
-                username: user.Username,
-                profileImageID: user.ProfileImageID,
-                bio: user.Bio,
-                dateJoined: user.Date_joined
-            });
+        for (const user of allUsers) {
+            const areFriends = await checkAreFriends(requesterID, user.id)
+            if (areFriends)
+                friends.push({
+                    id: user.id,
+                    username: user.Username,
+                    profileImageID: user.ProfileImageID,
+                    bio: user.Bio,
+                    dateJoined: user.Date_joined,
+                })
         }
-        ctx.body = friends;
-        return res(friends);
-    });
+        ctx.body = friends
+        return res(friends)
+    })
 }
 
 async function checkAreFriends(firstUserID, secondUserID) {
     const sql = `SELECT * FROM friendships WHERE (
                     (first_user_id=? AND second_user_id=?) OR
                     (first_user_id=? AND second_user_id=?)
-                )`;
+                )`
     return new Promise((res, rej) => {
-        conn.query({
-            sql,
-            values: [
-                firstUserID,
-                secondUserID,
-                secondUserID,
-                firstUserID
-            ]
-        }, (err, rows) => {
-            if(err)
-                return rej(err);
-            if(rows.length === 0)
-                return res(false);
-            return res(true);
-        })
+        conn.query(
+            {
+                sql,
+                values: [firstUserID, secondUserID, secondUserID, firstUserID],
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                if (rows.length === 0) return res(false)
+                return res(true)
+            }
+        )
     })
 }
 
+async function addFriendToGroup(ctx) {
+    const { accessToken, groupID, friendID } = ctx.request.query
+    const requesterID = await getIDFromAccessToken(accessToken)
 
+    const tryingToAddFriend = requesterID
+        ? await checkAreFriends(requesterID, friendID)
+        : undefined
+    const requestersGroupsSet = requesterID
+        ? await allGroupsForUser(requesterID)
+        : undefined
+    const requestersGroups = requestersGroupsSet
+        ? Array.from(requestersGroupsSet)
+        : undefined
+    const requesterWasInGroup = requestersGroups
+        ? requestersGroups.filter((group) => {
+              return group == groupID
+          }).length > 0
+        : undefined
+
+    return new Promise((res, rej) => {
+        if(!(tryingToAddFriend && requesterWasInGroup)){
+            ctx.body = apiResponse(false, 'invalid response');
+            return rej('invalid args');
+        };
+        const sql = `INSERT INTO user_group_memberships (user_id, group_id)
+                                    VALUES(?, ?)`;
+
+        conn.query({
+            sql,
+            values: [friendID, groupID]
+        }, (err, rows) => {
+            console.log(err, rows);
+            if(err)
+            {
+                ctx.body = apiResponse(false, err);
+                return rej(err);
+            }
+            ctx.body = apiResponse(true, 'Added friend to database');
+            return res('Added friend to database')
+        })
+    })
+}
 
 module.exports = {
     getAccessToken,
@@ -423,5 +458,6 @@ module.exports = {
     login,
     allInfo,
     addFriend,
-    allFriends
+    allFriends,
+    addFriendToGroup,
 }
