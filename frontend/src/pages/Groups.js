@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { UserContext } from '../contextSetup'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
@@ -18,9 +18,16 @@ import Button from '@mui/material/Button'
 import { makeNewGroup } from '../APIInterface/CreateGroup'
 import { userMetadata } from '../APIInterface/GetUserData'
 const Groups = () => {
+
+    useEffect(()=>{
+        const setup = async() =>{
+            await userMetadata().then(res=>setUserGroups(res.groups));
+        }
+        setup();
+    },[])
+
     const ctx = useContext(UserContext)
     const [userGroups, setUserGroups] = React.useState(ctx.userInfo.groups)
-
     const [open, setOpen] = React.useState(false)
     const [newGroupName, setNewGroupName] = React.useState('')
     const handleOpen = () => setOpen(true)

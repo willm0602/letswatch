@@ -57,7 +57,9 @@ const ManyMedia = () => {
 
     const handleExtendedSearch = () => {
         handleOpen();
-        const callBackend = async () => await mediaSearch(searchInputValue).then(res => setNewMediaFromSearch(res));
+        const callBackend = async () => await mediaSearch(searchInputValue).then(res => {
+            setNewMediaFromSearch(res);
+        });
         callBackend()
 
     }
@@ -252,7 +254,7 @@ const ManyMedia = () => {
                                     type: newMedia.type,
                                     id: newMedia.tmdbID,
                                 }}
-                                to={`media/${newMedia.id}`}
+                                to={`/media/${newMedia.type}/${newMedia.tmdbID}`}
                                 style={{ color: '#1976d2' }}
                             >
                                 <ArrowCircleRightIcon />

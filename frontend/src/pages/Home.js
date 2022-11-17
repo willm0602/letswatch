@@ -16,6 +16,7 @@ import { userMetadata } from '../APIInterface/GetUserData'
 import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 /*
+    update
     There's an issue with auto-complete adding to the media list, i'll need to re-call the function that gets the media lists
     cause right now the app needs to be reloaded for the new media to apply to the lists
     something like:
@@ -24,10 +25,10 @@ import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
     TODO:
         [x] fix the thing above?
         [x] have extended media search add to the backend
-        [~] play with media(plural) page and get it setup
-        [] media page needs to be setup for extended search
-        [] there's a bug with ID's and TV going from search to media page
-        [] groups page freaking out if you refresh, but different
+        [x] play with media(plural) page and get it setup
+        [x] media page needs to be setup for extended search
+        [x] there's a bug with ID's and TV going from search to media page
+        [x] groups page freaking out if you refresh, but different
 */
 
 const Home = () => {
