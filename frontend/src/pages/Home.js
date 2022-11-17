@@ -16,6 +16,7 @@ import { userMetadata } from '../APIInterface/GetUserData'
 import { setAccessToken, getAccessToken } from '../LocalStorageInterface'
 
 /*
+    update
     There's an issue with auto-complete adding to the media list, i'll need to re-call the function that gets the media lists
     cause right now the app needs to be reloaded for the new media to apply to the lists
     something like:
