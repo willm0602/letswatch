@@ -315,9 +315,199 @@ async function allInfo(ctx) {
     })
 }
 
+async function addFriend(ctx) {
+    const { accessToken, userID } = ctx.request.query
+    const requestUserID = await getIDFromAccessToken(accessToken)
+
+    const sql = `INSERT INTO friendships (
+                    first_user_id, 
+                    second_user_id
+                ) VALUES(
+                    ?,
+                    ?
+                )`
+
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+                values: [requestUserID, userID],
+            },
+            (err, rows) => {
+                if (err) {
+                    ctx.body = apiResponse(
+                        false,
+                        `Error adding friends ${userID} ${requestUserID}`
+                    )
+                    return rej(ctx.body)
+                }
+                ctx.body = 'Succesfully added friends'
+                return res(ctx.body)
+            }
+        )
+    })
+}
+
+async function getAllUsers() {
+    const sql = `SELECT * FROM users;`
+
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                return res(rows)
+            }
+        )
+    })
+}
+
+async function allFriends(ctx) {
+    const { accessToken } = ctx.request.query
+    const requesterID = await getIDFromAccessToken(accessToken)
+    const allUsers = await getAllUsers()
+    let friends = []
+
+    return new Promise(async (res, rej) => {
+        for (const user of allUsers) {
+            const areFriends = await checkAreFriends(requesterID, user.id)
+            if (areFriends)
+                friends.push({
+                    id: user.id,
+                    username: user.Username,
+                    profileImageID: user.ProfileImageID,
+                    bio: user.Bio,
+                    dateJoined: user.Date_joined,
+                })
+        }
+        ctx.body = friends
+        return res(friends)
+    })
+}
+
+async function checkAreFriends(firstUserID, secondUserID) {
+    const sql = `SELECT * FROM friendships WHERE (
+                    (first_user_id=? AND second_user_id=?) OR
+                    (first_user_id=? AND second_user_id=?)
+                ) AND accepted=1`
+    return new Promise((res, rej) => {
+        conn.query(
+            {
+                sql,
+                values: [firstUserID, secondUserID, secondUserID, firstUserID],
+            },
+            (err, rows) => {
+                if (err) return rej(err)
+                if (rows.length === 0) return res(false)
+                return res(true)
+            }
+        )
+    })
+}
+
+async function addFriendToGroup(ctx) {
+    const { accessToken, groupID, friendID } = ctx.request.query
+    const requesterID = await getIDFromAccessToken(accessToken)
+
+    const tryingToAddFriend = requesterID
+        ? await checkAreFriends(requesterID, friendID)
+        : undefined
+    const requestersGroupsSet = requesterID
+        ? await allGroupsForUser(requesterID)
+        : undefined
+    const requestersGroups = requestersGroupsSet
+        ? Array.from(requestersGroupsSet)
+        : undefined
+    const requesterWasInGroup = requestersGroups
+        ? requestersGroups.filter((group) => {
+              return group == groupID
+          }).length > 0
+        : undefined
+
+    return new Promise((res, rej) => {
+        if(!(tryingToAddFriend && requesterWasInGroup)){
+            ctx.body = apiResponse(false, 'invalid response');
+            return rej('invalid args');
+        };
+        const sql = `INSERT INTO user_group_memberships (user_id, group_id)
+                                    VALUES(?, ?)`;
+
+        conn.query({
+            sql,
+            values: [friendID, groupID]
+        }, (err, rows) => {
+            console.log(err, rows);
+            if(err)
+            {
+                ctx.body = apiResponse(false, err);
+                return rej(err);
+            }
+            ctx.body = apiResponse(true, 'Added friend to database');
+            return res('Added friend to database')
+        })
+    })
+}
+
+async function confirmFriendRequest(ctx) {
+    const sql = `UPDATE friendships SET accepted=1 WHERE first_user_id=? AND second_user_id=?`;
+    const {accessToken, requesterID} = ctx.request.query;
+    return new Promise(async (res, rej) => {
+        const receiverID = await getIDFromAccessToken(accessToken);
+        console.log(requesterID, receiverID, accessToken);
+        if(!(requesterID && receiverID))
+        {
+            ctx.body = apiResponse(false, 'missing args');
+            return rej(ctx.body);
+        }
+        conn.query({
+            sql,
+            values: [requesterID, receiverID]
+        }, (err, rows) => {
+            if(err)
+            {
+                ctx.body = apiResponse(false, err);
+                return rej(ctx.body);
+            }
+            ctx.body = apiResponse(true, 'confirmed friend request');
+            return res(ctx.body);
+        })
+
+    })
+}
+
+async function getAllFriendRequests(ctx) {
+    const {accessToken} = ctx.request.query;
+    const sql = `SELECT first_user_id as id, Username, ProfileImageID, Bio, Date_joined FROM friendships 
+	RIGHT JOIN users ON users.id=friendships.first_user_id
+    WHERE second_user_id=5 AND accepted=0;
+                `;
+    return new Promise(async (res, rej) => {
+        const userID = await getIDFromAccessToken(accessToken);
+        return conn.query({
+            sql,
+            values: [userID]
+        }, (err, rows) => {
+            if(err)
+            {
+                ctx.body = apiResponse(false, err);
+                return rej(ctx.body);
+            }
+            ctx.body = rows;
+            return res(ctx.body)
+        })
+    })
+}
+
 module.exports = {
     getAccessToken,
     signup,
     login,
     allInfo,
+    addFriend,
+    allFriends,
+    addFriendToGroup,
+    confirmFriendRequest,
+    getAllFriendRequests
 }
