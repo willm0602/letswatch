@@ -2,7 +2,7 @@ import { getAccessToken } from '../LocalStorageInterface'
 import { post } from './Utils'
 
 export async function makeWatchList(name, groupID) {
-    post('/watchlist/create', {
+    return post('/watchlist/create', {
         listName: name,
         groupID,
         accessToken: getAccessToken(),
@@ -10,16 +10,22 @@ export async function makeWatchList(name, groupID) {
 }
 
 export async function addMediaToWatchlist(listID, mediaID) {
-    post('/watchlist/add_media', {
+    return post('/watchlist/add_media', {
         mediaID,
         listID,
         accessToken: getAccessToken(),
     })
 }
 
-export function removeMediaFromWatchList(listID, mediaID) {
-    post('/watchlist/remove_media', {
+export async function removeMediaFromWatchList(listID, mediaID) {
+    return post('/watchlist/remove_media', {
         listID,
         mediaID,
+    })
+}
+
+export async function joinList(listID) {
+    return post('/watchlist/join', {
+        listID
     })
 }
