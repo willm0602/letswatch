@@ -12,4 +12,6 @@ WatchListRouter.post(
     '/remove_media',
     WatchListController.removeMediaFromWatchList
 )
+WatchListRouter.post('/join', WatchListController.addSelfToWatchlist)
+
 module.exports = WatchListRouter
