@@ -313,10 +313,75 @@ async function removeMediaFromWatchList(ctx) {
     })
 }
 
+async function getGroupForList(listID) {
+    const sql = `SELECT * FROM watch_lists WHERE id=?`;
+
+    return new Promise((res, rej) => {
+        const query = conn.query({
+            sql,
+            values: [listID]
+        }, (err, rows) => {
+            console.log(query.sql);
+            if(err)
+            {
+                console.log(err);
+                return rej(err);
+            }
+            if(rows.length == 0)
+            {
+                console.log('no groups found');     
+                return rej('no groups found for that list');
+            }
+            return res(rows[0].group_id);
+        })
+    })
+}
+
+
+// lets a user add themselves to a watchlist (assuming they have permission for it)
+async function addSelfToWatchlist(ctx) {
+    const {accessToken, listID} = ctx.request.query;
+    const userID = await getIDFromAccessToken(accessToken);
+    let groupID;
+    try{
+        groupID = await getGroupForList(listID);
+    }
+    catch{
+        groupID = undefined;
+    }
+
+    const sql = `INSERT INTO user_list_memberships (user_id, list_id) VALUES(
+                    ?, ?
+                )`;
+
+    return new Promise((res, rej) => {
+        if(groupID === undefined)
+        {
+            ctx.body = apiResponse('unable to get group for list');
+            return rej(ctx.body);
+        }
+        conn.query(
+            {
+                sql,
+                values: [userID, listID]
+            }, (err, rows) => {
+                if(err)
+                {
+                    ctx.body = apiResponse(false, err);
+                    return rej(ctx.body);
+                }
+                ctx.body = apiResponse(true, 'added user to watchlist');
+                return res(ctx.body);   
+            }
+        )
+    })
+}
+
 module.exports = {
     createList,
     createListForSingleUser,
     getListsForGroup,
     addMediaToWatchlist,
     removeMediaFromWatchList,
+    addSelfToWatchlist
 }
