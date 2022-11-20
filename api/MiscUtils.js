@@ -89,7 +89,7 @@ module.exports.userIsInGroup = async (accessToken, groupID, id = undefined) => {
     })
 }
 
-module.exports.getIDFromUsername = module.exports.getIDFromAccessToken = async (accessToken) => {
+module.exports.getIDFromUsername = async (accessToken) => {
     const query = `SELECT * FROM Users 
                         WHERE username=?;`
 
@@ -101,8 +101,8 @@ module.exports.getIDFromUsername = module.exports.getIDFromAccessToken = async (
             },
             (err, rows) => {
                 if (err) return rej(undefined)
-                if (tuples.length === 0) return res(undefined)
-                return res(tuples[0].id)
+                if (rows.length === 0) return res(undefined)
+                return res(rows[0].id)
             }
         )
     })

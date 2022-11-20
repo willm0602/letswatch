@@ -331,6 +331,9 @@ async function addFriend(ctx) {
                 )`
 
     return new Promise((res, rej) => {
+        console.log(`requester id: ${requestUserID}`);
+        console.log(`receiver id: ${userID}`);
+        console.log(`accessToken is ${accessToken}`);
         if(userID === undefined)
         {
             ctx.body = apiResponse(false, `no user with username ${potentialFriendUsername} exists`);
