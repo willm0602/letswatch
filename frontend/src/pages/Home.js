@@ -39,25 +39,24 @@ import { Modal } from '@mui/material'
         [x] add friends to list
         [x] single media, add media to list
         [] talk to will about getting userInfo
+        [] fix inital image to display avatar word thing
+        [] maybe add search above friends
+        [] remove lists on add to list when the list exists on that list
 */
 
 const Home = () => {   
     const ctx = useContext(UserContext)
-    const autoFillMedia = ctx.autoFillMedia
     const [userFriends, setUserFriends] = useState(null);
     const [currentFriendUsername, setCurrentFriendUesrname] = useState(null);
-    const [friendRequests, setFriendRequets] = useState(null);
-    
+    const [friendRequests, setFriendRequets] = useState(null); 
     const [openFriendRequestModal, setOpenFriendRequestModal] = useState(false);
     const handleCloseFriendRequestModal = () => setOpenFriendRequestModal(false);
     const handleOpenFriendRequestModal = () => setOpenFriendRequestModal(true);
-
     const [modalOpen, setModalOpen] = useState(false);
     const handleCloseModal = () => setModalOpen(false);
     const handleOpenModal = () => setModalOpen(true);
     
     const handleAddFriend = () => {
-        
         const sendRequest = async() => {
             await sendFriendRequest(currentFriendUsername)
                 .catch(err => console.log(err))
@@ -84,15 +83,8 @@ const Home = () => {
 
     useEffect(()=>{
         const setup = async() =>{
-            await getFriends().then(res=>{
-                console.log(res)
-                setUserFriends(res);
-            });
-
-            await getAllFriendRequests().then(res=>{
-                console.log(res);
-                setFriendRequets(res);
-            });
+            await getFriends().then(res=>setUserFriends(res));
+            await getAllFriendRequests().then(res=>setFriendRequets(res));
         }
         setup();
     },[])
@@ -209,7 +201,7 @@ const Home = () => {
 
             <h2>Friends</h2>
             {userFriends && userFriends.length > 0 ?
-                <div className='frame' style={{display:'flex', justifyContent:'start', padding:'15px', overflow:'scroll', marginBottom:'25px'}}>
+                <div className='frame' style={{display:'flex', justifyContent:'start', padding:'15px', overflow:'scroll', marginBottom:'25px', marginRight:'10px', marginLeft:'10px'}}>
                         {userFriends.map((friend, friendIndex) => 
                             <Link to={`/user/${friend.id}`} style={{textDecoration:'none'}}>
                                 <div style={{display:'flex', flexDirection:'column'}}>

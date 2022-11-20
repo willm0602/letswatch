@@ -104,6 +104,7 @@ const ManyMedia = () => {
                 <h1 style={{ color: 'white', zIndex: '99' }}>Let's Watch</h1>
                 <Autocomplete
                     id="autocomplete"
+                    autocomplete="do-not-autofill"
                     freeSolo={true}
                     inputValue={searchInputValue}
                     onInputChange={(event, value) => setSearchInputValue(value)}
