@@ -42,6 +42,7 @@ import { Modal } from '@mui/material'
         [] fix inital image to display avatar word thing
         [] maybe add search above friends
         [] remove lists on add to list when the list exists on that list
+        [] add snackbar for feedback
 */
 
 const Home = () => {   
