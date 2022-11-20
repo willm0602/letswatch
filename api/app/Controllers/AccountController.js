@@ -337,7 +337,7 @@ async function addFriend(ctx) {
                 if (err) {
                     ctx.body = apiResponse(
                         false,
-                        `Error adding friends ${userID} ${requestUserID}`
+                        `Error adding friends ${userID} ${requestUserID} ${err}`
                     )
                     return rej(ctx.body)
                 }
@@ -481,7 +481,7 @@ async function getAllFriendRequests(ctx) {
     const {accessToken} = ctx.request.query;
     const sql = `SELECT first_user_id as id, Username, ProfileImageID, Bio, Date_joined FROM friendships 
 	RIGHT JOIN users ON users.id=friendships.first_user_id
-    WHERE second_user_id=5 AND accepted=0;
+    WHERE second_user_id=? AND accepted=0;
                 `;
     return new Promise(async (res, rej) => {
         const userID = await getIDFromAccessToken(accessToken);

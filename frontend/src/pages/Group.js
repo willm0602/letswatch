@@ -22,15 +22,25 @@ import { TextField } from '@mui/material'
 //API stuff
 import { makeWatchList } from '../APIInterface/WatchList'
 import { userMetadata } from '../APIInterface/GetUserData'
+import { getFriends, addFriendToGroup } from '../APIInterface/Friendships'
+import AddCircle from '@mui/icons-material/AddCircle'
 
 const Group = () => {
     const location = useLocation()
     const [groupInfo, setGroupInfo] = React.useState(location.state.group)
     const ctx = useContext(UserContext)
-
     const [open, setOpen] = React.useState(false)
     const [newListName, setNewListName] = React.useState('')
     const handleOpen = () => setOpen(true)
+    const [friendsList, setFriendsList] = React.useState(null);
+    const [intermediateFriendsList, setIntermediateFriendsList] = React.useState(friendsList);
+
+    const [openFriendModal, setOpenFriendModal] = React.useState(false);
+    const handleOpenFM = () => {
+        setIntermediateFriendsList(friendsList);
+        setOpenFriendModal(true);
+    };
+    const handleCloseFM = () => setOpenFriendModal(false);
 
     const handleClose = () => {
         setOpen(false)
@@ -63,6 +73,25 @@ const Group = () => {
         handleClose()
     }
 
+    const handleFilterFriends = (searchTerm) => 
+        setIntermediateFriendsList(friendsList.filter( friend => friend.username.toLowerCase().includes(searchTerm.toLowerCase())));
+
+    const addToGroup = (friendID) => {
+        if(groupInfo.members.filter( members => members.id === friendID).length > 0)
+            return
+        
+        const add = async() => {
+            await addFriendToGroup(friendID, groupInfo.groupID).then(res=>console.log(res));
+            await userMetadata().then(res=>{
+                setGroupInfo(res.groups.filter(group => group.groupID === groupInfo.groupID)[0])
+                setIntermediateFriendsList(intermediateFriendsList.filter(friend => friend.id !== friendID))
+                setFriendsList(friendsList.filter(friend => friend.id !== friendID));
+                ctx.setUserInfo(res);
+            })
+        }
+        add();
+    }
+
     const style = {
         position: 'absolute',
         top: '50%',
@@ -77,6 +106,17 @@ const Group = () => {
         flexDirection: 'column',
     }
 
+    React.useEffect(()=>{
+        const getPals = async() =>{
+            await getFriends().then(res=>{
+                //Prevents from re-adding friends multiple times
+                const friends = res.filter(newFriend => !groupInfo.members.find(groupFriend => (groupFriend.id === newFriend.id) ))
+                setFriendsList(friends)
+            });
+        }
+        getPals();
+    },[])
+
     return (
         <div
             style={{
@@ -89,7 +129,7 @@ const Group = () => {
             <NMHeader />
             <h1>{groupInfo.groupName}</h1>
 
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', flexWrap:'wrap'}}>
                 {groupInfo.members.map((member) => (
                     <Avatar
                         style={{ margin: '5px' }}
@@ -98,6 +138,39 @@ const Group = () => {
                     />
                 ))}
             </div>
+            
+            <Button 
+                onClick={()=> handleOpenFM() }
+                variant="contained"
+                style={{
+                    width:'300px',
+                    maxWidth: '300px',
+                    backgroundColor: '#6C63FF',
+                    borderRadius: '15px',
+                    margin:'15px auto'
+                }}
+            >Add Friend(s) to Group</Button>
+
+            <Modal
+                open={openFriendModal}
+                onClose={handleCloseFM}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} style={{maxHeight:'800px', justifyContent:'center'}}>
+                    <h2>Add Friend to Group</h2>
+                    <TextField onChange={(e)=>handleFilterFriends(e.target.value)} fullWidth id="filled-basic" placeholder="Search Friend" variant="filled"/>
+                    <div style={{display:'flex', flexDirection:'column', overflow:'scroll', padding:'5px'}}>
+                        {intermediateFriendsList?.map(friend => 
+                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                                <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/>
+                                <p>{friend.username}</p>
+                                <AddCircle onClick={()=>addToGroup(friend.id)}/>
+                            </div>
+                        )}
+                    </div>
+                </Box>
+            </Modal>
 
             <Box>
                 <List>

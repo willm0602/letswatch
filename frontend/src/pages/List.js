@@ -18,11 +18,11 @@ import NMHeader from './components/nonMediaHeader'
 import { Link } from 'react-router-dom'
 
 //API stuff
-import { mediaSearch } from '../APIInterface/MediaSearch'
-import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList'
-import { userMetadata } from '../APIInterface/GetUserData'
-import { allMedia } from '../APIInterface/MediaSearch'
-
+import { mediaSearch } from '../APIInterface/MediaSearch';
+import {addMediaToWatchlist, removeMediaFromWatchList} from '../APIInterface/WatchList';
+import { userMetadata } from '../APIInterface/GetUserData';
+import { allMedia } from '../APIInterface/MediaSearch';
+import { joinList } from '../APIInterface/WatchList';
 
 const ListOfMedia = () => {
     //used for displaying the content as updating content doesn't update the DOM.
@@ -153,6 +153,17 @@ const ListOfMedia = () => {
         userMetadata().then((res) => console.log(res));//no op
     }
 
+    const handleJoinList = () => {
+        if(listInfo.listMembers.filter(member => member.username === ctx.userInfo.username).length > 0)
+            return; //prevent double adds
+
+        const join = async() =>
+            await joinList(listInfo.listID).then(_ => 
+                userMetadata().then(res => 
+                    setListInfo(res.groups[groupIdx].lists[listIdx])));
+        join();
+    }
+
     return (
         listInfo ?
         <>
@@ -181,6 +192,19 @@ const ListOfMedia = () => {
                         />
                     ))}
                 </Stack>
+                
+                <Button
+                    onClick={()=>handleJoinList()}
+                    variant="contained"
+                    style={{
+                        maxWidth: '300px',
+                        margin:'15px',
+                        backgroundColor: '#6C63FF',
+                        borderRadius: '15px',
+                    }}
+                >
+                Join List</Button>
+
                 <Autocomplete
                     id="add-media"
                     sx={{ width: '90%', border: '1px solid lightgrey' }}
@@ -281,7 +305,7 @@ const ListOfMedia = () => {
                                                     }}
                                                 >
                                                     <span style={{fontSize: '0.75em',}}>
-                                                        <b>{mediaItem.rating}</b>
+                                                        <b>{Math.round(mediaItem.rating)}</b>
                                                     </span>
                                                     <span style={{fontSize: '0.55em'}}>
                                                         %

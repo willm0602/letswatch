@@ -26,6 +26,7 @@ export async function removeMediaFromWatchList(listID, mediaID) {
 
 export async function joinList(listID) {
     return post('/watchlist/join', {
-        listID
+        listID,
+        accessToken: getAccessToken(),
     })
 }

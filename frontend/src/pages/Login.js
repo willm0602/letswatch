@@ -38,7 +38,7 @@ const Login = () => {
             }
             if(username === '') { 
                 setUsernameError(true);
-            } else if(cPasswordError && passwordError) {
+            } else if(!cPasswordError && !passwordError) {
                 signup(username, password);
             }
         }

@@ -5,11 +5,16 @@ import { UserContext } from '../contextSetup'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
+import { Modal } from '@mui/material'
+import { Box } from '@mui/material'
 
 //API
 import getFromTMDB from '../APIInterface/TMDB';
 import FrontPageRatingBubble from './components/frontPageRatingBubble';
-import FrontPageMedia from './components/frontPageMedia'
+import FrontPageMedia from './components/frontPageMedia';
+import { userMetadata } from '../APIInterface/GetUserData';
+import { addMediaToWatchlist } from '../APIInterface/WatchList';
+import { addMediaByIDAndType, searchForMedia } from '../APIInterface/MediaManagement';
 
 const SingleMedia = () => {
 
@@ -23,8 +28,24 @@ const SingleMedia = () => {
     const [cast, setCast] = useState(null);
     const [similarMedia, setSimilarMedia] = useState(null);
     const [pageReady, setPageReady] = useState(false);
+    const [userLists, setUserLists] = useState([])
+    const [openModal, setOpenModal] = useState(false);
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
+
+    const addMediaToList = (listID) => {
+        console.log(currentMedia);
+        const mediaID = currentMedia.id;
+        const mediaType = currentMedia.release_date ? 'movie' : 'tv';
+
+        const doThing = async() => {
+            await addMediaByIDAndType(mediaID, mediaType).then(res => addMediaToWatchlist(listID, res));
+        }
+        doThing();
+    }
 
     useEffect(()=>{
+        
         setPageReady(false);
         const setup = async(type, id) => {
             await getFromTMDB(`${type}/${id}`).then((res)=>{
@@ -37,14 +58,31 @@ const SingleMedia = () => {
                 getFromTMDB(`${type}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
                 getFromTMDB(`${type}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
             })
+            await userMetadata().then(res => {
+                let lists = []
+                res.groups.map(groups => groups.lists.map(list => lists = [...lists, list] ))
+                setUserLists(lists);
+            });
+            
         }
         if(mediaType && tmdbID)
             setup(mediaType, tmdbID);
     },[mediaType, tmdbID]);
 
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 300,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
+    };
+
     return (
         pageReady ?
-        <div style={{paddingBottom: '1200px'}}>
+        <div style={{paddingBottom: '1350px'}}>
             <div
                 style={{
                     backgroundImage: `url(https://www.themoviedb.org/t/p/original${currentMedia.backdrop_path})`,
@@ -111,7 +149,7 @@ const SingleMedia = () => {
                             ))}
                         </p>
                         <Button
-                            onClick={() => test()}
+                            onClick={() => handleOpenModal()}
                             variant="contained"
                             style={{
                                 maxWidth: '300px',
@@ -185,6 +223,21 @@ const SingleMedia = () => {
                     </div>                
                 </div>
             </div>
+            <Modal
+                open={openModal}
+                onClose={handleCloseModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <h2>Add To List</h2>
+                    <div style={{display:'flex', flexDirection:'column'}}>
+                    {userLists.map(list => 
+                        <Button onClick={()=>addMediaToList(list.listID)} style={{color:'white', backgroundColor:'#6C63FF', margin:'5px'}} >{list.listName}</Button>    
+                    )}
+                    </div>
+                </Box>
+            </Modal>
             <Footer />
         </div>
         : 
