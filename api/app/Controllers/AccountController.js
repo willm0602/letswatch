@@ -3,6 +3,7 @@ const {
     apiResponse,
     getIDFromAccessToken,
     randomStr,
+    getIDFromUsername,
 } = require('../../MiscUtils')
 const {
     createSinglePersonGroup,
@@ -316,8 +317,10 @@ async function allInfo(ctx) {
 }
 
 async function addFriend(ctx) {
-    const { accessToken, userID } = ctx.request.query
+    const { accessToken, potentialFriendUsername } = ctx.request.query
     const requestUserID = await getIDFromAccessToken(accessToken)
+
+    const userID = await getIDFromUsername(potentialFriendUsername);
 
     const sql = `INSERT INTO friendships (
                     first_user_id, 
@@ -328,6 +331,11 @@ async function addFriend(ctx) {
                 )`
 
     return new Promise((res, rej) => {
+        if(userID === undefined)
+        {
+            ctx.body = apiResponse(false, `no user with username ${potentialFriendUsername} exists`);
+            return rej(ctx.body);
+        }
         conn.query(
             {
                 sql,

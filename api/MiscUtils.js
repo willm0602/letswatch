@@ -88,3 +88,22 @@ module.exports.userIsInGroup = async (accessToken, groupID, id = undefined) => {
         )
     })
 }
+
+module.exports.getIDFromUsername = module.exports.getIDFromAccessToken = async (accessToken) => {
+    const query = `SELECT * FROM Users 
+                        WHERE username=?;`
+
+    return new Promise((res, rej) => {
+        const execution = conn.query(
+            {
+                sql: query,
+                values: [accessToken],
+            },
+            (err, rows) => {
+                if (err) return rej(undefined)
+                if (tuples.length === 0) return res(undefined)
+                return res(tuples[0].id)
+            }
+        )
+    })
+}
