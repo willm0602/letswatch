@@ -1,29 +1,32 @@
-import { get } from "svelte/store";
+import { get, post } from "./Utils";
+import { getAccessToken } from '../LocalStorageInterface'
 
 export async function getFriends()
 {
-    return get('/account/friends')
+    return get('/account/friends', {accessToken: getAccessToken()})
 }
 
 export async function sendFriendRequest(userID)
 {
-    return post('/account/add_friend', {userID})
+    return post('/account/add_friend', {userID, accessToken: getAccessToken()})
 }
 
 export async function acceptFriendRequest(userID)
 {
     return post('/account/confirm_friend_request', {
-        requesterID: userID
+        requesterID: userID,
+        accessToken: getAccessToken()
     })
 }
 
 export async function addFriendToGroup(friendID, groupID) {
     return post('/account/add_friend_to_group', {
         groupID,
-        friendID
+        friendID,
+        accessToken: getAccessToken()
     })
 }
 
 export async function getAllFriendRequests() {
-    return get('/account/get_friend_requests')
+    return get('/account/get_friend_requests', {accessToken: getAccessToken()})
 }

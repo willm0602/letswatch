@@ -1,9 +1,7 @@
-import { useLocation, useParams } from 'react-router-dom'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
-import { UserContext } from '../contextSetup'
-import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
+import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress } from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
@@ -11,22 +9,20 @@ import { userMetadata } from '../APIInterface/GetUserData'
 const User = () => {
     const [userInfo,setUserInfo] = useState(null)
     const [open, setOpen] = useState(false);
-    
-    const ctx = useContext(UserContext);
+    const handleClick = () => setOpen(!open);
+    const [userLists, setUserLists] = useState([])
 
-    const handleClick = () => {
-        setOpen(!open);
-    };
-    
-    //fixes refresh problem
     useEffect(()=>{
         const setup = async() =>{
-            await userMetadata().then(res=> setUserInfo(res));
+            await userMetadata().then(res=> {
+                setUserInfo(res);
+                let holdList=[];
+                res.groups.map(groups =>  groups.lists.map(list => holdList=([...holdList, list])))
+                setUserLists(holdList.slice(0,5));
+            });
         }
         setup()
     },[])
-
-    const userLists = [];
 
     return ( 
         userInfo ?
@@ -43,6 +39,7 @@ const User = () => {
                     justifyContent= "flex-end"
                     alignItems= "flex-start"
                     spacing = {1.5}
+                    style={{padding:'15px'}}
                 >
                     <Button
                         variant = "contained"
@@ -86,7 +83,7 @@ const User = () => {
                             window.location = '/'
                         }}
                         variant = "contained"
-                        sx={{ backgroundColor: '#6C63FF' }}
+                        sx={{ backgroundColor: 'red' }}
                     >
                         Logout
                     </Button>
@@ -138,9 +135,47 @@ const User = () => {
                     <Box style = {{ margin: 'auto', padding}}>
                         <List>
                             {userLists.length === 0 ? (
-                                <p style={{ textAlign: 'center'}}> No lists yet :(</p>
+                                <p style={{ textAlign: 'center'}}> No lists yet</p>
                             ) : (
-                                <p> Hello There </p>
+                                <Box style={{ margin: 'auto'}}>
+                                    <List>
+                                        {userLists.map((list,index) => 
+                                            <ListItem key={index}>
+                                                <Paper
+                                                    style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        width: '300px',
+                                                        padding: '4%',
+                                                        margin: 'auto',
+                                                        borderRadius: '25px',
+                                                    }}
+                                                    elevation={3}
+                                                >
+                                                    <Link
+                                                        to={`/group/${list.listID}`}
+                                                        style={{
+                                                            margin: 'auto',
+                                                            textDecoration: 'none',
+                                                            color: 'black',
+                                                        }}
+                                                    >
+                                                        {list.listName}
+                                                    </Link>
+                                                    <AvatarGroup max={2}>
+                                                        {list.listMembers.map((member) => (
+                                                            <Avatar
+                                                                alt={member.username}
+                                                                src={`/profileImages/${member.profileID}.jpg`}
+                                                            />
+                                                        ))}
+                                                    </AvatarGroup>
+                                                </Paper>
+                                            </ListItem> 
+                                        )}
+                                    </List>
+                                </Box>
+
                             )}
                         </List>
                     </Box>
@@ -155,7 +190,7 @@ const User = () => {
                     </h1>
                     <Box style={{ margin: 'auto'}}>
                         <List>
-                            {ctx.userInfo.groups.map((group, index) => (
+                            {userInfo.groups.map((group, index) => (
                                 <ListItem key={index}>
                                     <Paper
                                         style={{
@@ -200,7 +235,7 @@ const User = () => {
             <Footer />
         </>
         :
-        <></>//add loading circle thing here later
+        <CircularProgress style={{color:'#6C63FF', width:'100px', height:'100px', display:'flex', margin:'auto', alignItems:'center', height:'800px'}}/>
     )
 }
 

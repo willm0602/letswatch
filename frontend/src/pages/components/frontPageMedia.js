@@ -45,11 +45,11 @@ const FrontPageMedia = ({ mediaInfo }) => {
                     <i style={{ margin: 0 }}>
                         {mediaInfo.release_date.replaceAll('-', '/')}
                     </i>
-                ) : (
+                ) : mediaInfo.first_air_date ? (
                     <i style={{ margin: 0 }}>
                         {mediaInfo.first_air_date.replaceAll('-', '/')}
                     </i>
-                )}
+                ):null}
             </div>
         </Link>
     )
