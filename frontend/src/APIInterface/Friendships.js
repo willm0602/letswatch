@@ -30,3 +30,10 @@ export async function addFriendToGroup(friendID, groupID) {
 export async function getAllFriendRequests() {
     return get('/account/get_friend_requests', {accessToken: getAccessToken()})
 }
+
+export async function denyFriendRequest(username) {
+    return post('/account/deny_friend_request', {
+        accessToken: getAccessToken(),
+        deniedUserUsername: username
+    })
+}
