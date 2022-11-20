@@ -55,9 +55,9 @@ module.exports.getIDFromAccessToken = async (accessToken) => {
                 values: [accessToken],
             },
             (err, tuples) => {
+                console.log(execution.sql); 
                 console.log('got rows', tuples);
-                console.log(execution.sql);
-                if (err) return rej(undefined)
+                if (err) return rej(err)
                 if (tuples.length === 0) return res(undefined)
                 return res(tuples[0].id)
             }
@@ -84,6 +84,28 @@ module.exports.userIsInGroup = async (accessToken, groupID, id = undefined) => {
                 if (err) return rej(err)
                 if (rows.length > 0) return res(rows[0].id)
                 return res(false)
+            }
+        )
+    })
+}
+
+module.exports.getIDFromUsername = async (username) => {
+    const query = `SELECT * FROM Users 
+                        WHERE username=?;`
+
+    return new Promise((res, rej) => {
+        const execution = conn.query(
+            {
+                sql: query,
+                values: [username],
+            },
+            (err, rows) => {
+                console.log(execution.sql);
+                console.log(err);
+                console.log(rows);
+                if (err) return rej(undefined)
+                if (rows.length === 0) return res(undefined)
+                return res(rows[0].id)
             }
         )
     })

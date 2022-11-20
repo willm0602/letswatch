@@ -6,9 +6,9 @@ export async function getFriends()
     return get('/account/friends', {accessToken: getAccessToken()})
 }
 
-export async function sendFriendRequest(userID)
+export async function sendFriendRequest(potentialFriendUsername)
 {
-    return post('/account/add_friend', {userID, accessToken: getAccessToken()})
+    return post('/account/add_friend', {potentialFriendUsername, accessToken: getAccessToken()})
 }
 
 export async function acceptFriendRequest(userID)
@@ -29,4 +29,11 @@ export async function addFriendToGroup(friendID, groupID) {
 
 export async function getAllFriendRequests() {
     return get('/account/get_friend_requests', {accessToken: getAccessToken()})
+}
+
+export async function denyFriendRequest(username) {
+    return post('/account/deny_friend_request', {
+        accessToken: getAccessToken(),
+        deniedUserUsername: username
+    })
 }

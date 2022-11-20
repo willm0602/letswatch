@@ -3,6 +3,7 @@ const {
     apiResponse,
     getIDFromAccessToken,
     randomStr,
+    getIDFromUsername,
 } = require('../../MiscUtils')
 const {
     createSinglePersonGroup,
@@ -316,8 +317,10 @@ async function allInfo(ctx) {
 }
 
 async function addFriend(ctx) {
-    const { accessToken, userID } = ctx.request.query
+    const { accessToken, potentialFriendUsername } = ctx.request.query
     const requestUserID = await getIDFromAccessToken(accessToken)
+
+    const userID = await getIDFromUsername(potentialFriendUsername);
 
     const sql = `INSERT INTO friendships (
                     first_user_id, 
@@ -328,6 +331,13 @@ async function addFriend(ctx) {
                 )`
 
     return new Promise((res, rej) => {
+        console.log(`requester id: ${requestUserID}`);
+        console.log(`receiver id: ${userID}`);
+        console.log(`accessToken is ${accessToken}`);
+        if (userID === undefined) {
+            ctx.body = apiResponse(false, `no user with username ${potentialFriendUsername} exists`);
+            return rej(ctx.body);
+        }
         conn.query(
             {
                 sql,
@@ -422,12 +432,12 @@ async function addFriendToGroup(ctx) {
         : undefined
     const requesterWasInGroup = requestersGroups
         ? requestersGroups.filter((group) => {
-              return group == groupID
-          }).length > 0
+            return group == groupID
+        }).length > 0
         : undefined
 
     return new Promise((res, rej) => {
-        if(!(tryingToAddFriend && requesterWasInGroup)){
+        if (!(tryingToAddFriend && requesterWasInGroup)) {
             ctx.body = apiResponse(false, 'invalid response');
             return rej('invalid args');
         };
@@ -439,8 +449,7 @@ async function addFriendToGroup(ctx) {
             values: [friendID, groupID]
         }, (err, rows) => {
             console.log(err, rows);
-            if(err)
-            {
+            if (err) {
                 ctx.body = apiResponse(false, err);
                 return rej(err);
             }
@@ -452,12 +461,11 @@ async function addFriendToGroup(ctx) {
 
 async function confirmFriendRequest(ctx) {
     const sql = `UPDATE friendships SET accepted=1 WHERE first_user_id=? AND second_user_id=?`;
-    const {accessToken, requesterID} = ctx.request.query;
+    const { accessToken, requesterID } = ctx.request.query;
     return new Promise(async (res, rej) => {
         const receiverID = await getIDFromAccessToken(accessToken);
         console.log(requesterID, receiverID, accessToken);
-        if(!(requesterID && receiverID))
-        {
+        if (!(requesterID && receiverID)) {
             ctx.body = apiResponse(false, 'missing args');
             return rej(ctx.body);
         }
@@ -465,8 +473,7 @@ async function confirmFriendRequest(ctx) {
             sql,
             values: [requesterID, receiverID]
         }, (err, rows) => {
-            if(err)
-            {
+            if (err) {
                 ctx.body = apiResponse(false, err);
                 return rej(ctx.body);
             }
@@ -478,7 +485,7 @@ async function confirmFriendRequest(ctx) {
 }
 
 async function getAllFriendRequests(ctx) {
-    const {accessToken} = ctx.request.query;
+    const { accessToken } = ctx.request.query;
     const sql = `SELECT first_user_id as id, Username, ProfileImageID, Bio, Date_joined FROM friendships 
 	RIGHT JOIN users ON users.id=friendships.first_user_id
     WHERE second_user_id=? AND accepted=0;
@@ -489,8 +496,7 @@ async function getAllFriendRequests(ctx) {
             sql,
             values: [userID]
         }, (err, rows) => {
-            if(err)
-            {
+            if (err) {
                 ctx.body = apiResponse(false, err);
                 return rej(ctx.body);
             }
@@ -499,6 +505,34 @@ async function getAllFriendRequests(ctx) {
         })
     })
 }
+
+async function denyFriendRequest(ctx) {
+    const { deniedUserUsername, accessToken } = ctx.request.query;
+    const deniedUserID = await getIDFromUsername(deniedUserUsername);
+    const denierUserID = await getIDFromAccessToken(accessToken);
+    const sql = `DELETE FROM friendships WHERE first_user_id = ? AND second_user_id = ?`;
+
+    return new Promise((rej, res) => {
+        if ((!deniedUserID) || (!denierUserID)) {
+            ctx.body = `Error: deniedID is ${deniedUserID} denierID is ${denierUserID}`
+            return rej(`missing denier user id or denied user id`);
+        }
+
+        return conn.query({
+            sql,
+            values: [deniedUserID, denierUserID]
+        }, (err, rows) => {
+            if(err)
+            {
+                ctx.body = err;
+                return rej(err);
+            }
+            ctx.body = apiResponse(true, 'removed friend response');
+            return res(ctx.body);
+        })
+    })
+}
+
 
 module.exports = {
     getAccessToken,
@@ -509,5 +543,6 @@ module.exports = {
     allFriends,
     addFriendToGroup,
     confirmFriendRequest,
-    getAllFriendRequests
+    getAllFriendRequests,
+    denyFriendRequest
 }
