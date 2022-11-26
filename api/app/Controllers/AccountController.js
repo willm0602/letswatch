@@ -398,12 +398,13 @@ async function allFriends(ctx) {
 }
 
 async function checkAreFriends(firstUserID, secondUserID) {
+    console.log(firstUserID, secondUserID);
     const sql = `SELECT * FROM friendships WHERE (
                     (first_user_id=? AND second_user_id=?) OR
                     (first_user_id=? AND second_user_id=?)
                 ) AND accepted=1`
     return new Promise((res, rej) => {
-        conn.query(
+        const exec = conn.query(
             {
                 sql,
                 values: [firstUserID, secondUserID, secondUserID, firstUserID],
@@ -533,6 +534,49 @@ async function denyFriendRequest(ctx) {
     })
 }
 
+async function getFriendInfo(ctx) {
+    const {accessToken, friendID} = ctx.request.query;
+    const requesterID = await getIDFromAccessToken(accessToken);
+    const areFriends = requesterID ? await checkAreFriends(requesterID, friendID) : false;
+    const sql = `SELECT id, username, ProfileImageID, Bio, Date_joined FROM Users WHERE id=?`
+    return new Promise((res, rej) => {
+        if(!(requesterID && friendID))
+        {
+            ctx.body = apiResponse(false, 'missing args');
+            return rej(ctx.body);
+        }
+        if(!(areFriends))
+        {   
+            ctx.body = apiResponse(false, 'users are not friends');
+            return rej(ctx.body);
+        }
+        conn.query({
+            sql,
+            values: [friendID]
+        }, async (err, rows) => {
+            if(err)
+            {
+                ctx.body = apiResponse(false, err);
+                return rej(ctx.body);
+            }
+            if(rows.length == 0)
+            {
+                ctx.body = apiResponse(false, `no users found with id ${friendID}`);
+                return rej(ctx.body);
+            }
+            let friendInfo = rows[0];
+            const groupIDs = Array.from(await allGroupsForUser(friendID));
+            let groups = []
+            for (let groupID of groupIDs) {
+                const group = await getInfoForGroup(groupID)
+                groups.push(group)
+            }
+            friendInfo.groups = groups;
+            ctx.body = friendInfo;
+            return res(friendInfo);
+        })
+    })
+}
 
 module.exports = {
     getAccessToken,
@@ -544,5 +588,6 @@ module.exports = {
     addFriendToGroup,
     confirmFriendRequest,
     getAllFriendRequests,
-    denyFriendRequest
+    denyFriendRequest,
+    getFriendInfo
 }

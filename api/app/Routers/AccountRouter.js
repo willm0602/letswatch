@@ -31,5 +31,6 @@ AccountRouter.post('/add_friend_to_group', AccountController.addFriendToGroup)
 AccountRouter.post('/confirm_friend_request', AccountController.confirmFriendRequest)
 AccountRouter.get('/get_friend_requests', AccountController.getAllFriendRequests)
 AccountRouter.post('/deny_friend_request', AccountController.denyFriendRequest)
+AccountRouter.get('/friend_info', AccountController.getFriendInfo)
 
 module.exports = AccountRouter
