@@ -157,7 +157,7 @@ const User = () => {
                                                     <AvatarGroup max={2}>
                                                         {list.listMembers.map((member) => (
                                                             <Avatar
-                                                                alt={member.username}
+                                                                alt={member.username.toUpperCase()}
                                                                 src={`/profileImages/${member.profileID}.jpg`}
                                                             />
                                                         ))}
@@ -212,7 +212,7 @@ const User = () => {
                                         <AvatarGroup max={2}>
                                             {group.members.map((member) => (
                                                 <Avatar
-                                                    alt={member.username}
+                                                    alt={member.username.toUpperCase()}
                                                     src={`/profileImages/${member.profileID}.jpg`}
                                                 />
                                             ))}

@@ -71,7 +71,7 @@ const User = () => {
                                     fontSize: 'large',
                                     fontFamily: 'sans-serif',
                                 }}
-                            >{friendInfo.bio}</p>
+                            >{friendInfo.Bio}</p>
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@ const User = () => {
                                                     <AvatarGroup max={2}>
                                                         {list.listMembers.map((member) => (
                                                             <Avatar
-                                                                alt={member.username}
+                                                                alt={member.username.toUpperCase()}
                                                                 src={`/profileImages/${member.profileID}.jpg`}
                                                             />
                                                         ))}
@@ -166,7 +166,7 @@ const User = () => {
                                         <AvatarGroup max={2}>
                                             {group.members.map((member) => (
                                                 <Avatar
-                                                    alt={member.username}
+                                                    alt={member.username.toUpperCase()}
                                                     src={`/profileImages/${member.profileID}.jpg`}
                                                 />
                                             ))}

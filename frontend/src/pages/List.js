@@ -42,6 +42,11 @@ const ListOfMedia = () => {
         setOpenSnackBar(true);
     }
 
+    const handleOpenSnackbarAddMedia = (mediaName, listName) => {
+        setSnackbarMessage(`Successfully added ${mediaName} to ${listName}!`);
+        setOpenSnackBar(true);
+    }
+
     const handleCloseSnackBar = () => setOpenSnackBar(false)
 
     useEffect(()=>{
@@ -96,6 +101,9 @@ const ListOfMedia = () => {
             ...mediaToAdd,
             image_url: mediaToAdd.image,
         }
+        //prevent duplicates
+        if (listContent.filter((media) => media.id === mediaToAdd.id).length > 0) return;
+
         setListContent([...listContent, mediaToAdd])
         const newMedia = [
             ...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(),
@@ -103,6 +111,7 @@ const ListOfMedia = () => {
         ]
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         const createNewListItem = async (mediaID) => {
+
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
                 userMetadata().then((res) => {
@@ -114,6 +123,8 @@ const ListOfMedia = () => {
                         ...res.groups[groupIdx].lists[listIdx].media,
                     ])
                     allMedia().then((res) => ctx.setAutoFillMedia(res))
+                    setNewMediaFromSearch(newMediaFromSearch.filter(media => media.id !== mediaID))
+                    handleOpenSnackbarAddMedia(mediaToAdd.title, ctx.userInfo.groups[groupIdx].lists[listIdx].listName)
                 })
             )
         }
@@ -123,9 +134,6 @@ const ListOfMedia = () => {
 
     const newHandleClick = (mediaID) => {
         //this return needs to be changed
-
-        console.log(listInfo)
-
         if(listInfo.listMembers.filter( member => member.username === ctx.userInfo.username).length === 0){
             handleOpenSnackbarNotMember();
             return
@@ -198,14 +206,16 @@ const ListOfMedia = () => {
                 <h2>List members:</h2>
                 <Stack direction="row">
                     {listInfo.listMembers.map((member) => (
+                        <Link to = {member.id === ctx.userInfo.id ? `/user/${member.id}`:`/user/friend/${member.id}`}>
                             <Avatar
                                 style={{
                                     margin: '15px 5px',
                                     border: '1px solid black',
                                 }}
-                                alt={member.username}
+                                alt={member.username.toUpperCase()}
                                 src={`/profileImages/${member.profileID}.jpg`}
                             />
+                        </Link>
                     ))}
                 </Stack>
                 
