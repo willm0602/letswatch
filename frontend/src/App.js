@@ -15,6 +15,7 @@ import { userIsSignedIn } from './LocalStorageInterface'
 import { userMetadata } from './APIInterface/GetUserData'
 import { allMedia } from './APIInterface/MediaSearch'
 import SingleMedia from './pages/SingleMedia'
+import FriendPage from './pages/Friend'
 
 function App() {
     const ctx = useContext(UserContext) //context works
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/media/:tmdbID" element={<SingleMedia />} />
                     <Route path="/media/:mediaType/:tmdbID" element={<SingleMedia />} />
                     <Route path="/groups" element={<Groups />} />
+                    <Route path="/user/friend/:userID" element={<FriendPage />} />
                 </>
             ) : (
                 <Route path="/" element={<Login />} />

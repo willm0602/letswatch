@@ -131,11 +131,13 @@ const Group = () => {
 
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap:'wrap'}}>
                 {groupInfo.members.map((member) => (
-                    <Avatar
-                        style={{ margin: '5px' }}
-                        alt={member.username}
-                        src={`/profileImages/${member.profileID}.jpg`}
-                    />
+                    <Link to={`/user/friend/${member.id}`}>
+                        <Avatar
+                            style={{ margin: '5px' }}
+                            alt={member.username}
+                            src={`/profileImages/${member.profileID}.jpg`}
+                        />
+                    </Link>
                 ))}
             </div>
             

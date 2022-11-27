@@ -198,14 +198,14 @@ const ListOfMedia = () => {
                 <h2>List members:</h2>
                 <Stack direction="row">
                     {listInfo.listMembers.map((member) => (
-                        <Avatar
-                            style={{
-                                margin: '15px 5px',
-                                border: '1px solid black',
-                            }}
-                            alt={member.username}
-                            src={`/profileImages/${member.profileID}.jpg`}
-                        />
+                            <Avatar
+                                style={{
+                                    margin: '15px 5px',
+                                    border: '1px solid black',
+                                }}
+                                alt={member.username}
+                                src={`/profileImages/${member.profileID}.jpg`}
+                            />
                     ))}
                 </Stack>
                 
