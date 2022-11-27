@@ -5,7 +5,7 @@ module.exports = function (app) {
     app.use(
         cors({
             credentials: true,
-            exposeHeaders: ['Access-Token', 'Cookie'],
+            exposeHeaders: ['Access-Token', 'Cookie', 'Access-Control-Allow-Origin'],
         })
     )
 }
