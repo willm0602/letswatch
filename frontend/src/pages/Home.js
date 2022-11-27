@@ -35,11 +35,12 @@ import Snackbar from '@mui/material/Snackbar';
         [x] single media, add media to list
         [x] talk to will about getting userInfo
         [x] fix inital image to display avatar word thing
-        [] maybe add search above friends
+        [?] maybe add search above friends
         [x] remove lists on add to list when the list exists on that list
-        [] add snackbar for feedback
+        [x] add snackbar for feedback
         [x] add follow through to single media page from extended search on list page
-        [] friend profiles
+        [x] friend profiles
+        [] fix single media top space to look more consistent
 */
 
 const Home = () => {   

@@ -19,6 +19,7 @@ import { useContext } from 'react'
 import { UserContext } from '../contextSetup'
 import { TextField } from '@mui/material'
 import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
 
 //API stuff
 import { makeWatchList } from '../APIInterface/WatchList'
@@ -173,7 +174,11 @@ const Group = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style} style={{maxHeight:'800px', justifyContent:'center'}}>
-                    <h2>Add Friend to Group</h2>
+                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                        <h2>Add Friend to Group</h2>
+                        <CloseIcon onClick={()=>handleCloseFM()} style={{color:'red'}}/>
+                    </div>
+                    
                     <TextField onChange={(e)=>handleFilterFriends(e.target.value)} fullWidth id="filled-basic" placeholder="Search Friend" variant="filled"/>
                     <div style={{display:'flex', flexDirection:'column', overflow:'scroll', padding:'5px'}}>
                         {intermediateFriendsList?.map(friend => 
@@ -187,6 +192,7 @@ const Group = () => {
                                 <AddCircle onClick={()=>addToGroup(friend.id)}/>
                             </div>
                         )}
+                        {intermediateFriendsList?.length <= 0 ? <p>No more friends to add</p> : <></>}
                     </div>
                 </Box>
             </Modal>

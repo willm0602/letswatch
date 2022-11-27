@@ -454,7 +454,10 @@ const ListOfMedia = () => {
             </div>
         </>
         :
-        <>uh oh, loading those bad boys up</> //add spinner
+        <div style={{margin:'auto'}}>
+            <CircularProgress style={{color:'#6C63FF', width:'100px', height:'100px', display:'flex', margin:'auto', alignItems:'center', height:'800px'}}/>
+            <Footer/>
+        </div>
     )
 }
 export default ListOfMedia
