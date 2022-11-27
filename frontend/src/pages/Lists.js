@@ -8,7 +8,6 @@ import NMHeader from './components/nonMediaHeader'
 import SearchIcon from '@mui/icons-material/Search'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { Grid } from '@mui/material'
-import { display, width } from '@mui/system'
 import ProfileImage from './components/ProfileImage'
 
 const Watchlist = ({ watchlistData }) => {

@@ -92,10 +92,14 @@ const User = () => {
                     style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                     <div style={{ textAlign: 'center' }}>
+                        {userInfo.profileID !== null ? 
                         <img
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
                             src={`/profileImages/${userInfo.profileID}.jpg`}
                         />
+                        :
+                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                        }
                         <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
                     </div>
 

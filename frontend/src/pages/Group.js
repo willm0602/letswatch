@@ -163,7 +163,11 @@ const Group = () => {
                     <div style={{display:'flex', flexDirection:'column', overflow:'scroll', padding:'5px'}}>
                         {intermediateFriendsList?.map(friend => 
                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                                <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/>
+                                {friend.profileImageID !== null ? 
+                                    <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/> 
+                                    : 
+                                    <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`https://eu.ui-avatars.com/api/?name=${friend.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                                }
                                 <p>{friend.username}</p>
                                 <AddCircle onClick={()=>addToGroup(friend.id)}/>
                             </div>

@@ -7,6 +7,7 @@ import Skeleton from '@mui/material/Skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Modal } from '@mui/material'
 import { Box } from '@mui/material'
+import Snackbar from '@mui/material/Snackbar';
 
 //API
 import getFromTMDB from '../APIInterface/TMDB';
@@ -20,8 +21,6 @@ const SingleMedia = () => {
 
     //get parameters from the url with routes
     let {mediaType, tmdbID} = useParams();
-    console.log(mediaType, tmdbID)
-
     const [currentMedia, setCurrentMedia] = useState(null);
     const ctx = useContext(UserContext)
     const [trailer, setTrailer] = useState(null);
@@ -32,24 +31,72 @@ const SingleMedia = () => {
     const [openModal, setOpenModal] = useState(false);
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
+    const [LWMediaID, setLWMediaID] = useState(null);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    const handleCloseSnackBar = () => setOpenSnackBar(false);
+    const handleOpenSnackBar= (listID) => {
+        currentMedia.release_date ? 
+            setSnackbarMessage(`Successfully added ${currentMedia.title} to ${userLists.filter(list => list.listID === listID)[0].listName}!`) 
+            : 
+            setSnackbarMessage(`Successfully added ${currentMedia.name} to ${userLists.filter(list => list.listID === listID)[0].listName}!`)
+        setOpenSnackBar(true);
+    }
+    const handleErrorSnack = () => {
+        setSnackbarMessage('Uh oh! there was a problem!')
+    }
 
     const addMediaToList = (listID) => {
-        console.log(currentMedia);
-        const mediaID = currentMedia.id;
-        const mediaType = currentMedia.release_date ? 'movie' : 'tv';
+        const currentListMembers = userLists.filter(list => list.listID === listID)[0].listMembers;
+        const memberCheck = currentListMembers.filter(listMember => listMember.username === ctx.userInfo.username)
+        if(memberCheck.length === 0) return;
+
+        const duplicateCheck = userLists.filter(list => list.listID === listID)[0].media.filter(media => media.id === LWMediaID);
+        
+        if(duplicateCheck.length > 0)
+            return;
 
         const doThing = async() => {
-            await addMediaByIDAndType(mediaID, mediaType).then(res => addMediaToWatchlist(listID, res));
+            addMediaToWatchlist(listID, LWMediaID)
+                .catch(err => handleErrorSnack())    
+                .then(_ => handleOpenSnackBar(listID))
+                
+            userMetadata().then(res => {
+                let lists = []
+                res.groups.map(groups => groups.lists.map(list => {
+                    console.log(list)
+                    if(list.listMembers.some(member => member.username === ctx.userInfo.username))   
+                        lists = [...lists, list] 
+                }))
+                setUserLists(lists.filter( list => !list.media.some(media => media.id === LWMediaID)))
+            });
         }
         doThing();
     }
 
     useEffect(()=>{
-        
         setPageReady(false);
         const setup = async(type, id) => {
             await getFromTMDB(`${type}/${id}`).then((res)=>{
                 console.log(res);
+                
+                const mediaID = res.id;
+                const mediaType = res.release_date ? 'movie' : 'tv';
+                addMediaByIDAndType(mediaID, mediaType).then(res => {
+                    setLWMediaID(res)
+                    userMetadata().then(results => {
+                        let lists = []                        
+                        results.groups.map(groups => groups.lists.map(list => {
+                            console.log(list)
+                            if(list.listMembers.some(member => member.username === ctx.userInfo.username))   
+                                lists = [...lists, list] 
+                        }))
+                        setUserLists(lists.filter( list => !list.media.some(media => media.id === res)))
+                    });
+                });
+
+
                 setCurrentMedia(res);
                 getFromTMDB(`${type}/${res.id}/videos?`).then((res)=>{
                     const YTvids = res.results.filter(res => res.site==="YouTube" && res.name.toLowerCase().includes('trailer'));
@@ -57,13 +104,7 @@ const SingleMedia = () => {
                 })
                 getFromTMDB(`${type}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
                 getFromTMDB(`${type}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
-            })
-            await userMetadata().then(res => {
-                let lists = []
-                res.groups.map(groups => groups.lists.map(list => lists = [...lists, list] ))
-                setUserLists(lists);
-            });
-            
+            })  
         }
         if(mediaType && tmdbID)
             setup(mediaType, tmdbID);
@@ -83,6 +124,7 @@ const SingleMedia = () => {
     return (
         pageReady ?
         <div style={{paddingBottom: '1350px'}}>
+            <Snackbar open={openSnackBar} anchorOrigin={{vertical:'top', horizontal:'center'}}  autoHideDuration={5000} onClose={handleCloseSnackBar} message={snackbarMessage} />
             <div
                 style={{
                     backgroundImage: `url(https://www.themoviedb.org/t/p/original${currentMedia.backdrop_path})`,
