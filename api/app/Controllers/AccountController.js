@@ -99,10 +99,8 @@ async function login(ctx, next) {
     const queryParams = ctx.request.query
     const username = queryParams.username
     const password = queryParams.password
-    console.log(username, password, '\n\n')
 
     const accessToken = await getAccessToken(username, password)
-    console.log(`accessToken is`, accessToken)
     return new Promise((res, rej) => {
         if (accessToken !== undefined) {
             ctx.body = apiResponse(true, accessToken)
@@ -164,7 +162,6 @@ async function getAccessToken(username, password) {
                 values: [username, password],
             },
             (err, tuples) => {
-                console.log('got access tokens from database', tuples, err)
                 if (err) return rej(undefined)
                 if (tuples.length === 0) return res(undefined)
                 return res(tuples[0].Access_Token)
@@ -273,7 +270,6 @@ async function allInfo(ctx) {
                 values: [accessToken],
             },
             async (err, tuples) => {
-                console.log(query.sql)
                 if (err || !tuples) {
                     ctx.body = apiResponse(
                         false,
@@ -296,7 +292,6 @@ async function allInfo(ctx) {
                     groups.push(group)
                 }
 
-                console.log('groups is', groups)
 
                 let userInfo = await {
                     id: userData.id,
@@ -308,7 +303,6 @@ async function allInfo(ctx) {
                     groups,
                 }
                 ctx.body = userInfo
-                console.log('sending info for user')
 
                 return res(userInfo)
             }
@@ -436,7 +430,6 @@ async function allFriends(ctx) {
  * 
  */ 
 async function checkAreFriends(firstUserID, secondUserID) {
-    console.log(firstUserID, secondUserID);
     const sql = `SELECT * FROM friendships WHERE (
                     (first_user_id=? AND second_user_id=?) OR
                     (first_user_id=? AND second_user_id=?)
@@ -500,7 +493,6 @@ async function addFriendToGroup(ctx) {
             sql,
             values: [friendID, groupID]
         }, (err, rows) => {
-            console.log(err, rows);
             if (err) {
                 ctx.body = apiResponse(false, err);
                 return rej(err);

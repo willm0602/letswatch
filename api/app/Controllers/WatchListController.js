@@ -241,7 +241,6 @@ async function addMediaToWatchlist(ctx) {
                 values: [listID, mediaID, userID, new Date()],
             },
             (err, rows) => {
-                console.log(query.sql)
                 if (err) {
                     ctx.body = apiResponse(false, err)
                     return rej(err)
@@ -274,7 +273,6 @@ async function getMediaForWatchList(watchListID) {
                 if (err) return rej(erimage.pngr)
                 let allMedia = []
                 for (let row of rows) {
-                    console.log('row is ', row)
                     let media = {
                         title: row.title,
                         image: row.image_url,
@@ -285,7 +283,6 @@ async function getMediaForWatchList(watchListID) {
                         tmdbID: row.tmdb_id,
                         type: row.type,
                     }
-                    console.log(`media is`, media)
                     allMedia.push(media)
                 }
                 return res(allMedia)
@@ -332,15 +329,12 @@ async function getGroupForList(listID) {
             sql,
             values: [listID]
         }, (err, rows) => {
-            console.log(query.sql);
             if(err)
             {
-                console.log(err);
                 return rej(err);
             }
             if(rows.length == 0)
             {
-                console.log('no groups found');     
                 return rej('no groups found for that list');
             }
             return res(rows[0].group_id);

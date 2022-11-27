@@ -12,7 +12,6 @@ async function queryTMDBFromLW(ctx) {
         ctx.body = 'no url provided'
     }
     const url = baseURL + path + '?' + `&api_key=${TMDBAPIToken}`
-    console.log(`url is`, url)
 
     return new Promise((res, rej) => {
         axios
