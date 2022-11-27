@@ -1,3 +1,8 @@
+/* .MuiSnackbarContent-root {
+    background-color:darkgray !important;
+} */
+
+
 .MuiOutlinedInput-notchedOutline {
     border: none !important;
     /* Removes borders from autocomplete fields */
