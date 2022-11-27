@@ -6,6 +6,7 @@ const {
 } = require('../../MiscUtils')
 const { createSinglePersonGroup } = require('./GroupController')
 
+// gets the id of the users initial group that is made when they register
 async function getUserGroupID(userID) {
     const query = `SELECT * FROM user_groups WHERE Name=?;`
     return new Promise((res, rej) => {
@@ -23,6 +24,7 @@ async function getUserGroupID(userID) {
     })
 }
 
+// adds the list to the default group made for a user on registering
 async function createListForSingleUser(userID, listName) {
     let groupID = await getUserGroupID(userID)
     if (!groupID) {
@@ -68,6 +70,7 @@ async function createListForSingleUser(userID, listName) {
     })
 }
 
+// adds a user to a watchlist
 async function addUserToList(userID, listID) {
     const userAlreadyInList = await userInList(userID, listID)
     const sql = `INSERT INTO user_list_memberships(user_id, list_id) VALUES (?, ?)`
@@ -88,6 +91,7 @@ async function addUserToList(userID, listID) {
     })
 }
 
+// checks if a user is in a watch list
 async function userInList(userID, listID) {
     const sql = `SELECT * FROM user_list_memberships WHERE user_id=? AND list_id=?`
 
@@ -105,6 +109,7 @@ async function userInList(userID, listID) {
         )
     })
 }
+
 
 async function createList(ctx) {
     const queryParams = ctx.request.query
@@ -153,6 +158,7 @@ async function guessListMade(listName, groupID) {
     })
 }
 
+// gets all the lists that are in a group
 async function getListsForGroup(groupID) {
     const sql = `SELECT * FROM watch_lists WHERE group_id=? ORDER BY id`
     return new Promise((res, rej) => {
@@ -187,6 +193,7 @@ async function getListsForGroup(groupID) {
     })
 }
 
+// gets all the users that are in a watchlist
 async function getUsersForList(listID) {
     const sql = `SELECT Username, ProfileImageID FROM watch_lists
 	                LEFT JOIN user_list_memberships 
@@ -208,6 +215,7 @@ async function getUsersForList(listID) {
     })
 }
 
+// adds a media object to a watchlist
 async function addMediaToWatchlist(ctx) {
     const mediaID = ctx.request.query.mediaID
     const listID = ctx.request.query.listID
@@ -245,6 +253,7 @@ async function addMediaToWatchlist(ctx) {
     })
 }
 
+// gets all media objects that are in a watchlist
 async function getMediaForWatchList(watchListID) {
     const sql = `SELECT * FROM watch_list_items
 	INNER JOIN media 
@@ -285,6 +294,7 @@ async function getMediaForWatchList(watchListID) {
     })
 }
 
+// removes a media object from a watchlist
 async function removeMediaFromWatchList(ctx) {
     const queryParams = ctx.request.query
     const { mediaID, listID } = queryParams
@@ -313,6 +323,7 @@ async function removeMediaFromWatchList(ctx) {
     })
 }
 
+// gets the group id that a watchlist is in
 async function getGroupForList(listID) {
     const sql = `SELECT * FROM watch_lists WHERE id=?`;
 
