@@ -7,7 +7,7 @@
         "frontend": "cd frontend && npm install && npm start",
         "api": "nodemon ./api/index.js",
         "dev": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"npm run api\"",
-        "start": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"node ./api/index.js\""
+        "start": "\"node ./api/index.js\""
     },
     "keywords": [],
     "author": "",
