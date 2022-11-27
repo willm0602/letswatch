@@ -18,6 +18,7 @@ import Modal from '@mui/material/Modal'
 import { useContext } from 'react'
 import { UserContext } from '../contextSetup'
 import { TextField } from '@mui/material'
+import Snackbar from '@mui/material/Snackbar';
 
 //API stuff
 import { makeWatchList } from '../APIInterface/WatchList'
@@ -34,6 +35,16 @@ const Group = () => {
     const handleOpen = () => setOpen(true)
     const [friendsList, setFriendsList] = React.useState(null);
     const [intermediateFriendsList, setIntermediateFriendsList] = React.useState(friendsList);
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
+    const handleCloseSnackBar = () => setOpenSnackBar(false);
+
+    const handleOpenSnackBar = (friendID) => {
+        const friendAdded = friendsList.filter(friend => friend.id === friendID)[0]
+        setSnackbarMessage(`${friendAdded.username} was added to the group!`)
+        setOpenSnackBar(true)
+    }
+    
 
     const [openFriendModal, setOpenFriendModal] = React.useState(false);
     const handleOpenFM = () => {
@@ -87,6 +98,7 @@ const Group = () => {
                 setIntermediateFriendsList(intermediateFriendsList.filter(friend => friend.id !== friendID))
                 setFriendsList(friendsList.filter(friend => friend.id !== friendID));
                 ctx.setUserInfo(res);
+                handleOpenSnackBar(friendID);
             })
         }
         add();
@@ -127,14 +139,15 @@ const Group = () => {
             }}
         >
             <NMHeader />
+            <Snackbar open={openSnackBar} anchorOrigin={{vertical:'top', horizontal:'center'}} autoHideDuration={5000} onClose={handleCloseSnackBar} message={snackbarMessage} />
             <h1>{groupInfo.groupName}</h1>
 
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap:'wrap'}}>
                 {groupInfo.members.map((member) => (
-                    <Link to={`/user/friend/${member.id}`}>
+                    <Link to={member.id === ctx.userInfo.id ? `/user/${member.id}` : `/user/friend/${member.id}`}>
                         <Avatar
                             style={{ margin: '5px' }}
-                            alt={member.username}
+                            alt={member.username.toUpperCase()}
                             src={`/profileImages/${member.profileID}.jpg`}
                         />
                     </Link>
@@ -213,7 +226,7 @@ const Group = () => {
                                 <AvatarGroup max={2}>
                                     {list.listMembers.map((member) => (
                                         <Avatar
-                                            alt={member.username}
+                                            alt={member.username.toUpperCase()}
                                             src={`/profileImages/${member.profileID}.jpg`}
                                         />
                                     ))}

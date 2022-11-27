@@ -197,7 +197,7 @@ const Home = () => {
             <h2>Groups</h2>
             <Box style={{ margin: 'auto' }}>
                 <List>
-                    {ctx.userInfo.groups.map((group, index) => (
+                    {ctx.userInfo.groups.slice(0,5).map((group, index) => (
                         <ListItem key={index}>
                             <Paper
                                 style={{
@@ -227,7 +227,7 @@ const Home = () => {
                                 <AvatarGroup max={2}>
                                     {group.members.map((member) => (
                                         <Avatar
-                                            alt={member.username}
+                                            alt={member.username.toUpperCase()}
                                             src={`/profileImages/${member.profileID}.jpg`}
                                         />
                                     ))}
