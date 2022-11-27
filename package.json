@@ -6,7 +6,7 @@
     "scripts": {
         "frontend": "cd frontend && npm start",
         "api": "nodemon ./api/index.js",
-        "dev": "concurrently \"npm run frontend\" \"npm run api\""
+        "dev": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"npm run api\""
     },
     "keywords": [],
     "author": "",
