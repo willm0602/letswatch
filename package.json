@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "frontend": "cd frontend && npm start",
+        "frontend": "cd frontend && npm install && npm start",
         "api": "nodemon ./api/index.js",
         "dev": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"npm run api\"",
         "start": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"node ./build/api/index.js\""
