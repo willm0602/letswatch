@@ -162,7 +162,7 @@ async function guessListMade(listName, groupID) {
 async function getListsForGroup(groupID) {
     const sql = `SELECT * FROM watch_lists WHERE group_id=? ORDER BY id`
     return new Promise((res, rej) => {
-        conn.query(
+        const query = conn.query(
             {
                 sql,
                 values: [groupID],
@@ -181,6 +181,7 @@ async function getListsForGroup(groupID) {
                             return {
                                 username: member.Username,
                                 profileID: member.ProfileImageID,
+                                id: member.id
                             }
                         }),
                         media,
@@ -195,14 +196,14 @@ async function getListsForGroup(groupID) {
 
 // gets all the users that are in a watchlist
 async function getUsersForList(listID) {
-    const sql = `SELECT Username, ProfileImageID FROM watch_lists
+    const sql = `SELECT Username, ProfileImageID, user_id as id FROM watch_lists
 	                LEFT JOIN user_list_memberships 
 		                ON watch_lists.id=user_list_memberships.list_id
 	                RIGHT JOIN users
 		                ON users.id=user_list_memberships.user_id
 	            WHERE list_id=?;`
     return new Promise((res, rej) => {
-        conn.query(
+        const query = conn.query(
             {
                 sql,
                 values: [listID],
