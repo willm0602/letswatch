@@ -99,10 +99,8 @@ async function login(ctx, next) {
     const queryParams = ctx.request.query
     const username = queryParams.username
     const password = queryParams.password
-    console.log(username, password, '\n\n')
 
     const accessToken = await getAccessToken(username, password)
-    console.log(`accessToken is`, accessToken)
     return new Promise((res, rej) => {
         if (accessToken !== undefined) {
             ctx.body = apiResponse(true, accessToken)
@@ -164,7 +162,6 @@ async function getAccessToken(username, password) {
                 values: [username, password],
             },
             (err, tuples) => {
-                console.log('got access tokens from database', tuples, err)
                 if (err) return rej(undefined)
                 if (tuples.length === 0) return res(undefined)
                 return res(tuples[0].Access_Token)
@@ -273,7 +270,6 @@ async function allInfo(ctx) {
                 values: [accessToken],
             },
             async (err, tuples) => {
-                console.log(query.sql)
                 if (err || !tuples) {
                     ctx.body = apiResponse(
                         false,
@@ -296,7 +292,6 @@ async function allInfo(ctx) {
                     groups.push(group)
                 }
 
-                console.log('groups is', groups)
 
                 let userInfo = await {
                     id: userData.id,
@@ -308,7 +303,6 @@ async function allInfo(ctx) {
                     groups,
                 }
                 ctx.body = userInfo
-                console.log('sending info for user')
 
                 return res(userInfo)
             }
@@ -316,6 +310,19 @@ async function allInfo(ctx) {
     })
 }
 
+
+/**
+ * API Call to send a friend request to a user
+ * This will default to accepted = 0 since it shouldn't be accepted by default
+ * 
+ * Parameters (passeed through query parameters)
+ * -------------
+ * accessToken: str
+ *      access token for the user requesting to add another user as a friend
+ * 
+ * potentialFriendUsername: str
+ *      username of user that the friend request is being sent to     
+ */ 
 async function addFriend(ctx) {
     const { accessToken, potentialFriendUsername } = ctx.request.query
     const requestUserID = await getIDFromAccessToken(accessToken)
@@ -331,9 +338,6 @@ async function addFriend(ctx) {
                 )`
 
     return new Promise((res, rej) => {
-        console.log(`requester id: ${requestUserID}`);
-        console.log(`receiver id: ${userID}`);
-        console.log(`accessToken is ${accessToken}`);
         if (userID === undefined) {
             ctx.body = apiResponse(false, `no user with username ${potentialFriendUsername} exists`);
             return rej(ctx.body);
@@ -358,6 +362,11 @@ async function addFriend(ctx) {
     })
 }
 
+/**
+ * Utility function to get all users
+ * 
+ * Returns all information from the users table of the database
+*/
 async function getAllUsers() {
     const sql = `SELECT * FROM users;`
 
@@ -374,6 +383,16 @@ async function getAllUsers() {
     })
 }
 
+
+/**
+ * API call to get all the friends that a user has
+ * 
+ * Parameters (passed through query parameters)
+ * ------------
+ * accessToken: str
+ *      access token of user requesting to get all of their friends
+ * 
+ */  
 async function allFriends(ctx) {
     const { accessToken } = ctx.request.query
     const requesterID = await getIDFromAccessToken(accessToken)
@@ -397,8 +416,20 @@ async function allFriends(ctx) {
     })
 }
 
+
+/**
+ * Utility function to see if two users are friends
+ * NOTE: the order doesn't matter here
+ * 
+ * Parameters
+ * ----------
+ * firstUserID: int
+ *      id of one of the users that we are seeing is friends with the other
+ * secondUserID: int
+ *      id of the other user that we are checking if is friends with the first
+ * 
+ */ 
 async function checkAreFriends(firstUserID, secondUserID) {
-    console.log(firstUserID, secondUserID);
     const sql = `SELECT * FROM friendships WHERE (
                     (first_user_id=? AND second_user_id=?) OR
                     (first_user_id=? AND second_user_id=?)
@@ -418,6 +449,19 @@ async function checkAreFriends(firstUserID, secondUserID) {
     })
 }
 
+
+/**
+ * API call for a user to add their friend to a group
+ * 
+ * Parameters (passed through query parameters)
+ * -----------------------------------------------
+ * accessToken: str
+ *      access token for the user adding their friend to a group
+ * groupID: int
+ *      id of the group that the user is trying to add their friend to
+ * friendID: int
+ *      id of the friend that is being added to the group
+*/ 
 async function addFriendToGroup(ctx) {
     const { accessToken, groupID, friendID } = ctx.request.query
     const requesterID = await getIDFromAccessToken(accessToken)
@@ -449,7 +493,6 @@ async function addFriendToGroup(ctx) {
             sql,
             values: [friendID, groupID]
         }, (err, rows) => {
-            console.log(err, rows);
             if (err) {
                 ctx.body = apiResponse(false, err);
                 return rej(err);
@@ -460,12 +503,22 @@ async function addFriendToGroup(ctx) {
     })
 }
 
+
+/**
+ * API call to let a user confirm a friend request
+ * 
+ * Parameters (passed through query parameters)
+ * -------------------------------------------
+ * accessToken: string
+ *      access token for the user making the request
+ * requesterID: int
+ *      the id of the user that sent the friend request that the user is accepting
+ */ 
 async function confirmFriendRequest(ctx) {
     const sql = `UPDATE friendships SET accepted=1 WHERE first_user_id=? AND second_user_id=?`;
     const { accessToken, requesterID } = ctx.request.query;
     return new Promise(async (res, rej) => {
         const receiverID = await getIDFromAccessToken(accessToken);
-        console.log(requesterID, receiverID, accessToken);
         if (!(requesterID && receiverID)) {
             ctx.body = apiResponse(false, 'missing args');
             return rej(ctx.body);
@@ -485,6 +538,15 @@ async function confirmFriendRequest(ctx) {
     })
 }
 
+
+/**
+ * API call to get all pending friend requests that a user has
+ * 
+ * Parameters (passed through query parameters)
+ * ---------------------------------------------
+ * accessToken: string
+ *      the access token of the user requesting all their friend requests
+*/   
 async function getAllFriendRequests(ctx) {
     const { accessToken } = ctx.request.query;
     const sql = `SELECT first_user_id as id, Username, ProfileImageID, Bio, Date_joined FROM friendships 
@@ -507,6 +569,19 @@ async function getAllFriendRequests(ctx) {
     })
 }
 
+
+
+/**
+ * API Call that lets a user deny a friend request from another user
+ * 
+ * Parameters (passed through query)
+ * ------------------------------------
+ * deniedUserUsername: string
+ *      the username of the user whose friend request is being denied
+ * 
+ * accessToken: string
+ *      the access token of the user denying the friend request
+ */   
 async function denyFriendRequest(ctx) {
     const { deniedUserUsername, accessToken } = ctx.request.query;
     const deniedUserID = await getIDFromUsername(deniedUserUsername);
@@ -534,6 +609,17 @@ async function denyFriendRequest(ctx) {
     })
 }
 
+/**
+ * API call to get all the information of a friend
+ * 
+ * Parameters (passed through query parameters)
+ * --------------------------------------------
+ * accessToken: string
+ *      the access token of the user requesting information for their friend
+ * 
+ * friendID: int
+ *      the id of the friend that the user is requesting information for 
+*/
 async function getFriendInfo(ctx) {
     const {accessToken, friendID} = ctx.request.query;
     const requesterID = await getIDFromAccessToken(accessToken);

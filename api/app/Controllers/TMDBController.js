@@ -2,6 +2,8 @@ const axios = require('axios')
 
 const TMDBAPIToken = process.env.tmdb
 
+// Utility function to make some stuff easier for frontend development so we can make any calls from the frontend
+// NOTE: highly insecure, once we're done adding features we should remove this and replace it with individual queries
 async function queryTMDBFromLW(ctx) {
     const baseURL = `https://api.themoviedb.org/3/`
     var queryParams = ctx.request.query
@@ -10,7 +12,6 @@ async function queryTMDBFromLW(ctx) {
         ctx.body = 'no url provided'
     }
     const url = baseURL + path + '?' + `&api_key=${TMDBAPIToken}`
-    console.log(`url is`, url)
 
     return new Promise((res, rej) => {
         axios

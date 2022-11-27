@@ -33,7 +33,6 @@ async function createSinglePersonGroup(userID) {
                 values: [groupName],
             },
             async (err, tuples) => {
-                console.log(query.sql)
                 if (err) return rej(err)
                 await createListForSingleUser(
                     userID,
@@ -276,7 +275,6 @@ async function ajaxAddUserToGroup(ctx) {
                 groupID,
                 userID
             )
-            console.log(`userAlreadyInGroup is`, userAlreadyInGroup)
             if (userAlreadyInGroup) {
                 const errorMessage = apiResponse(
                     false,
@@ -297,7 +295,6 @@ async function ajaxAddUserToGroup(ctx) {
                     return rej(err)
                 })
         }
-        console.log(requestingUserInGroup, 'requesting user in group')
         const errorMessage = apiResponse(
             false,
             `Error: Requesting User Does Not Belong to Group`
