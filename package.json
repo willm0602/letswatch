@@ -6,7 +6,8 @@
     "scripts": {
         "frontend": "cd frontend && npm start",
         "api": "nodemon ./api/index.js",
-        "dev": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"npm run api\""
+        "dev": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"npm run api\"",
+        "start": "concurrently --names \"FRONTEND, API\" \"npm run frontend\" \"node ./build/api/index.js\""
     },
     "keywords": [],
     "author": "",
