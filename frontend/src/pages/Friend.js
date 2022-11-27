@@ -5,8 +5,13 @@ import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, D
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
+import { useParams } from 'react-router-dom'
+import { getFriendInfo } from '../APIInterface/Friendships'
 
 const User = () => {
+    let {userID} = useParams();
+    const [friendInfo, setFriendInfo] = useState(null);
+    const [friendLists, setFriendLists] = useState(null);
     const [userInfo,setUserInfo] = useState(null)
     const [open, setOpen] = useState(false);
     const handleClick = () => setOpen(!open);
@@ -20,89 +25,38 @@ const User = () => {
                 res.groups.map(groups =>  groups.lists.map(list => holdList=([...holdList, list])))
                 setUserLists(holdList.slice(0,5));
             });
+            await getFriendInfo(userID).then(res => {
+                console.log(res);
+                setFriendInfo(res);
+
+                let holdList=[];
+                res.groups.map(groups =>  groups.lists.map(list => holdList=([...holdList, list])))
+                setFriendLists(holdList.slice(0,5));
+            });
         }
         setup()
     },[])
 
     return ( 
-        userInfo ?
+        friendInfo ?
         <>
-            <div
-                style = 
-                {{
-                    paddingBottom: '80px',
-                }}
-            >    
+            <div style = {{paddingBottom: '80px',}}>    
                 <NMHeader />
-                <Stack
-                    direction = "row"
-                    justifyContent= "flex-end"
-                    alignItems= "flex-start"
-                    spacing = {1.5}
-                    style={{padding:'15px'}}
-                >
-                    <Button
-                        variant = "contained"
-                        onClick={handleClick}
-                        sx={{ backgroundColor: '#6C63FF' }}
-                    >
-                        Edit
-                    </Button>
-                    <Dialog
-                        open = {open}
-                        fullWidth = 'false'
-                    >
-                        <DialogTitle>
-                            Change Bio
-                        </DialogTitle>
-                        <DialogContent>
-                            <TextField
-                                margin = 'dense'
-                                multiline
-                                fullWidth
-                                maxRows = {3}
-                                variant='standard'
-                            />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button
-                                onClick={handleClick}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                disabled
-                            >
-                                Submit
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                    <Button
-                        onClick={(e) => {
-                            deleteAccessToken()
-                            window.location = '/'
-                        }}
-                        variant = "contained"
-                        sx={{ backgroundColor: 'red' }}
-                    >
-                        Logout
-                    </Button>
-                </Stack>
                 <div style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div style={{ textAlign: 'center' }}>
-                        {userInfo.profileID !== null ? 
+                        {friendInfo.ProfileImageID !== null ? 
                         <img
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
-                            src={`/profileImages/${userInfo.profileID}.jpg`}
+                            src={`/profileImages/${friendInfo.ProfileImageID}.jpg`}
                         />
                         :
-                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${friendInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
                         }
-                        <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
+                        <p>Date Joined: {friendInfo.Date_joined.split('T')[0]}</p>
                     </div>
 
                     <div style={{ width: '100%', margin: '1% 5%', maxWidth: '227px' }}>
-                        <h2>{userInfo.username}</h2>
+                        <h2>{friendInfo.username}</h2>
                         <div
                             style={{
                                 backgroundColor: 'rgb(217, 217, 217, 0.25)',
@@ -117,7 +71,7 @@ const User = () => {
                                     fontSize: 'large',
                                     fontFamily: 'sans-serif',
                                 }}
-                            >{userInfo.bio}</p>
+                            >{friendInfo.bio}</p>
                         </div>
                     </div>
                 </div>
@@ -126,12 +80,12 @@ const User = () => {
                     <h1 style={{textAlign:'center' }}>Lists</h1>
                     <Box style = {{ margin: 'auto', padding}}>
                         <List>
-                            {userLists.length === 0 ? (
+                            {friendLists.length === 0 ? (
                                 <p style={{ textAlign: 'center'}}> No lists yet</p>
                             ) : (
                                 <Box style={{ margin: 'auto'}}>
                                     <List>
-                                        {userLists.map((list,index) => 
+                                        {friendLists.map((list,index) => 
                                             <ListItem key={index}>
                                                 <Paper
                                                     style={{
@@ -182,7 +136,7 @@ const User = () => {
                     </h1>
                     <Box style={{ margin: 'auto'}}>
                         <List>
-                            {userInfo.groups.map((group, index) => (
+                            {friendInfo.groups.map((group, index) => (
                                 <ListItem key={index}>
                                     <Paper
                                         style={{

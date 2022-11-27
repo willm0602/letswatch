@@ -44,6 +44,7 @@ import Snackbar from '@mui/material/Snackbar';
 
 const Home = () => {   
     const ctx = useContext(UserContext)
+    console.log(ctx)
     const [userFriends, setUserFriends] = useState(null);
     const [currentFriendUsername, setCurrentFriendUesrname] = useState(null);
     const [friendRequests, setFriendRequets] = useState(null); 
@@ -254,7 +255,7 @@ const Home = () => {
             {userFriends && userFriends.length > 0 ?
                 <div className='frame' style={{display:'flex', justifyContent:'start', padding:'15px', overflow:'scroll', marginBottom:'25px', marginRight:'10px', marginLeft:'10px'}}>
                         {userFriends.map((friend, friendIndex) => 
-                            <Link key={friendIndex} to={`/user/${friend.id}`} style={{textDecoration:'none'}}>
+                            <Link key={friendIndex} to={`/user/friend/${friend.id}`} style={{textDecoration:'none'}}>
                                 <div style={{display:'flex', flexDirection:'column'}}>
                                     {friend.profileImageID !== null ? 
                                         <img style={{maxWidth:'80px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/> 
