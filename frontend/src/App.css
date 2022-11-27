@@ -1,9 +1,14 @@
-/* .MuiSnackbarContent-root {
-    background-color:darkgray !important;
-} */
-
 a{
     text-decoration: none;
+}
+
+.footerPadding{
+    padding-bottom: 0;
+}
+
+.singleMediaHeader{
+    font-size: 16px;
+    margin:0;
 }
 
 .MuiOutlinedInput-notchedOutline {

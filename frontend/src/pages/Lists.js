@@ -9,11 +9,19 @@ import SearchIcon from '@mui/icons-material/Search'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { Grid } from '@mui/material'
 import ProfileImage from './components/ProfileImage'
+import { Link } from 'react-router-dom'
 
 const Watchlist = ({ watchlistData }) => {
     console.log(watchlistData)
     return (
-        <a
+        <Link
+            state={{
+                list: watchlistData,
+                groupName: watchlistData.groupName,
+                groupID: watchlistData.groupID,
+                groupIdx: watchlistData.groupIdx,
+                listIdx: watchlistData.listIdx,
+            }}
             style={{
                 width: '120px',
                 height: '80px',
@@ -25,7 +33,7 @@ const Watchlist = ({ watchlistData }) => {
                 marginBottom: 25,
                 position: 'relative',
             }}
-            href={`/list/${watchlistData.listID}`}
+            to={`/list/${watchlistData.listID}`}
         >
             <h2
                 style={{
@@ -68,6 +76,7 @@ const Watchlist = ({ watchlistData }) => {
                         return (
                             <ProfileImage
                                 profileID={member.profileID}
+                                username={member.username}
                                 otherStyles={{
                                     position: 'absolute',
                                     alignSelf: 'center',
@@ -79,7 +88,7 @@ const Watchlist = ({ watchlistData }) => {
                     })}
                 </div>
             </div>
-        </a>
+        </Link>
     )
 }
 
@@ -91,9 +100,17 @@ const Lists = () => {
         userMetadata().then((data) => {
             const groups = data.groups
             let newListOfLists = []
-            for (const group of groups) {
-                for (const list of group.lists) {
-                    newListOfLists.push({ ...list, groupName: group.groupName })
+            for (const group in groups) {
+                for (const list in groups[group].lists) {
+                    newListOfLists.push(
+                        { 
+                            ...groups[group].lists[list],
+                            groupName: groups[group].groupName, 
+                            groupID: groups[group].groupID, 
+                            groupIdx:group, 
+                            listIdx:list 
+                        }
+                    )
                 }
             }
             setWatchlists(newListOfLists)
@@ -149,6 +166,9 @@ const Lists = () => {
 
             <Grid
                 container
+                style={{
+                    paddingBottom:'80px'
+                }}
                 sx={{
                     columnCount: 3,
                     marginTop: '4vh',
