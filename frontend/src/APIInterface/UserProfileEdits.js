@@ -1,8 +1,19 @@
-export async function updateBio(bio,id){
-    await post( `/edit/bio`, 
+import { post } from './Utils'
+
+export async function changeBio(id, newBio){
+    return await post( `/edit/bio`, 
         {
             userID: id,
-            bio: bio
+            bio: newBio
+        }
+    )
+}
+
+export async function changeImage(id, image){
+    return await post(`/edit/image`,
+        {
+            userID: id,
+            newImage: image
         }
     )
 }
