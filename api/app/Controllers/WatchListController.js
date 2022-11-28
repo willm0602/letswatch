@@ -114,6 +114,7 @@ async function userInList(userID, listID) {
 async function createList(ctx) {
     const queryParams = ctx.request.query
     const { groupID, listName, accessToken } = queryParams
+    console.log(queryParams);
 
     const userInGroup = await userIsInGroup(accessToken, groupID)
 
