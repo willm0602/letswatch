@@ -12,7 +12,6 @@ const Login = () => {
     const [usernameError, setUsernameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [cPasswordError, setCPasswordError] = useState(false);
-    const navigate = useNavigate(); // For when Will add's something to be returned when finished, will route it to home page
 
     const handleSubmit = (e) => {
         e.preventDefault();

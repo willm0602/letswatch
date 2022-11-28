@@ -1,16 +1,57 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState} from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
-import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress } from '@mui/material'
+import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog,
+    DialogActions, DialogContent, DialogTitle, TextField, CircularProgress, FormControl, Grid } from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
+import { changeBio } from '../APIInterface/UserProfileEdits'
+
 
 const User = () => {
-    const [userInfo,setUserInfo] = useState(null)
-    const [open, setOpen] = useState(false);
-    const handleClick = () => setOpen(!open);
-    const [userLists, setUserLists] = useState([])
+    const [bio, setBio] = useState('');
+    const [modolHelperText, setModolHelperText] = useState(`Character Length: 0/100`);
+    const [modolSubmit, setModolSubmit] = useState(true);
+    const [userInfo,setUserInfo] = useState(null);
+    const [modolOpen, setModolOpen] = useState(false);
+    const [userLists, setUserLists] = useState([]);
+    const [imageModolOpen, setImageModolOpen] = useState(false);
+    const imageArray = [...Array(20).keys()]
+
+    const handleClick = (event) => {
+        setImageModolOpen(!imageModolOpen);
+    }
+
+    const handleModolClick = () => {
+        setModolOpen(!modolOpen);
+        setBio('');
+        setModolHelperText(`Character Length: 0/100`);
+    };
+    
+    const handleBio = (ev) => {
+        setModolHelperText(`Character Length: ${ev.length}/100`)
+        if ((ev).length <= 100) 
+        {
+            if(!modolSubmit){
+                setModolSubmit(!modolSubmit);
+            }
+            setBio(ev);
+        } else if ((ev).length > 100) {
+            setModolSubmit(false);
+        }
+    }
+
+    const submitBio = () => {
+        setBio(bio.replaceAll("'", "''"));
+        const submitBioRequest = async() => {
+            await changeBio(userInfo.id, bio)
+                .catch(err => console.log(err))
+                .then(res => console.log(res))
+        }
+        submitBioRequest();
+        handleModolClick();
+    }
 
     useEffect(()=>{
         const setup = async() =>{
@@ -43,38 +84,53 @@ const User = () => {
                 >
                     <Button
                         variant = "contained"
-                        onClick={handleClick}
+                        onClick={handleModolClick}
                         sx={{ backgroundColor: '#6C63FF' }}
                     >
                         Edit
                     </Button>
                     <Dialog
-                        open = {open}
+                        open = {modolOpen}
                         fullWidth = 'false'
                     >
                         <DialogTitle>
                             Change Bio
                         </DialogTitle>
                         <DialogContent>
-                            <TextField
-                                margin = 'dense'
-                                multiline
+                            <FormControl 
                                 fullWidth
-                                maxRows = {3}
-                                variant='standard'
-                            />
+                            >
+                                <TextField
+                                    color='secondary'
+                                    margin = 'dense'
+                                    variant='standard'
+                                    multiline
+                                    maxRows = {3}
+                                    onChange = {(e) => {handleBio(e.target.value)}}
+                                    helperText = {modolHelperText}
+                                />
+
+                            </FormControl>
                         </DialogContent>
                         <DialogActions>
                             <Button
-                                onClick={handleClick}
+                                onClick={handleModolClick}
                             >
                                 Cancel
                             </Button>
+                            {modolSubmit && 
+                            <Button
+                                type = 'submit'
+                                onClick={submitBio} 
+                            >
+                                Submit
+                            </Button>}
+                            {!modolSubmit && 
                             <Button
                                 disabled
                             >
                                 Submit
-                            </Button>
+                            </Button>}
                         </DialogActions>
                     </Dialog>
                     <Button
@@ -95,6 +151,7 @@ const User = () => {
                         <img
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
                             src={`/profileImages/${userInfo.profileID}.jpg`}
+                            onClick = {(event) => handleClick(event)}
                         />
                         <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
                     </div>
@@ -119,6 +176,63 @@ const User = () => {
                         </div>
                     </div>
                 </div>
+                <Dialog
+                    open = {imageModolOpen}
+                    fullWidth = 'false'
+                >
+                    <DialogTitle>
+                        Change Profile Image
+                    </DialogTitle>
+                    <DialogContent>
+                        <Grid
+                            container
+                            direction = "column"
+                            justifyContent="center"
+                            alignItems = "center"
+                        >
+
+                            <h4>Current Profile Image</h4>
+                            <img
+                                style={{ maxWidth: '100px', borderRadius: '50%'}}
+                                src={`/profileImages/${userInfo.profileID}.jpg`}
+                            />
+                        </Grid>
+                        <Grid
+                            //sx = {{overflowY: "scroll"}}
+                            container
+                            direction = "row"
+                        >
+                            <Grid
+                                container
+                                direction = "row"
+                                aliigItems = "center"
+                                justifyContent = "center"
+                            >
+                                {imageArray.map((index) => (
+                                    <Grid
+                                    >
+                                        <img
+                                            style = {{maxWidth: '100px', borderRadius: '50%'}}
+                                            src={`/profileImages/${index}.jpg`}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={handleClick}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            disabled
+                        >
+                            Submit
+                        </Button>
+                    </DialogActions>
+                </Dialog>
                 <hr />
                 <div
                     style={{

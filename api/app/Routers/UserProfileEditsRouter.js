@@ -7,5 +7,6 @@ const UserProfileEditsRouter = KoaRouter({
 })
 
 UserProfileEditsRouter.post('/bio', UserProfileEditsController.changeBio)
+UserProfileEditsRouter.post('/image', UserProfileEditsController.changeImage)
 
 module.exports = UserProfileEditsRouter
