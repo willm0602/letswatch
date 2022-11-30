@@ -3,6 +3,7 @@ const GroupRouter = require('./GroupRouter')
 const MediaRouter = require('./MediaRouter')
 const TMDBRouter = require('./TMDBRouter')
 const WatchListRouter = require('./WatchListRouter')
+const UserProfileEditsRouter = require('./UserProfileEditsRouter');
 
 module.exports = [
     AccountRouter,
@@ -10,4 +11,5 @@ module.exports = [
     MediaRouter,
     TMDBRouter,
     WatchListRouter,
+    UserProfileEditsRouter
 ]
