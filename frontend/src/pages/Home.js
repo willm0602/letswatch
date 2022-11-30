@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { getFriends, sendFriendRequest, getAllFriendRequests, acceptFriendRequest, denyFriendRequest } from '../APIInterface/Friendships';
-import { Modal } from '@mui/material'
+import { Autocomplete, Modal } from '@mui/material'
 import Snackbar from '@mui/material/Snackbar';
 
 /*
@@ -40,7 +40,7 @@ import Snackbar from '@mui/material/Snackbar';
         [x] add snackbar for feedback
         [x] add follow through to single media page from extended search on list page
         [x] friend profiles
-        [] fix single media top space to look more consistent
+        [x] fix single media top space to look more consistent
 */
 
 const Home = () => {   
