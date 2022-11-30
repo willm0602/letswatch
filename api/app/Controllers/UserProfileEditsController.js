@@ -28,8 +28,13 @@ async function changeBio(ctx) {
                 values: [bio,userID],
             },
             async (err, tuples) => {
-                if (err) return rej('Unable to update bio. Sadge :(')
-                return res('Updated bio')
+                if (err) 
+                {
+                    ctx.body = apiResponse(false, 'unable to update bio')
+                    return rej(ctx.body);
+                }
+                ctx.body = apiResponse(true, 'updated bio');
+                return res(ctx.body);
             }
         )
     })
@@ -46,8 +51,12 @@ async function changeImage(ctx) {
                 values: [image, userID],
             },
             async (err, tuples) => {
-                if (err) return rej('Unable to update profile image')
-                return res('Updated profile image')
+                if (err){
+                    ctx.body = apiResponse(false, 'unable to update profile image')
+                    return rej(ctx.body);
+                } 
+                ctx.body = apiResponse(true, 'updated profile image');
+                return res(ctx.body);
             }
         )
     })
