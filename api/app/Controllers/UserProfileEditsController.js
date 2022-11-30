@@ -20,7 +20,7 @@ const AccountController = require('./AccountController');
 async function changeBio(ctx) {
     const queryParams = ctx.request.query;
     const {userID, bio} = queryParams;
-    const updateQuery = `UPDATE Users SET Bio = ? WHERE id=?;`;
+    const updateQuery = `UPDATE Users SET Bio = ? WHERE id = ?;`;
     return new Promise(async (res,rej) => {
         conn.query(
             {

@@ -1,8 +1,9 @@
 import { useEffect, useState} from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
-import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog,
-    DialogActions, DialogContent, DialogTitle, TextField, CircularProgress, FormControl, Grid, Divider } from '@mui/material'
+import { Link } from 'react-router-dom'
+import { Box, List, ListItem, Paper, AvatarGroup, Avatar, Button, Stack, Dialog,
+    DialogActions, DialogContent, DialogTitle, TextField, CircularProgress, FormControl, Grid,} from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
@@ -49,8 +50,18 @@ const User = () => {
                 .catch(err => console.log(err))
                 .then(res => console.log(res))
         }
-        submitBioRequest();
+        if (submitBioRequest())
+        {
+            userInfo.bio = bio;
+        } else {
+            alert("Hmm, looks like the bio could't be changed. \nPlease try again");
+        }
         handleModolClick();
+    }
+
+    const handleImageChoiceClick = (iSrc) => {
+        console.log(iSrc)
+
     }
 
     useEffect(()=>{
@@ -87,7 +98,7 @@ const User = () => {
                         onClick={handleModolClick}
                         sx={{ backgroundColor: '#6C63FF' }}
                     >
-                        Edit
+                        Edit Bio
                     </Button>
                     <Dialog
                         open = {modolOpen}
@@ -150,10 +161,18 @@ const User = () => {
                         <img
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
                             src={`/profileImages/${userInfo.profileID}.jpg`}
+                            alt={`${userInfo.profileID}.jpg`}
                             onClick = {(event) => handleClick(event)}
                         />
                         :
-                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                        <img 
+                            style={{
+                                maxWidth:'100px', 
+                                borderRadius:'50%'
+                            }} 
+                            src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}
+                            alt={`basicAvatar.jpg`}
+                            />
                         }
                         <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
                     </div>
@@ -183,7 +202,24 @@ const User = () => {
                     fullWidth = 'false'
                 >
                     <DialogTitle>
-                        Change Profile Image
+                        <Grid
+                            container
+                            direction = "column"
+                            justifyContent="center"
+                            alignItems = "center"
+                        >
+                            <h4>Current Profile Image</h4>
+                            <img
+                                style={{ 
+                                    maxWidth: '100px', 
+                                    borderRadius: '50%', 
+                                    marginTop: "0px"
+                                }}
+                                src={`/profileImages/${userInfo.profileID}.jpg`}
+                                alt={`${userInfo.profileID}.jpg`}
+                            />
+                            <h4>Profile Image Choices</h4>
+                        </Grid>
                     </DialogTitle>
                     <DialogContent>
                         <Stack
@@ -191,23 +227,6 @@ const User = () => {
                             alignItems = "center"
                             spacing = {2}
                         >
-                            <Grid>
-                                <h4>Current Profile Image</h4>
-                            </Grid>
-                            <Grid
-                                container
-                                direction = "column"
-                                justifyContent="center"
-                                alignItems = "center"
-                            >
-                                <img
-                                    style={{ maxWidth: '100px', borderRadius: '50%', marginTop: "0px"}}
-                                    src={`/profileImages/${userInfo.profileID}.jpg`}
-                                />
-                            </Grid>
-                            <Grid>
-                                <h4>Profile Image Choices</h4>
-                            </Grid>
                             <Grid
                                 container
                                 direction = "row"
@@ -225,7 +244,8 @@ const User = () => {
                                         <img
                                             style = {{maxWidth: '100px', borderRadius: '50%'}}
                                             src={`/profileImages/${index}.jpg`}
-                                            onClick = {(event) => console.log(event.target)}
+                                            alt = {`${index}.jpg`}
+                                            onClick = {(event) => handleImageChoiceClick(event.target.src)}
                                         />
                                     </Grid>
                                 ))}
@@ -270,7 +290,12 @@ const User = () => {
                                                 >
                                                     <Link
                                                         to={`/list/${list.listID}`}
-                                                        //Fix This
+                                                        /*
+                                                        state = {{
+                                                            list: list,
+                                                            listIdx: index
+                                                        }}
+                                                        */
                                                         style={{
                                                             margin: 'auto',
                                                             textDecoration: 'none',
