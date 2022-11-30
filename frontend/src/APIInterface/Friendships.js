@@ -37,3 +37,10 @@ export async function denyFriendRequest(username) {
         deniedUserUsername: username
     })
 }
+
+export async function getFriendInfo(friendID) {
+    return get('/account/friend_info', {
+        accessToken: getAccessToken(),
+        friendID
+    });
+}

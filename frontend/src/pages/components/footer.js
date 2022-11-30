@@ -36,6 +36,7 @@ const Footer = () => {
                 >
                     <BottomNavigationAction
                         icon={
+                            userInfo.profileID !== null ? 
                             <img
                                 src={`/profileImages/${userInfo.profileID}.jpg`}
                                 style={{
@@ -45,6 +46,8 @@ const Footer = () => {
                                     border: '1px solid black',
                                 }}
                             />
+                            :
+                            <img style={{maxWidth:'30px', borderRadius:'50%', color:'white', border:'1px solid black'}} src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
                         }
                     />
                 </Link>

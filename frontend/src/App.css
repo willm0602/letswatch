@@ -1,3 +1,16 @@
+a{
+    text-decoration: none;
+}
+
+.footerPadding{
+    padding-bottom: 0;
+}
+
+.singleMediaHeader{
+    font-size: 16px;
+    margin:0;
+}
+
 .MuiOutlinedInput-notchedOutline {
     border: none !important;
     /* Removes borders from autocomplete fields */

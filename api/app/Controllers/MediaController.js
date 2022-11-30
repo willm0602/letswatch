@@ -45,7 +45,6 @@ async function mediaSearch(ctx) {
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbAPIToken}&language=en-US&page=1&include_adult=false&query=${query
         .split(' ')
         .join('+')}`
-    console.log(`url is`, url)
     return new Promise(async (res, rej) => {
         const resp = await axios.get(url)
         const tmdbData = resp.data.results.map((media) => {
@@ -131,6 +130,18 @@ async function getTrailerPath(media) {
         })
 }
 
+
+/**
+ * Gets the information of a media object given its ID in our database
+ * 
+ * NOTE: the id of the media object in our database is different than the id in the
+ * TMDB API database
+ * 
+ * Parameters
+ * -----------
+ * id: int
+ *      id of the media object we are returning information for
+*/
 async function getMediaByID(id) {
     const query = `SELECT * FROM media WHERE id=?;`
 
@@ -150,6 +161,17 @@ async function getMediaByID(id) {
     })
 }
 
+/**
+ * checks if we have a media object in the Let's Watch Database given a TMDB ID and a media
+ * type (movie or show)
+ * 
+ * Parameters
+ * ---------------
+ * mediaID: int
+ *      id of the media as it exists in the TMDB API (NOT Let's Watch database)
+ * mediaType: string
+ *      the type that the media is (either tv or movie)
+*/ 
 async function existsInDatabase(mediaID, mediaType) {
     const query = `SELECT * 
                     FROM media 
@@ -170,6 +192,15 @@ async function existsInDatabase(mediaID, mediaType) {
     })
 }
 
+/**
+ * Saves a media object to our database 
+ * 
+ * Parameters
+ * ------------
+ * media: object
+ *      JSON object containing all the information from TMDB that we want to save to our database
+ * 
+*/ 
 async function saveMediaToDB(media) {
     const alreadyExists = await existsInDatabase(media.tmdbID, media.type)
 
@@ -221,12 +252,17 @@ async function saveMediaToDB(media) {
     })
 }
 
+// Utility function to get the path of a media object given its poster location
 function getPosterPath(path) {
     return path ? `https://image.tmdb.org/t/p/original${path}` : undefined
 }
 
+
+/**
+ * API Call to get all media from OUR database (not all from TMDB)
+ * 
+*/ 
 async function allMedia(ctx) {
-    console.log(`allMedia called`)
     const sql = `SELECT * FROM Media;`
     return new Promise((res, rej) => {
         conn.query(
@@ -247,6 +283,18 @@ async function allMedia(ctx) {
     })
 }
 
+/**
+ * API call to add a media object to our database given a TMDB ID and a type
+ * NOTE: this will only add it if we don't already have that media object inside 
+ * our database
+ * 
+ * Parameters (passed through query parameters)
+ * ---------------------------------------------
+ * tmdbID: int
+ *      id of the media object as represented in the TMDB API
+ * type: string
+ *      string representing the type that a media is (either tv or movie)
+*/ 
 async function axiosAddMedia(ctx) {
     const queryParams = ctx.request.query
     const { tmdbID, type } = queryParams
@@ -301,6 +349,8 @@ async function axiosAddMedia(ctx) {
     })
 }
 
+
+// Utility function to get information on a tv show given a TMDB id
 async function getTVFromTMDB(id) {
     const url = `https://api.themoviedb.org/3/tv/${id}?api_key=${tmdbAPIToken}`
     return new Promise((res, rej) => {
@@ -315,6 +365,7 @@ async function getTVFromTMDB(id) {
     })
 }
 
+// Utility function to get information on a movie given a TMDB id
 async function getMovieFromTMDB(id) {
     const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${tmdbAPIToken}`
     return new Promise((res, rej) => {

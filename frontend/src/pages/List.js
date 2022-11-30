@@ -16,6 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { Link } from 'react-router-dom'
+import Snackbar from '@mui/material/Snackbar';
 
 //API stuff
 import { mediaSearch } from '../APIInterface/MediaSearch';
@@ -33,6 +34,20 @@ const ListOfMedia = () => {
     const location = useLocation();
     const groupIdx = location.state.groupIdx;
     const listIdx = location.state.listIdx;
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    const handleOpenSnackbarNotMember = () => {
+        setSnackbarMessage("Sorry, you can only make changes to lists if you are a member :/");
+        setOpenSnackBar(true);
+    }
+
+    const handleOpenSnackbarAddMedia = (mediaName, listName) => {
+        setSnackbarMessage(`Successfully added ${mediaName} to ${listName}!`);
+        setOpenSnackBar(true);
+    }
+
+    const handleCloseSnackBar = () => setOpenSnackBar(false)
 
     useEffect(()=>{
         const setup = async() =>{
@@ -45,8 +60,6 @@ const ListOfMedia = () => {
         }
         setup()
     },[])
-
-
 
     //search bar stuff
     const [searchInputValue, setSearchInputValue] = useState('')
@@ -78,7 +91,7 @@ const ListOfMedia = () => {
     const handleMediaNotFound = () => {
         handleOpen()
         const searchMedia = async (search) =>
-            await mediaSearch(search).then((res) => setNewMediaFromSearch(res))
+            await mediaSearch(search).then((res) => {console.log(res);setNewMediaFromSearch(res)})
         searchMedia(searchInputValue)
     }
 
@@ -88,6 +101,9 @@ const ListOfMedia = () => {
             ...mediaToAdd,
             image_url: mediaToAdd.image,
         }
+        //prevent duplicates
+        if (listContent.filter((media) => media.id === mediaToAdd.id).length > 0) return;
+
         setListContent([...listContent, mediaToAdd])
         const newMedia = [
             ...ctx.userInfo.groups[groupIdx].lists[listIdx].media.slice(),
@@ -95,6 +111,7 @@ const ListOfMedia = () => {
         ]
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia
         const createNewListItem = async (mediaID) => {
+
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
                 userMetadata().then((res) => {
@@ -106,6 +123,8 @@ const ListOfMedia = () => {
                         ...res.groups[groupIdx].lists[listIdx].media,
                     ])
                     allMedia().then((res) => ctx.setAutoFillMedia(res))
+                    setNewMediaFromSearch(newMediaFromSearch.filter(media => media.id !== mediaID))
+                    handleOpenSnackbarAddMedia(mediaToAdd.title, ctx.userInfo.groups[groupIdx].lists[listIdx].listName)
                 })
             )
         }
@@ -115,15 +134,17 @@ const ListOfMedia = () => {
 
     const newHandleClick = (mediaID) => {
         //this return needs to be changed
-        if (listContent.filter((media) => media.id === mediaID) > 0) return;
+        if(listInfo.listMembers.filter( member => member.username === ctx.userInfo.username).length === 0){
+            handleOpenSnackbarNotMember();
+            return
+        };
+
+        if (listContent.filter((media) => media.id === mediaID).length > 0) return;
 
         const creatNewListItem = async () => {
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
                 userMetadata().then((res) => {
-                    console.log(res)
-                    console.log(listContent)
-                    console.log(listIdx)
                     ctx.setUserInfo(res)
                     setListContent([
                         ...res.groups[groupIdx].lists[listIdx].media,
@@ -137,9 +158,11 @@ const ListOfMedia = () => {
     }
 
     const handleRemove = (mediaIDtoRemove) => {
-
-        console.log(listContent);
-        console.log(mediaIDtoRemove);
+        
+        if(listInfo.listMembers.filter( member => member.username === ctx.userInfo.username).length === 0){
+            handleOpenSnackbarNotMember();
+            return
+        };
 
         const newMedia = [...ctx.userInfo.groups[groupIdx].lists[listIdx].media.filter(media => media.id !== mediaIDtoRemove)];
         ctx.userInfo.groups[groupIdx].lists[listIdx].media = newMedia;
@@ -168,6 +191,7 @@ const ListOfMedia = () => {
         listInfo ?
         <>
             <NMHeader />
+            <Snackbar open={openSnackBar} anchorOrigin={{vertical:'top', horizontal:'center'}} autoHideDuration={5000} onClose={handleCloseSnackBar} message={snackbarMessage} />
             <div
                 style={{
                     display: 'flex',
@@ -182,14 +206,16 @@ const ListOfMedia = () => {
                 <h2>List members:</h2>
                 <Stack direction="row">
                     {listInfo.listMembers.map((member) => (
-                        <Avatar
-                            style={{
-                                margin: '15px 5px',
-                                border: '1px solid black',
-                            }}
-                            alt={member.username}
-                            src={`/profileImages/${member.profileID}.jpg`}
-                        />
+                        <Link to = {member.id === ctx.userInfo.id ? `/user/${member.id}`:`/user/friend/${member.id}`}>
+                            <Avatar
+                                style={{
+                                    margin: '15px 5px',
+                                    border: '1px solid black',
+                                }}
+                                alt={member.username.toUpperCase()}
+                                src={`/profileImages/${member.profileID}.jpg`}
+                            />
+                        </Link>
                     ))}
                 </Stack>
                 
@@ -378,6 +404,7 @@ const ListOfMedia = () => {
                         {newMediaFromSearch ? (
                             newMediaFromSearch.map(
                                 (newMedia, newMediaIndex) => (
+                                    
                                     <div
                                         style={{
                                             display: 'flex',
@@ -395,10 +422,12 @@ const ListOfMedia = () => {
                                             }}
                                         >
                                             {' '}
+                                            <Link to={`/media/${newMedia.type}/${newMedia.tmdbID}`} onClick={() => handlePageTransition(newMedia)}>
                                             <img
                                                 style={{ maxWidth: '50px' }}
                                                 src={newMedia.image}
                                             />
+                                            </Link>
                                             <p style={{ marginLeft: '15px' }}>
                                                 {newMedia.title}
                                             </p>
@@ -425,7 +454,10 @@ const ListOfMedia = () => {
             </div>
         </>
         :
-        <>uh oh, loading those bad boys up</> //add spinner
+        <div style={{margin:'auto'}}>
+            <CircularProgress style={{color:'#6C63FF', width:'100px', height:'100px', display:'flex', margin:'auto', alignItems:'center', height:'800px'}}/>
+            <Footer/>
+        </div>
     )
 }
 export default ListOfMedia

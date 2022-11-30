@@ -144,15 +144,17 @@ const User = () => {
                         Logout
                     </Button>
                 </Stack>
-                <div
-                    style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
+                <div style={{ margin: '0% 5% 5%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div style={{ textAlign: 'center' }}>
+                        {userInfo.profileID !== null ? 
                         <img
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
                             src={`/profileImages/${userInfo.profileID}.jpg`}
                             onClick = {(event) => handleClick(event)}
                         />
+                        :
+                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${userInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                        }
                         <p>Date Joined: {userInfo.dateJoined.split('T')[0]}</p>
                     </div>
 
@@ -244,18 +246,8 @@ const User = () => {
                     </DialogActions>
                 </Dialog>
                 <hr />
-                <div
-                    style={{
-                        margin: '0 5%',
-                    }}
-                >
-                    <h1
-                        style={{
-                            textAlign:'center' 
-                        }}
-                    >
-                        Lists
-                    </h1>
+                <div style={{margin: '0 5%',}}>
+                    <h1 style={{textAlign:'center' }}>Lists</h1>
                     <Box style = {{ margin: 'auto', padding}}>
                         <List>
                             {userLists.length === 0 ? (
@@ -290,7 +282,7 @@ const User = () => {
                                                     <AvatarGroup max={2}>
                                                         {list.listMembers.map((member) => (
                                                             <Avatar
-                                                                alt={member.username}
+                                                                alt={member.username.toUpperCase()}
                                                                 src={`/profileImages/${member.profileID}.jpg`}
                                                             />
                                                         ))}
@@ -345,7 +337,7 @@ const User = () => {
                                         <AvatarGroup max={2}>
                                             {group.members.map((member) => (
                                                 <Avatar
-                                                    alt={member.username}
+                                                    alt={member.username.toUpperCase()}
                                                     src={`/profileImages/${member.profileID}.jpg`}
                                                 />
                                             ))}

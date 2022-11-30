@@ -101,7 +101,7 @@ const ManyMedia = () => {
                         width: '100%',
                     }}
                 ></div>
-                <h1 style={{ color: 'white', zIndex: '99' }}>Let's Watch</h1>
+                <Link to='/' style={{ color: 'white', zIndex: '99' }}><h1 >Let's Watch</h1></Link>
                 <Autocomplete
                     id="autocomplete"
                     autocomplete="do-not-autofill"

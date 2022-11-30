@@ -18,6 +18,8 @@ import Modal from '@mui/material/Modal'
 import { useContext } from 'react'
 import { UserContext } from '../contextSetup'
 import { TextField } from '@mui/material'
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
 
 //API stuff
 import { makeWatchList } from '../APIInterface/WatchList'
@@ -34,6 +36,16 @@ const Group = () => {
     const handleOpen = () => setOpen(true)
     const [friendsList, setFriendsList] = React.useState(null);
     const [intermediateFriendsList, setIntermediateFriendsList] = React.useState(friendsList);
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
+    const handleCloseSnackBar = () => setOpenSnackBar(false);
+
+    const handleOpenSnackBar = (friendID) => {
+        const friendAdded = friendsList.filter(friend => friend.id === friendID)[0]
+        setSnackbarMessage(`${friendAdded.username} was added to the group!`)
+        setOpenSnackBar(true)
+    }
+    
 
     const [openFriendModal, setOpenFriendModal] = React.useState(false);
     const handleOpenFM = () => {
@@ -87,6 +99,7 @@ const Group = () => {
                 setIntermediateFriendsList(intermediateFriendsList.filter(friend => friend.id !== friendID))
                 setFriendsList(friendsList.filter(friend => friend.id !== friendID));
                 ctx.setUserInfo(res);
+                handleOpenSnackBar(friendID);
             })
         }
         add();
@@ -127,15 +140,18 @@ const Group = () => {
             }}
         >
             <NMHeader />
+            <Snackbar open={openSnackBar} anchorOrigin={{vertical:'top', horizontal:'center'}} autoHideDuration={5000} onClose={handleCloseSnackBar} message={snackbarMessage} />
             <h1>{groupInfo.groupName}</h1>
 
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap:'wrap'}}>
                 {groupInfo.members.map((member) => (
-                    <Avatar
-                        style={{ margin: '5px' }}
-                        alt={member.username}
-                        src={`/profileImages/${member.profileID}.jpg`}
-                    />
+                    <Link to={member.id === ctx.userInfo.id ? `/user/${member.id}` : `/user/friend/${member.id}`}>
+                        <Avatar
+                            style={{ margin: '5px' }}
+                            alt={member.username.toUpperCase()}
+                            src={`/profileImages/${member.profileID}.jpg`}
+                        />
+                    </Link>
                 ))}
             </div>
             
@@ -158,16 +174,25 @@ const Group = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style} style={{maxHeight:'800px', justifyContent:'center'}}>
-                    <h2>Add Friend to Group</h2>
+                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                        <h2>Add Friend to Group</h2>
+                        <CloseIcon onClick={()=>handleCloseFM()} style={{color:'red'}}/>
+                    </div>
+                    
                     <TextField onChange={(e)=>handleFilterFriends(e.target.value)} fullWidth id="filled-basic" placeholder="Search Friend" variant="filled"/>
                     <div style={{display:'flex', flexDirection:'column', overflow:'scroll', padding:'5px'}}>
                         {intermediateFriendsList?.map(friend => 
                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                                <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/>
+                                {friend.profileImageID !== null ? 
+                                    <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/> 
+                                    : 
+                                    <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`https://eu.ui-avatars.com/api/?name=${friend.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                                }
                                 <p>{friend.username}</p>
                                 <AddCircle onClick={()=>addToGroup(friend.id)}/>
                             </div>
                         )}
+                        {intermediateFriendsList?.length <= 0 ? <p>No more friends to add</p> : <></>}
                     </div>
                 </Box>
             </Modal>
@@ -207,7 +232,7 @@ const Group = () => {
                                 <AvatarGroup max={2}>
                                     {list.listMembers.map((member) => (
                                         <Avatar
-                                            alt={member.username}
+                                            alt={member.username.toUpperCase()}
                                             src={`/profileImages/${member.profileID}.jpg`}
                                         />
                                     ))}
