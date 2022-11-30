@@ -2,7 +2,7 @@ import { useEffect, useState} from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
 import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog,
-    DialogActions, DialogContent, DialogTitle, TextField, CircularProgress, FormControl, Grid } from '@mui/material'
+    DialogActions, DialogContent, DialogTitle, TextField, CircularProgress, FormControl, Grid, Divider } from '@mui/material'
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
@@ -184,41 +184,51 @@ const User = () => {
                         Change Profile Image
                     </DialogTitle>
                     <DialogContent>
-                        <Grid
-                            container
+                        <Stack
                             direction = "column"
-                            justifyContent="center"
                             alignItems = "center"
+                            spacing = {2}
                         >
-
-                            <h4>Current Profile Image</h4>
-                            <img
-                                style={{ maxWidth: '100px', borderRadius: '50%'}}
-                                src={`/profileImages/${userInfo.profileID}.jpg`}
-                            />
-                        </Grid>
-                        <Grid
-                            //sx = {{overflowY: "scroll"}}
-                            container
-                            direction = "row"
-                        >
+                            <Grid>
+                                <h4>Current Profile Image</h4>
+                            </Grid>
+                            <Grid
+                                container
+                                direction = "column"
+                                justifyContent="center"
+                                alignItems = "center"
+                            >
+                                <img
+                                    style={{ maxWidth: '100px', borderRadius: '50%', marginTop: "0px"}}
+                                    src={`/profileImages/${userInfo.profileID}.jpg`}
+                                />
+                            </Grid>
+                            <Grid>
+                                <h4>Profile Image Choices</h4>
+                            </Grid>
                             <Grid
                                 container
                                 direction = "row"
-                                aliigItems = "center"
+                                alignItems = "center"
                                 justifyContent = "center"
                             >
                                 {imageArray.map((index) => (
                                     <Grid
+                                        item
+                                        direction = "column"
+                                        alignItems = "center"
+                                        justifyContent = "center"
+                                        sx = {{padding: "8px"}}
                                     >
                                         <img
                                             style = {{maxWidth: '100px', borderRadius: '50%'}}
                                             src={`/profileImages/${index}.jpg`}
+                                            onClick = {(event) => console.log(event.target)}
                                         />
                                     </Grid>
                                 ))}
                             </Grid>
-                        </Grid>
+                        </Stack>
                     </DialogContent>
                     <DialogActions>
                         <Button
@@ -254,7 +264,7 @@ const User = () => {
                                 <Box style={{ margin: 'auto'}}>
                                     <List>
                                         {userLists.map((list,index) => 
-                                            <ListItem key={index}>
+                                            (<ListItem key={index}>
                                                 <Paper
                                                     style={{
                                                         display: 'flex',
@@ -267,7 +277,8 @@ const User = () => {
                                                     elevation={3}
                                                 >
                                                     <Link
-                                                        to={`/group/${list.listID}`}
+                                                        to={`/list/${list.listID}`}
+                                                        //Fix This
                                                         style={{
                                                             margin: 'auto',
                                                             textDecoration: 'none',
@@ -285,7 +296,7 @@ const User = () => {
                                                         ))}
                                                     </AvatarGroup>
                                                 </Paper>
-                                            </ListItem> 
+                                            </ListItem>) 
                                         )}
                                     </List>
                                 </Box>
