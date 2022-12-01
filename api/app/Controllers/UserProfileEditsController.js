@@ -19,13 +19,13 @@ const AccountController = require('./AccountController');
 
 async function changeBio(ctx) {
     const queryParams = ctx.request.query;
-    const {userID, bio} = queryParams;
-    const updateQuery = `UPDATE Users SET Bio = ? WHERE id = ?;`;
+    const {accessToken, bio} = queryParams;
+    const updateQuery = `UPDATE Users SET Bio = ? WHERE access_token = ?;`;
     return new Promise(async (res,rej) => {
         conn.query(
             {
                 sql: updateQuery,
-                values: [bio,userID],
+                values: [bio,accessToken],
             },
             async (err, tuples) => {
                 if (err) 
@@ -42,13 +42,13 @@ async function changeBio(ctx) {
 
 async function changeImage(ctx) {
     const queryParams = ctx.request.query;
-    const {userID, image} = queryParams;
-    const query = `UPDATE Users SET ProfileImageID = ? WHERE id = ?;`
+    const {accessToken, image} = queryParams;
+    const query = `UPDATE Users SET ProfileImageID = ? WHERE access_token = ?;`
     return new Promise((res, rej) => {
         conn.query(
             {
                 sql: query,
-                values: [image, userID],
+                values: [image, accessToken],
             },
             async (err, tuples) => {
                 if (err){

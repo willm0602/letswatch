@@ -1,9 +1,10 @@
+import { getAccessToken } from '../LocalStorageInterface'
 import { post } from './Utils'
 
 export async function changeBio(id, newBio){
     return await post( `/edit/bio`, 
         {
-            userID: id,
+            accessToken: getAccessToken(),
             bio: newBio
         }
     )
@@ -12,7 +13,7 @@ export async function changeBio(id, newBio){
 export async function changeImage(id, image){
     return await post(`/edit/image`,
         {
-            userID: id,
+            accessToken: getAccessToken(),
             newImage: image
         }
     )
