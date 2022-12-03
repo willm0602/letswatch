@@ -49,8 +49,11 @@ async function signup(ctx, next) {
 
     return new Promise(async (res, rej) => {
         const userExists = await usernameTaken(username)
-        if (userExists) return rej('Error: User Already Exists')
-        const execution = conn.query(
+        if (userExists) {
+            ctx.body = apiResponse(false, 'User Already Exists')
+            return rej('Error: User Already Exists')
+        }
+            const execution = conn.query(
             {
                 sql: query,
                 values: [
