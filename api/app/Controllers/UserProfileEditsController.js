@@ -20,7 +20,6 @@ const AccountController = require('./AccountController');
 async function changeBio(ctx) {
     const queryParams = ctx.request.query;
     const {accessToken, bio} = queryParams;
-    console.log(accessToken, bio);
     const updateQuery = `UPDATE Users SET Bio = ? WHERE access_token = ?;`;
     return new Promise(async (res,rej) => {
         conn.query(
