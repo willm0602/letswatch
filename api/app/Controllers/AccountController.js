@@ -23,10 +23,10 @@ Parameters (passed through ctx)
 */
 async function signup(ctx, next) {
     const params = ctx.request.query
-    const defaultProfileImage = undefined
-    const defaultProfileBio = ''
-    const username = params.username
-    const password = params.password
+    const defaultProfileImage = 0;
+    const defaultProfileBio = "";
+    const username = params.username;
+    const password = params.password;
     const joinDate = new Date()
     const accessTokenLen = 32
 
@@ -110,7 +110,7 @@ async function login(ctx, next) {
             return res('Succesfully logged in')
         }
         ctx.body = apiResponse(false, {})
-        return rej('Failed to sign in')
+        return rej(alert('Failed to sign in'))
     })
 }
 

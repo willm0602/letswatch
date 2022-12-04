@@ -2,7 +2,7 @@ import { setAccessToken } from '../LocalStorageInterface'
 import { get, post } from './Utils'
 
 export async function signup(username, password) {
-    await post(
+    return await post(
         '/account/signup',
         {
             username,
@@ -14,13 +14,13 @@ export async function signup(username, password) {
             }
         },
         (rej) => {
-            console.error(rej)
+            return rej;
         }
     )
 }
 
 export async function login(username, password) {
-    await get(
+    return await get(
         '/account/login',
         {
             username,
@@ -33,8 +33,7 @@ export async function login(username, password) {
             }
         },
         (rej) => {
-            //window.alert(rej);
-            console.error(rej)
+            return rej;
         }
     )
 }
