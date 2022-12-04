@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import Footer from './components/footer'
 import NMHeader from './components/nonMediaHeader'
-import { Box, List, ListItem, Paper, Link, AvatarGroup, Avatar, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress } from '@mui/material'
-import { deleteAccessToken } from '../LocalStorageInterface'
+import { Box, List, ListItem, Paper, AvatarGroup, Avatar, CircularProgress } from '@mui/material'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
 import { useParams } from 'react-router-dom'
@@ -13,8 +12,6 @@ const User = () => {
     const [friendInfo, setFriendInfo] = useState(null);
     const [friendLists, setFriendLists] = useState(null);
     const [userInfo,setUserInfo] = useState(null)
-    const [open, setOpen] = useState(false);
-    const handleClick = () => setOpen(!open);
     const [userLists, setUserLists] = useState([])
 
     useEffect(()=>{
@@ -26,11 +23,17 @@ const User = () => {
                 setUserLists(holdList.slice(0,5));
             });
             await getFriendInfo(userID).then(res => {
-                console.log(res);
                 setFriendInfo(res);
-
                 let holdList=[];
-                res.groups.map(groups =>  groups.lists.map(list => holdList=([...holdList, list])))
+                res.groups.map((groups,groupIdx) =>  groups.lists.map(list => holdList=([
+                    ...holdList, 
+                    {
+                        ...list, 
+                        groupName:groups.groupName, 
+                        groupID:groups.groupID, 
+                        groupIdx:groupIdx
+                    }
+                ])))
                 setFriendLists(holdList.slice(0,5));
             });
         }
@@ -46,11 +49,12 @@ const User = () => {
                     <div style={{ textAlign: 'center' }}>
                         {friendInfo.ProfileImageID !== null ? 
                         <img
+                            alt='user profile'
                             style={{ maxWidth: '100px', borderRadius: '50%' }}
                             src={`/profileImages/${friendInfo.ProfileImageID}.jpg`}
                         />
                         :
-                        <img style={{maxWidth:'100px', borderRadius:'50%'}} src={`https://eu.ui-avatars.com/api/?name=${friendInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
+                        <img style={{maxWidth:'100px', borderRadius:'50%'}} alt='user profile holder' src={`https://eu.ui-avatars.com/api/?name=${friendInfo.username}&size=250&length=1&background=bdbdbd&color=fff`}/>
                         }
                         <p>Date Joined: {friendInfo.Date_joined.split('T')[0]}</p>
                     </div>
@@ -83,6 +87,7 @@ const User = () => {
                             {friendLists.length === 0 ? (
                                 <p style={{ textAlign: 'center'}}> No lists yet</p>
                             ) : (
+                                
                                 <Box style={{ margin: 'auto'}}>
                                     <List>
                                         {friendLists.map((list,index) => 
@@ -98,19 +103,11 @@ const User = () => {
                                                     }}
                                                     elevation={3}
                                                 >
-                                                    <Link
-                                                        to={`/group/${list.listID}`}
-                                                        style={{
-                                                            margin: 'auto',
-                                                            textDecoration: 'none',
-                                                            color: 'black',
-                                                        }}
-                                                    >
-                                                        {list.listName}
-                                                    </Link>
+                                                    <p style={{margin:'auto'}}>{list.listName}</p>
                                                     <AvatarGroup max={2}>
-                                                        {list.listMembers.map((member) => (
+                                                        {list.listMembers.map((member, index) => (
                                                             <Avatar
+                                                                key={index}
                                                                 alt={member.username.toUpperCase()}
                                                                 src={`/profileImages/${member.profileID}.jpg`}
                                                             />
@@ -121,7 +118,6 @@ const User = () => {
                                         )}
                                     </List>
                                 </Box>
-
                             )}
                         </List>
                     </Box>
@@ -149,23 +145,11 @@ const User = () => {
                                         }}
                                         elevation={3}
                                     >
-                                        <Link
-                                            to={`/group/${group.groupID}`}
-                                            state={{
-                                                group: group,
-                                                groupIdx: index,
-                                            }}
-                                            style={{
-                                                margin: 'auto',
-                                                textDecoration: 'none',
-                                                color: 'black',
-                                            }}
-                                        >
-                                            {group.groupName}
-                                        </Link>
+                                        <p style={{margin:'auto'}}>{group.groupName}</p>
                                         <AvatarGroup max={2}>
-                                            {group.members.map((member) => (
+                                            {group.members.map((member, index) => (
                                                 <Avatar
+                                                    key={index}
                                                     alt={member.username.toUpperCase()}
                                                     src={`/profileImages/${member.profileID}.jpg`}
                                                 />

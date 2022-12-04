@@ -68,8 +68,8 @@ const ManyMedia = () => {
         const randomNumber = Math.floor(Math.random() * 21)
         setRandomBackground(randomNumber)
         const setup = async() => {
-            await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> {console.log(res); setPopularMovies(res.results)});
-            await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> {console.log(res); setPopularTV(res.results)});
+            await getFromTMDB('/movie/popular?language=en-US&page=1').then((res)=> setPopularMovies(res.results));
+            await getFromTMDB('/tv/popular?language=en-US&page=1').then((res)=> setPopularTV(res.results));
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/trending/all/day?').then((res)=> setTrending(res.results));
             await getFromTMDB('/person/popular?language=en-US&page=1').then((res)=> setPopularActor(res.results));
@@ -119,7 +119,6 @@ const ManyMedia = () => {
                     }}
                     renderOption={(props, options) => (
                         <Button
-                            onClick={() => console.log(options)}
                             style={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
@@ -181,22 +180,22 @@ const ManyMedia = () => {
                     <>
                         <h3>Trending</h3>                        
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                            {trending.map( trendingMedia => <FrontPageMedia mediaInfo={trendingMedia} />)}
+                            {trending.map( (trendingMedia,index) => <FrontPageMedia key={index} mediaInfo={trendingMedia} />)}
                         </div>
 
                         <h3>Popular Movies</h3>                        
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                            {popularMovies.map( movie => <FrontPageMedia mediaInfo={movie} />)}
+                            {popularMovies.map( (movie,index) => <FrontPageMedia key={index} mediaInfo={movie} />)}
                         </div>
 
                         <h3>Popular TV</h3>                        
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                            {popularTV.map( tv => <FrontPageMedia mediaInfo={tv} />)}
+                            {popularTV.map( (tv,index) => <FrontPageMedia key={index} mediaInfo={tv} />)}
                         </div>
 
                         <h3>Popular Actors</h3>                        
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px'}}>
-                            {popularActor.map( actor => <FrontPageActors actorInfo={actor}/>)}
+                            {popularActor.map( (actor,index) => <FrontPageActors key={index} actorInfo={actor}/>)}
                         </div>
                     </>
                     :
@@ -221,9 +220,9 @@ const ManyMedia = () => {
                         Search based off input: <b>{searchInputValue}</b>
                     </p>
 
-                    {newMediaFromSearch ? newMediaFromSearch.map(newMedia => 
+                    {newMediaFromSearch ? newMediaFromSearch.map((newMedia,index) => 
                         <Button
-                            onClick={() => console.log(newMedia)}
+                            key={index}
                             style={{
                                 display: 'flex',
                                 justifyContent: 'space-between',

@@ -66,7 +66,6 @@ const SingleMedia = () => {
             userMetadata().then(res => {
                 let lists = []
                 res.groups.map(groups => groups.lists.map(list => {
-                    console.log(list)
                     if(list.listMembers.some(member => member.username === ctx.userInfo.username))   
                         lists = [...lists, list] 
                 }))
@@ -80,8 +79,6 @@ const SingleMedia = () => {
         setPageReady(false);
         const setup = async(type, id) => {
             await getFromTMDB(`${type}/${id}`).then((res)=>{
-                console.log(res);
-                
                 const mediaID = res.id;
                 const mediaType = res.release_date ? 'movie' : 'tv';
                 addMediaByIDAndType(mediaID, mediaType).then(res => {
@@ -89,7 +86,6 @@ const SingleMedia = () => {
                     userMetadata().then(results => {
                         let lists = []                        
                         results.groups.map(groups => groups.lists.map(list => {
-                            console.log(list)
                             if(list.listMembers.some(member => member.username === ctx.userInfo.username))   
                                 lists = [...lists, list] 
                         }))
@@ -103,8 +99,8 @@ const SingleMedia = () => {
                     const YTvids = res.results.filter(res => res.site==="YouTube" && res.name.toLowerCase().includes('trailer'));
                     YTvids.length > 0 ? setTrailer(`https://www.youtube.com/embed/${YTvids[0].key}`) : setTrailer(null)
                 })
-                getFromTMDB(`${type}/${res.id}/credits`).then((res) => { console.log(res); setCast(res.cast)});
-                getFromTMDB(`${type}/${res.id}/similar`).then((res) => { console.log(res); setSimilarMedia(res.results); setPageReady(true);});
+                getFromTMDB(`${type}/${res.id}/credits`).then((res) => setCast(res.cast));
+                getFromTMDB(`${type}/${res.id}/similar`).then((res) => {setSimilarMedia(res.results); setPageReady(true);});
             })  
         }
         if(mediaType && tmdbID)
@@ -168,25 +164,25 @@ const SingleMedia = () => {
                     </div>
                     <div style={{ width: '65%' }}>
                         {currentMedia.title ? (
-                            <h4 class='singleMediaHeader'>{currentMedia.title}</h4>
+                            <h4 className='singleMediaHeader'>{currentMedia.title}</h4>
                         ) : (
-                            <h4 class='singleMediaHeader'>{currentMedia.name}</h4>
+                            <h4 className='singleMediaHeader'>{currentMedia.name}</h4>
                         )}
                         {currentMedia.release_date ? (
-                            <i class='singleMediaHeader'>
+                            <i className='singleMediaHeader'>
                                 {currentMedia.release_date.replaceAll('-', '/')}
                             </i>
                         ) : (
-                            <i class='singleMediaHeader'>
+                            <i className='singleMediaHeader'>
                                 {currentMedia.first_air_date.replaceAll(
                                     '-',
                                     '/'
                                 )}
                             </i>
                         )}
-                        <p class='singleMediaHeader'>
-                            {currentMedia.genres.map((genre) => (
-                                <i>{genre.name} </i>
+                        <p className='singleMediaHeader'>
+                            {currentMedia.genres.map((genre,index) => (
+                                <i key={index}>{genre.name} </i>
                             ))}
                         </p>
                         <Button
@@ -239,15 +235,15 @@ const SingleMedia = () => {
                     <h3>Cast</h3>
                     <div>
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px', maxWidth:'350px', alignItems:'start',}}>
-                            {cast ?  cast.map(c =>
-                                <div style={{display:'flex', flexDirection:'column', margin:'0 10px'}}>
-                                    {c.profile_path ?
-                                        <img style={{width:'120px'}} src={`https://www.themoviedb.org/t/p/original/${c.profile_path}`}/>
+                            {cast ?  cast.map((cast,index) =>
+                                <div key={index} style={{display:'flex', flexDirection:'column', margin:'0 10px'}}>
+                                    {cast.profile_path ?
+                                        <img style={{width:'120px'}} src={`https://www.themoviedb.org/t/p/original/${cast.profile_path}`}/>
                                         :
                                         <Skeleton variant="rectangular" width={120} height={180} />
                                     }
-                                    <b style={{margin:0}}>{c.name}</b>
-                                    <i style={{margin:0}}>{c.character}</i>
+                                    <b style={{margin:0}}>{cast.name}</b>
+                                    <i style={{margin:0}}>{cast.character}</i>
                                 </div>
                             ):null}
                         </div>
@@ -256,8 +252,8 @@ const SingleMedia = () => {
                     <h3>Similar Media</h3>
                     <div style={{paddingBottom:'150px'}}>
                         <div className='frame' style={{display:'flex', overflow:'scroll', padding:'10px', maxWidth:'350px', alignItems:'start',}}>
-                            {similarMedia ?  similarMedia.map(media =>
-                                <div style={{display:'flex', flexDirection:'column', margin:'0 10px'}}>
+                            {similarMedia ?  similarMedia.map((media,index) =>
+                                <div key={index} style={{display:'flex', flexDirection:'column', margin:'0 10px'}}>
                                     <FrontPageMedia mediaInfo={media} />
                                 </div>
                             ):null}
@@ -274,8 +270,8 @@ const SingleMedia = () => {
                 <Box sx={style}>
                     <h2>Add To List</h2>
                     <div style={{display:'flex', flexDirection:'column'}}>
-                    {userLists.map(list => 
-                        <Button onClick={()=>addMediaToList(list.listID)} style={{color:'white', backgroundColor:'#6C63FF', margin:'5px'}} >{list.listName}</Button>    
+                    {userLists.map((list,index) => 
+                        <Button key={index} onClick={()=>addMediaToList(list.listID)} style={{color:'white', backgroundColor:'#6C63FF', margin:'5px'}} >{list.listName}</Button>    
                     )}
                     </div>
                 </Box>

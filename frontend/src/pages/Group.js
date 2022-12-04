@@ -81,7 +81,7 @@ const Group = () => {
         }
         createNewList()
         //functions as no-op?
-        userMetadata().then((res) => console.log(res))
+        userMetadata().then((res) => console.log('no-op'))
         handleClose()
     }
 
@@ -93,7 +93,7 @@ const Group = () => {
             return
         
         const add = async() => {
-            await addFriendToGroup(friendID, groupInfo.groupID).then(res=>console.log(res));
+            await addFriendToGroup(friendID, groupInfo.groupID);
             await userMetadata().then(res=>{
                 setGroupInfo(res.groups.filter(group => group.groupID === groupInfo.groupID)[0])
                 setIntermediateFriendsList(intermediateFriendsList.filter(friend => friend.id !== friendID))
@@ -144,8 +144,8 @@ const Group = () => {
             <h1>{groupInfo.groupName}</h1>
 
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap:'wrap'}}>
-                {groupInfo.members.map((member) => (
-                    <Link to={member.id === ctx.userInfo.id ? `/user/${member.id}` : `/user/friend/${member.id}`}>
+                {groupInfo.members.map((member, index) => (
+                    <Link key={index} to={member.id === ctx.userInfo.id ? `/user/${member.id}` : `/user/friend/${member.id}`}>
                         <Avatar
                             style={{ margin: '5px' }}
                             alt={member.username.toUpperCase()}
@@ -181,8 +181,8 @@ const Group = () => {
                     
                     <TextField onChange={(e)=>handleFilterFriends(e.target.value)} fullWidth id="filled-basic" placeholder="Search Friend" variant="filled"/>
                     <div style={{display:'flex', flexDirection:'column', overflow:'scroll', padding:'5px'}}>
-                        {intermediateFriendsList?.map(friend => 
-                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                        {intermediateFriendsList?.map((friend,index) => 
+                            <div key={index} style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
                                 {friend.profileImageID !== null ? 
                                     <img style={{maxWidth:'40px', borderRadius:'50%', margin:'15px'}} src={`/profileImages/${friend.profileImageID}.jpg`}/> 
                                     : 
@@ -230,8 +230,9 @@ const Group = () => {
                                     {list.listName}
                                 </Link>
                                 <AvatarGroup max={2}>
-                                    {list.listMembers.map((member) => (
+                                    {list.listMembers.map((member, index) => (
                                         <Avatar
+                                            key={index}
                                             alt={member.username.toUpperCase()}
                                             src={`/profileImages/${member.profileID}.jpg`}
                                         />

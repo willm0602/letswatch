@@ -84,14 +84,12 @@ const ListOfMedia = () => {
     }
 
     const handlePageTransition = (mediaInfo) => {
-        console.log(mediaInfo);
         mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
     };
 
     const handleMediaNotFound = () => {
         handleOpen()
-        const searchMedia = async (search) =>
-            await mediaSearch(search).then((res) => {console.log(res);setNewMediaFromSearch(res)})
+        const searchMedia = async (search) => await mediaSearch(search).then((res) => setNewMediaFromSearch(res))
         searchMedia(searchInputValue)
     }
 
@@ -115,9 +113,6 @@ const ListOfMedia = () => {
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
                 userMetadata().then((res) => {
-                    console.log(res)
-                    console.log(listContent)
-                    console.log(listIdx)
                     ctx.setUserInfo(res)
                     setListContent([
                         ...res.groups[groupIdx].lists[listIdx].media,
@@ -129,7 +124,7 @@ const ListOfMedia = () => {
             )
         }
         createNewListItem(mediaToAdd.id)
-        userMetadata().then((res) => console.log(res)) //no op
+        userMetadata().then((res) => console.log('no-op')) //no op
     }
 
     const newHandleClick = (mediaID) => {
@@ -154,7 +149,7 @@ const ListOfMedia = () => {
             )
         }
         creatNewListItem()
-        userMetadata().then((res) => console.log(res)) //no op
+        userMetadata().then((res) => console.log('no-op')) //no op
     }
 
     const handleRemove = (mediaIDtoRemove) => {
@@ -173,7 +168,7 @@ const ListOfMedia = () => {
             await removeMediaFromWatchList(listID, mediaIDtoRemove);
         }
         removeItem()
-        userMetadata().then((res) => console.log(res));//no op
+        userMetadata().then((res) => console.log('no-op'));//no op
     }
 
     const handleJoinList = () => {
@@ -205,8 +200,8 @@ const ListOfMedia = () => {
                 <h1>{listInfo.listName}</h1>
                 <h2>List members:</h2>
                 <Stack direction="row">
-                    {listInfo.listMembers.map((member) => (
-                        <Link to = {member.id === ctx.userInfo.id ? `/user/${member.id}`:`/user/friend/${member.id}`}>
+                    {listInfo.listMembers.map((member,index) => (
+                        <Link key={index} to = {member.id === ctx.userInfo.id ? `/user/${member.id}`:`/user/friend/${member.id}`}>
                             <Avatar
                                 style={{
                                     margin: '15px 5px',
@@ -299,7 +294,7 @@ const ListOfMedia = () => {
                 <Box>
                     <List>
                         {listContent.map((mediaItem, mediaIndex) => (
-                            <ListItem>
+                            <ListItem key={mediaIndex}>
                                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
                                     <div style={{display: 'flex', flexDirection: 'column'}}>
                                         <Link to={`/media/${mediaItem.type}/${mediaItem.tmdbID}`} onClick={() => handlePageTransition(mediaItem)} >
@@ -404,8 +399,8 @@ const ListOfMedia = () => {
                         {newMediaFromSearch ? (
                             newMediaFromSearch.map(
                                 (newMedia, newMediaIndex) => (
-                                    
                                     <div
+                                        key={newMediaIndex}
                                         style={{
                                             display: 'flex',
                                             padding: '15px',

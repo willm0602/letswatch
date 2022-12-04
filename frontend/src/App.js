@@ -1,6 +1,5 @@
 import './App.css'
-import React, { useContext, useEffect } from 'react'
-
+import React, { useContext } from 'react'
 import { UserContext } from './contextSetup'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'

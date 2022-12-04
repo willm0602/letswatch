@@ -51,7 +51,7 @@ const Groups = () => {
         }
         createNewGroup()
         //no idea why this works :shrug:
-        userMetadata().then((res) => console.log(res))
+        userMetadata().then((res) => console.log('no-op'))
         handleClose()
     }
 
@@ -86,7 +86,7 @@ const Groups = () => {
                         <Box style={{ margin: 'auto' }}>
                             <List>
                                 {userGroups.map((group, groupIndex) => (
-                                    <ListItem>
+                                    <ListItem key={groupIndex}>
                                         <Paper
                                             style={{
                                                 display: 'flex',
@@ -114,8 +114,9 @@ const Groups = () => {
                                             </Link>
 
                                             <AvatarGroup max={2}>
-                                                {group.members.map((member) => (
+                                                {group.members.map((member,index) => (
                                                     <Avatar
+                                                        key={index}
                                                         alt={member.username.toUpperCase()}
                                                         src={`/profileImages/${member.profileID}.jpg`}
                                                     />
