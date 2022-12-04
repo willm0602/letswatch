@@ -1,4 +1,3 @@
-import {useNavigate} from 'react-router-dom';
 import { Stack, FilledInput, ToggleButtonGroup, ToggleButton, Button, Box} from "@mui/material";
 import { Fragment, useState } from "react";
 import { login, signup} from "../APIInterface/AccountManagement";
@@ -18,6 +17,29 @@ const Login = () => {
         setUsernameError(false);
         setPasswordError(false);
         setCPasswordError(false);
+        const submitLogin = async() => {
+            await login(username, password)
+                .then(
+                    (value) => {
+                        if(value.status === "FAIL"){
+                            alert("Login Failed\nUsername/Password Incorrect\n")
+                        }
+                    }
+                )
+        }
+
+        const submitSignup = async() => {
+            await signup(username, password)
+                .then(
+                    (value) => {
+                        if(value.status === 'FAIL'){
+                            alert(value.data);
+                        } else {
+                            console.log("Success")
+                        }
+                    }
+                )
+        }
 
         if(action === 'Login'){
             if(username === '') { 
@@ -26,7 +48,7 @@ const Login = () => {
             if(password === '') { 
                 setPasswordError(true);
             } else {
-                login(username, password);
+                submitLogin();
             }
         } else if( action === 'Register') {
             if(password === '') { 
@@ -38,7 +60,7 @@ const Login = () => {
             if(username === '') { 
                 setUsernameError(true);
             } else if(!cPasswordError && !passwordError) {
-                signup(username, password);
+                submitSignup();
             }
         }
     }
@@ -54,9 +76,10 @@ const Login = () => {
     }
 
     return (
-        <div className="LoginPage">
+        <div className="LoginPage"
+        >
             <img
-                style={{ maxWidth: '350px', marginTop: '2%' }}
+                style={{ maxWidth: '300px', marginTop: '2%' }}
                 src="/loginImageMan.svg"
                 alt="whoopsies"
             />

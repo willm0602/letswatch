@@ -45,7 +45,6 @@ import Snackbar from '@mui/material/Snackbar';
 
 const Home = () => {   
     const ctx = useContext(UserContext)
-    console.log(ctx)
     const [userFriends, setUserFriends] = useState(null);
     const [currentFriendUsername, setCurrentFriendUesrname] = useState(null);
     const [friendRequests, setFriendRequets] = useState(null); 

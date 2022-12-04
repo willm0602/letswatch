@@ -7,7 +7,7 @@ import { Box, List, ListItem, Paper, AvatarGroup, Avatar, Button, Stack, Dialog,
 import { deleteAccessToken } from '../LocalStorageInterface'
 import { padding } from '@mui/system'
 import { userMetadata } from '../APIInterface/GetUserData'
-import { changeBio } from '../APIInterface/UserProfileEdits'
+import { changeBio, changeImage } from '../APIInterface/UserProfileEdits'
 
 
 const User = () => {
@@ -18,11 +18,8 @@ const User = () => {
     const [modolOpen, setModolOpen] = useState(false);
     const [userLists, setUserLists] = useState([]);
     const [imageModolOpen, setImageModolOpen] = useState(false);
-    const imageArray = [...Array(20).keys()]
-
-    const handleClick = (event) => {
-        setImageModolOpen(!imageModolOpen);
-    }
+    const imageArray = [...Array(20).keys()];
+    const [imageChoice, setImageChoice] = useState([]);
 
     const handleModolClick = () => {
         setModolOpen(!modolOpen);
@@ -46,35 +43,67 @@ const User = () => {
     const submitBio = () => {
         setBio(bio.replaceAll("'", "''"));
         const submitBioRequest = async() => {
-            await changeBio(userInfo.id, bio)
-                .catch(err => console.log(err))
-                .then(res => console.log(res))
+            await changeBio(bio)
+                .then(
+                    () => { console.log('Update Complete')},
+                    () => { alert("Hmm, looks like the bio could't be changed. \nPlease try again");}
+                )
         }
-        if (submitBioRequest())
-        {
-            userInfo.bio = bio;
-        } else {
-            alert("Hmm, looks like the bio could't be changed. \nPlease try again");
-        }
+        submitBioRequest();
         handleModolClick();
     }
 
-    const handleImageChoiceClick = (iSrc) => {
-        console.log(iSrc)
+    const handleClick = (event) => {
+        if(!imageModolOpen){
+            setImageChoice([userInfo.profileID]);
+        }
+        setImageModolOpen(!imageModolOpen);
+    }
 
+    const handleImageChoiceClick = (iSrc) => {
+        const last = iSrc.lastIndexOf('/');
+        const ext = iSrc.indexOf('.jpg');
+        const newImage = Number(iSrc.substring((last + 1),ext));
+        setImageChoice([newImage]);
+    }
+
+    const submitImageChoice = () => {
+        const newImage = imageChoice[0];
+        const submitImageChoiceRequest = async() => {
+            await changeImage(newImage)
+                .then(
+                    () => { console.log('Update Complete')},
+                    () => { alert("Hmm, looks like image couldn't be changed.\nPlease try again");}
+                )
+        }
+        submitImageChoiceRequest();
+        handleClick();
     }
 
     useEffect(()=>{
         const setup = async() =>{
             await userMetadata().then(res=> {
                 setUserInfo(res);
+                let groupPosition = 0;
                 let holdList=[];
-                res.groups.map(groups =>  groups.lists.map(list => holdList=([...holdList, list])))
+                res.groups.map((groups) =>  {
+                    let listPosition = 0;
+                    groups.lists.map(list => {
+                        list.groupID = groups.groupID;
+                        list.groupName = groups.groupName;
+                        list.groupIdx = groupPosition;
+                        list.listIdx = listPosition;
+                        holdList=([...holdList, list])
+                        listPosition += 1;
+                        }
+                    )
+                    groupPosition += 1;
+                })
                 setUserLists(holdList.slice(0,5));
             });
         }
         setup()
-    },[])
+    },[userInfo])
 
     return ( 
         userInfo ?
@@ -208,16 +237,34 @@ const User = () => {
                             justifyContent="center"
                             alignItems = "center"
                         >
-                            <h4>Current Profile Image</h4>
-                            <img
-                                style={{ 
-                                    maxWidth: '100px', 
-                                    borderRadius: '50%', 
-                                    marginTop: "0px"
-                                }}
-                                src={`/profileImages/${userInfo.profileID}.jpg`}
-                                alt={`${userInfo.profileID}.jpg`}
-                            />
+                            {(imageChoice[0] === userInfo.profileID) &&
+                                <>
+                                    <h4>Current Profile Image</h4>
+                                    <img
+                                        style={{ 
+                                            maxWidth: '100px', 
+                                            borderRadius: '50%', 
+                                            marginTop: "0px"
+                                        }}
+                                        src={`/profileImages/${userInfo.profileID}.jpg`}
+                                        alt={`${userInfo.profileID}.jpg`}
+                                    />
+                                </>
+                            }
+                            {(imageChoice[0] !== userInfo.profileID) &&
+                                <>
+                                    <h4>New Profile Image Choice</h4>
+                                    <img
+                                        style={{ 
+                                            maxWidth: '100px', 
+                                            borderRadius: '50%', 
+                                            marginTop: "0px"
+                                        }}
+                                        src={`/profileImages/${imageChoice[0]}.jpg`}
+                                        alt={`${imageChoice[0]}.jpg`}
+                                    />
+                                </>
+                            }
                             <h4>Profile Image Choices</h4>
                         </Grid>
                     </DialogTitle>
@@ -236,7 +283,6 @@ const User = () => {
                                 {imageArray.map((index) => (
                                     <Grid
                                         item
-                                        direction = "column"
                                         alignItems = "center"
                                         justifyContent = "center"
                                         sx = {{padding: "8px"}}
@@ -258,11 +304,18 @@ const User = () => {
                         >
                             Cancel
                         </Button>
+                        {(imageChoice[0] === userInfo.profileID) &&
                         <Button
                             disabled
                         >
                             Submit
-                        </Button>
+                        </Button>}
+                        {(imageChoice[0] !== userInfo.profileID) &&
+                        <Button
+                            onClick={submitImageChoice}
+                        >
+                            Submit
+                        </Button>}
                     </DialogActions>
                 </Dialog>
                 <hr />
@@ -290,12 +343,13 @@ const User = () => {
                                                 >
                                                     <Link
                                                         to={`/list/${list.listID}`}
-                                                        /*
                                                         state = {{
                                                             list: list,
-                                                            listIdx: index
+                                                            groupName: list.groupName,
+                                                            groupID: list.groupID,
+                                                            groupIdx: list.groupIdx,
+                                                            listIdx: list.listIdx
                                                         }}
-                                                        */
                                                         style={{
                                                             margin: 'auto',
                                                             textDecoration: 'none',

@@ -23,10 +23,10 @@ Parameters (passed through ctx)
 */
 async function signup(ctx, next) {
     const params = ctx.request.query
-    const defaultProfileImage = undefined
-    const defaultProfileBio = ''
-    const username = params.username
-    const password = params.password
+    const defaultProfileImage = 0;
+    const defaultProfileBio = "";
+    const username = params.username;
+    const password = params.password;
     const joinDate = new Date()
     const accessTokenLen = 32
 
@@ -49,8 +49,11 @@ async function signup(ctx, next) {
 
     return new Promise(async (res, rej) => {
         const userExists = await usernameTaken(username)
-        if (userExists) return rej('Error: User Already Exists')
-        const execution = conn.query(
+        if (userExists) {
+            ctx.body = apiResponse(false, 'User Already Exists')
+            return rej('Error: User Already Exists')
+        }
+            const execution = conn.query(
             {
                 sql: query,
                 values: [
@@ -107,7 +110,7 @@ async function login(ctx, next) {
             return res('Succesfully logged in')
         }
         ctx.body = apiResponse(false, {})
-        return rej('Failed to sign in')
+        return rej(alert('Failed to sign in'))
     })
 }
 
