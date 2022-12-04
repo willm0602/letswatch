@@ -258,7 +258,7 @@ const Lists = () => {
                     </TextField>
                     <TextField
                         id="filled-basic"
-                        label="Group Name"
+                        label="List Name"
                         variant="filled"
                         value={newListName}
                         onChange={(e) => {
