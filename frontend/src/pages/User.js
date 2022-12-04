@@ -282,6 +282,7 @@ const User = () => {
                             >
                                 {imageArray.map((index) => (
                                     <Grid
+                                        key={index}
                                         item
                                         alignItems = "center"
                                         justifyContent = "center"
@@ -359,8 +360,9 @@ const User = () => {
                                                         {list.listName}
                                                     </Link>
                                                     <AvatarGroup max={2}>
-                                                        {list.listMembers.map((member) => (
+                                                        {list.listMembers.map((member,index) => (
                                                             <Avatar
+                                                                key={index}
                                                                 alt={member.username.toUpperCase()}
                                                                 src={`/profileImages/${member.profileID}.jpg`}
                                                             />
@@ -414,8 +416,9 @@ const User = () => {
                                             {group.groupName}
                                         </Link>
                                         <AvatarGroup max={2}>
-                                            {group.members.map((member) => (
+                                            {group.members.map((member,index) => (
                                                 <Avatar
+                                                    key={index}
                                                     alt={member.username.toUpperCase()}
                                                     src={`/profileImages/${member.profileID}.jpg`}
                                                 />

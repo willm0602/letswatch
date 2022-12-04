@@ -42,9 +42,6 @@ const ListAutoCompleteBar = () => {
             const listID = ctx.userInfo.groups[groupIdx].lists[listIdx].listID
             await addMediaToWatchlist(listID, mediaID).then((res) =>
                 userMetadata().then((res) => {
-                    console.log(res)
-                    console.log(listContent)
-                    console.log(listIdx)
                     ctx.setUserInfo(res)
                     setListContent([
                         ...res.groups[groupIdx].lists[listIdx].media,
@@ -54,13 +51,10 @@ const ListAutoCompleteBar = () => {
             )
         }
         creatNewListItem()
-        userMetadata().then((res) => console.log(res)) //no op
+        userMetadata().then((res) => console.log('no-op')) //no op
     }
 
-    const handlePageTransition = (mediaInfo) => {
-        console.log(mediaInfo);
-        mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID})
-    };
+    const handlePageTransition = (mediaInfo) => mediaInfo.tmdb_id ? ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdb_id}) : ctx.setCurrentMediaPage({...mediaInfo, id:mediaInfo.tmdbID});
 
     const handleMediaNotFound = () => {
         handleOpen()

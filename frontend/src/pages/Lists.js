@@ -81,6 +81,7 @@ const Watchlist = ({ watchlistData }) => {
                     {watchlistData.listMembers.map((member, idx) => {
                         return (
                             <ProfileImage
+                            key={idx}
                             profileID={member.profileID}
                             username={member.username}
                             otherStyles={{
@@ -139,7 +140,6 @@ const Lists = () => {
             }
             setWatchlists(newListOfLists)
             setUserGroups(groups);
-            console.log('new groups list is', userGroups);
         })
     }
 
@@ -211,8 +211,8 @@ const Lists = () => {
                     .filter((watchList) => {
                         return watchList.listName.toLowerCase().includes(currentSearch.toLowerCase())
                     })
-                    .map((list) => {
-                        return <Watchlist watchlistData={list} />
+                    .map((list, index) => {
+                        return <Watchlist key={index} watchlistData={list} />
                     })}
             </Grid>
             
@@ -244,12 +244,11 @@ const Lists = () => {
                         select
                         onChange={(e) => {
                             setModalSelectedGroup(e.target.value);
-                            console.log(modalSelectedGroup);
                         }}
                         label='Select Group'
                         fullWidth
                         >
-                        {userGroups.map((group) => {
+                        {userGroups.map((group,index) => {
                             return <MenuItem value={group} key={`group-${group.id}`}
                             >
                                 {group.groupName}

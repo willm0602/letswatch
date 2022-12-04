@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { getFriends, sendFriendRequest, getAllFriendRequests, acceptFriendRequest, denyFriendRequest } from '../APIInterface/Friendships';
-import { Modal } from '@mui/material'
+import { Autocomplete, Modal } from '@mui/material'
 import Snackbar from '@mui/material/Snackbar';
 
 /*
@@ -40,7 +40,7 @@ import Snackbar from '@mui/material/Snackbar';
         [x] add snackbar for feedback
         [x] add follow through to single media page from extended search on list page
         [x] friend profiles
-        [] fix single media top space to look more consistent
+        [x] fix single media top space to look more consistent
 */
 
 const Home = () => {   
@@ -81,8 +81,6 @@ const Home = () => {
     const handleCloseSnackBar = () => setOpenSnackBar(false);
 
     const handleAddFriend = () => {
-        console.log(currentFriendUsername);
-
         if(currentFriendUsername === ctx.userInfo.username){
             handleOpenSnackBarAddYourself()
             return;
@@ -101,25 +99,17 @@ const Home = () => {
                     handleCloseModal();
                 })
         }
-        console.log(currentFriendUsername);
         sendRequest();
     }
 
     const handleApproveFriendRequest = (requestID) => {
         acceptFriendRequest(requestID);
-        console.log(`approve request for id: ${requestID}`);
         setFriendRequets(friendRequests.filter(friend => friend.id !== requestID))
-        
-        const updateRequests = async() => {
-            await getFriends().then(res => setUserFriends(res));
-        }
+        const updateRequests = async() => await getFriends().then(res => setUserFriends(res));
         updateRequests();
     }
 
     const handleDenyFriendRequest = (requestUsername) => {
-        console.log(`deny request for id: ${requestUsername}`);
-
-        
         const updateFriends = async() => {
             await denyFriendRequest(requestUsername).then( _ =>
                 getAllFriendRequests().then(res=>setFriendRequets(res))
@@ -225,8 +215,9 @@ const Home = () => {
                                     {group.groupName}
                                 </Link>
                                 <AvatarGroup max={2}>
-                                    {group.members.map((member) => (
+                                    {group.members.map((member,index) => (
                                         <Avatar
+                                            key={index}
                                             alt={member.username.toUpperCase()}
                                             src={`/profileImages/${member.profileID}.jpg`}
                                         />
